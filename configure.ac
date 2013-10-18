@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([Infinity plugin],[0.7.1],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
+AC_INIT([Infinity plugin],[0.8.0beta1],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
 AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
 
 INF_MSG_MMX_NOT_ALLOWED="
@@ -208,6 +208,16 @@ fi
 
 AC_SUBST(INF_CFLAGS_EXTRA)
 
+AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libSDL.so",
+# Ubuntu on AMD64 puts libraries into x86_64-linux-gnu/
+  libdir="${libdir}/x86_64-linux-gnu/audacious/Visualization",
+  libdir="${libdir}/audacious/Visualization"
+)
+
+pkglibdir="${libdir}"
+AC_SUBST(libdir)
+AC_SUBST(pkglibdir)
+
 AC_CONFIG_FILES([Makefile
 		 po/Makefile.in
                  src/Makefile])
@@ -218,7 +228,7 @@ echo "
 Infinity Plugin for the Audacious Player -- version $VERSION
 =========================================================
 
-Install path           : ${prefix}/lib/audacious/Visualization
+Install path           : ${libdir}
 Compiler               : ${CC}
 CFLAGS		       : ${INF_CFLAGS_EXTRA} ${CFLAGS}
 Debug enabled          : ${debug}

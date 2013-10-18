@@ -3,11 +3,9 @@
 lib_LTLIBRARIES = libinfinite.la
 data_DATA = infinite_states
 
-libdir = $(prefix)/lib/audacious/Visualization
 datadir = $(prefix)/share/audacious
 
-# translations go in the infinity's own directory
-# not in xmms directory
+# translations go into infinity's own directory not in audacious directory
 infinity_datadir = @datadir@
 localedir = $(infinity_datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@

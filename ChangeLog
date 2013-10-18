@@ -1,7 +1,9 @@
 2013-10-18  Duilio Protti  <dprotti@users.sourceforge.net>
 
-	Repository moved to Github
+	* Repository moved to Github
 	https://github.com/dprotti/infinity-plugin
+	* configure.ac: version bumped to 0.8.0beta1. Build fix for Ubuntu
+	on AMD64.
 
 2011-11-25  Duilio Protti  <dprotti@users.sourceforge.net>
 
