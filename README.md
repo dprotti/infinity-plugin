@@ -1,11 +1,7 @@
 Infinity Visualization Plugin
------------------------------
+=============================
 
 https://github.com/dprotti/infinity-plugin
-
-by
-- Julien Carme (c) 2000
-- Duilio Protti (c) 2004 - 2013
 
 Infinity is a visualization plugin that generates light effects according to a
 playing sound.
@@ -38,9 +34,9 @@ To enter/leave Full-Screen mode press Tab key.
 Modes
 -----
 
-The plugin has two modes. Default is non-interactive.
+The plugin has two modes. Default is Non-Interactive.
 
-- Non-Interactive Mode:
+**Non-Interactive Mode**:
 
 States and palettes periodically switches in a random sequence.
 
@@ -62,7 +58,7 @@ terminal when Infinity loads:
   - F11:   	screenshot.
   - F12:   	change palette.
 
-- Interactive Mode:
+**Interactive Mode**:
 
 You can control the effects using keys:
 
@@ -91,6 +87,18 @@ In Ubuntu systems over AMD64 architectures, try running configure with
 
 If you found a bug please report it at
 <https://github.com/dprotti/infinity-plugin/issues>.
+
+Authors
+-------
+
+- Julien Carme (c) 2000 Original author
+- Duilio Protti (C) 2004 - 2013 <dprotti@users.sourceforge.net> Actual maintainer
+- John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
+- Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
+- Will Tatam (C) 2004 <wtatam@premierit.com> Online source RPMs <http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/>
+- Haavard Kvaalen (C) 2000 <havardk@xmms.org> Converted original hand made Makefile to automake/autoconf/libtool
+- Chris Lea (C) 2000 <chrislea@luciddesign.com> Made RPMs
+- Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si> Misc optimisations
 
 Old Versions
 ------------

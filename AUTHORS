@@ -1,36 +1,11 @@
 
 Infinity Visualization Plugin
 
-Copyright (C) 2000 Julien Carme <julien.carme@acm.org>
-
-Copyright (C) 2004 Duilio Protti <dprotti@users.sourceforge.net>
-			Actual maintainer.
-Copyright (C) 2004 John Lightsey with GPL v2 <john@nixnuts.net>
-			Portability fixes and GPL License compliance.
-Copyright (C) 2004 Jean Delvare  <khali@linux-fr.org>
-			Some nice patches.
-Copyright (C) 2004 Will Tatam <wtatam@premierit.com>
-			Who put online source's RPMs at:
-			http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/
-Copyright (C) 2000 Haavard Kvaalen <havardk@xmms.org>
-			Who converted the original hand made
-			Makefile to automake/autoconf/libtool.
-Copyright (C) 2000 Chris Lea <chrislea@luciddesign.com>
-			Made RPMs.
-Copyright (C) 2000 Mitja Horvat <Mitja.Horvat@hermes.si>
-			Some optimisations.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Library General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-
+- Julien Carme (c) 2000 Original author
+- Duilio Protti (C) 2004 - 2013 <dprotti@users.sourceforge.net> Actual maintainer
+- John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
+- Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
+- Will Tatam (C) 2004 <wtatam@premierit.com> Online source RPMs <http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/>
+- Haavard Kvaalen (C) 2000 <havardk@xmms.org> Converted original hand made Makefile to automake/autoconf/libtool
+- Chris Lea (C) 2000 <chrislea@luciddesign.com> Made RPMs
+- Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si> Misc optimisations
