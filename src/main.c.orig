@@ -1,0 +1,168 @@
+/**
+ * \file main.c
+ *
+ * \brief The main module of Infinity plugin.
+ *
+ * The only thing that a XMMS visualization plugin has to do
+ * (from the point of view of XMMS) is to export a function called
+ * get_vplugin_info() wich returns a pointer to a VisPlugin structure.
+ * This struct is defined in xmms/plugin.h. It contains pointers to
+ * functions which will be called on the ocurrence of certain events.
+ */
+
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+#include <string.h>
+#include <xmms/plugin.h>
+#include <xmms/configfile.h>
+#include <xmms/util.h>
+#include <gtk/gtk.h>
+
+#include "config.h"
+#include "infconfig.h"
+#include "renderer.h"
+#include "gettext.h"
+
+
+VisPlugin *get_vplugin_info(void);
+
+
+static void plugin_init (void);
+static void plugin_close (void);
+static void plugin_about (void);
+
+/**
+ * Structure shared with XMMS in order to register and get information
+ * about the plugin.
+ *
+ * The \a VisPlugin type is defined on <xmms/plugin.h>. XMMS will 
+ * obtain a reference to this structure calling ::get_vplugin_info()
+ * when started.
+ */
+static VisPlugin sdlblur_vp = {
+	NULL,		/**< Handle, filled in by xmms */
+	NULL,		/**< Filename, filled in by xmms */
+	0,			/**< XMMS Session ID, filled in by XMMS */
+	"Infinity " PACKAGE_VERSION, /**< description */
+	2,			/**< Number of PCM channels wanted */
+	0,			/**< Number of freq channels wanted */
+	plugin_init,	/**< Called when plugin is enabled */
+	plugin_close,	/**< Called when plugin is disabled */
+	plugin_about,		/**< Show the about box */
+	config_plugin_config_window, /**< Show the configure box */
+	NULL,		/**<
+			   void (*disable_plugin)(struct _VisPlugin *)
+			   
+			   Called to disable plugin, filled in by XMMS.
+			   Must be called with a pointer to our plugin
+			   struct to disable the plugin */
+	NULL,	        /**< Called when playback starts */
+	NULL,		/**< Called when playback stops */
+	renderer_set_pcm_data, /**< Render the PCM data */
+	NULL,		/**< Render the freq data */
+};
+
+
+static void plugin_init(void)
+{
+#if ENABLE_NLS
+	(void) setlocale (LC_MESSAGES, "");
+	(void) bindtextdomain (PACKAGE, LOCALEDIR);
+	(void) textdomain (PACKAGE);
+#endif
+
+	g_message (_("Infinity commands:\n"
+		     "- Space:\tchange effect.\n"
+		     "- Tab:\t\ttoggle full-screen.\n"
+		     "- Up/Down:\tup/down xmms main volume.\n"
+		     "- Left/Right:\treward/forward actual played song, if any.\n"
+		     "- z:\t\tprevious song.\n"
+		     "- x:\t\tplay.\n"
+		     "- c:\t\tpause.\n"
+		     "- v:\t\tstop.\n"
+		     "- b:\t\tnext song.\n"
+		     "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
+		     "- F11:\t\tscreenshot.\n"
+		     "- F12:\t\tchange palette."));
+	config_plugin_load_prefs ();
+	renderer_set_plugin_info (&sdlblur_vp);
+	renderer_init ();
+}
+
+
+static void plugin_close (void)
+{
+	config_plugin_save_prefs ();
+	renderer_finish ();
+}
+
+static void dummy (GtkWidget *widget, gpointer data)
+{
+}
+
+static void plugin_about (void)
+{
+	GtkWidget *window_about;
+
+#if ENABLE_NLS    
+	(void) setlocale (LC_MESSAGES, "");
+	(void) bindtextdomain (PACKAGE, LOCALEDIR);
+	(void) textdomain (PACKAGE);
+#endif
+
+	window_about = xmms_show_message (_("About Infinity"),
+					  _("\n" PACKAGE_STRING "\n"
+					    "\n<http://infinity-plugin.sf.net>\n"
+					    "\nCopyright (C) 2000, Julien Carme.\n"
+					    "Email: <julien.carme@acm.org>\n"
+					    "\n"
+					    "Duilio J. Protti <dprotti@fceia.unr.edu.ar>\n"
+					    "Actual maintainer\n"
+					    "\n"
+					    "This program is free software; you can redistribute it and/or modify\n"
+					    "it under the terms of the GNU General Public License as published by\n"
+					    "the Free Software Foundation; either version 2 of the License, or\n"
+					    "(at your option) any later version.\n"
+					    "\n"
+					    "This program is distributed in the hope that it will be useful,\n"
+					    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+					    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+					    "GNU General Public License for more details.\n"
+					    "\n"
+					    "You should have received a copy of the GNU General Public License\n"
+					    "along with this program; if not, write to the Free Software\n"
+					    "Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n"
+					    "USA"),
+					  _("Ok"), FALSE, dummy, NULL);
+
+	gtk_widget_show (window_about);  
+}
+
+
+/*
+ *
+ * Public functions
+ *
+ */
+
+
+/**
+ * Function to be exported to XMMS in order to register the plugin.
+ */
+VisPlugin *get_vplugin_info(void)
+{
+	return &sdlblur_vp;
+}

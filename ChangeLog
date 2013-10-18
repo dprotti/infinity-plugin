@@ -1,0 +1,512 @@
+2013-10-18  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	Repository moved to Github
+	https://github.com/dprotti/infinity-plugin
+
+2011-11-25  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.7.1 ===
+
+	* src/infconfig.c: default frame rate dropped to 15 fps. Default
+	screen size bumped to 512x288
+	* src/renderer.c: re-enabled all keyboard shortcuts to control
+	playing and take snapshots. Shortcuts to control volume	not
+	re-enabled yet (for some reason a quick sequence of UP or DOWN's
+	freezes Audacious). Re-enabled support of title displaying.
+	* configure.ac: added dependency for glib-dbus-1 library.
+
+2011-11-23  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: automake version required bumped to 1.9
+	* po/LINGUAS: added. New versions of gettext require it
+	* src/renderer.c: re-enabled fullscreen mode support
+
+2011-11-21  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: cleaned up and updated. Vectorization enabled by
+	default (gcc 4 is old enough now). Glib version required bumped to
+	2.8 (for g_mkdir_with_parents())
+	* autogen.sh: added again to the repository, for ease of
+	development
+	* Makefile.in: removed from the repo. I don't know why was there
+	* src/config-dialog.c: translation catalogs bind to the right
+	package name. Updated creation of GtkSpinButton to avoid use of
+	deprecated API. Config window properly configured to be shown on
+	top of the rest of the Audacious windows.
+
+2009-04-18  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.7.0beta1 ===
+
+	Reborn from hashes...
+	First release for Audacious media player
+
+2005-07-18  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.6.2 ===
+
+	* configure.ac: package name changed to xmms-infinity.
+	* autogen.sh: complete rewrite, mostly based on autogen.sh
+	from gnome-common package.
+	* mkinstalldirs: removed from the repository. New autogen.sh
+	will take care of generate one.
+	* src/config-dialog.c:
+	* src/infconfig.c:
+	* src/renderer.c: added option to see the current play title on
+	the plugin's title bar.
+
+2005-04-19  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: CFLAGS is not overwritten anymore. Added
+	support for vectorization under gcc 4.
+
+2005-04-15  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.6.1 ===
+
+	* src/types.h: byte type defined as Uint8 instead of guchar.
+	* src/display.c: heavy clenup using splint.
+	* src/renderer.c: idem.
+	* src/main.c: idem.
+	* src/effects.c: now a random seed is set randomly :-)
+
+2005-04-14  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: version bumped to 0.6.1.
+
+2005-04-12  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/compute.c: Too many cleanups, thanks to the 'splint' tool.
+	Added compute_quit(). This fix a SERIOUS memory leak.
+	* src/display.c: pcm_data_mutex was released too early!!!!
+	Thanks Valgrind.
+
+2005-04-12  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: now MMX detection is disabled on non Intel 32
+	bit architectures (I'm not sure if the checks works for AMD64).
+	* src/cputest.c: don't use inline mmx assembly instructions
+	if the target isn't an Intel 32 bit machine and mmx detection
+	was not requested. Fix bugs #1105207 and #1106762.
+
+2004-11-12  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.6.0 === 
+
+	* src/infconfig.c: config window fully functional.
+
+2004-11-06  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/main.c: about window now is created using
+	xmms_show_message().
+	* src/renderer.c: usleep() -> xmms_usleep().
+	* src/compute.c: finally fixed bug #1059004 !
+	- mmx_t variables qualified volatile.
+	- punpcklbw_m2r changed to punpcklbw_r2r (dohh).
+	* configure.ac:
+	- version bumped to 0.6.0.
+	- usleep() check removed.
+	- mmx detection enabled by default!
+	
+
+2004-11-04  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: now we test for gtk+ to be at least 1.2.2.
+
+2004-11-03  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/cputest.c: really define things when MMX_DETECTION
+	is set (problem arises because of the move of MMX_DETECTION
+	to config.h file).
+	* src/compute.c: made mmx section smaller (but still not
+	working :-(.
+	
+2004-11-02  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c, src/infconfig.c: more work on config
+	window, specially on FPS setting.
+
+2004-11-01  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c: now we cleanly quit plugin on SDL_QUIT
+	event.
+	* infinity-plugin.glade: added.
+	* src/config-dialog.*: added. New config window builded with
+	Glade.
+
+2004-10-31  John Lightsey <john@nixnuts.net>
+
+	* src/*: most integral types moved to Glib bit-fixed 
+	types, for portability. infinite_states managed to work
+	on big-endian machines.
+
+2004-09-28  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/gettext.h: we include locale.h if it is available.
+	I hope this fix bug #1015706.
+	
+2004-09-21  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.9 === 
+
+	* configure.ac: now we use AC_CONFIG_HEADER(config.h).
+	* src/display.c: key repeat enabled.
+	* src/renderer.c: allowed xmms control through the 
+	standard keys (thanks YoaR suggestion). Faster event
+	check.
+	* src/main.c: a command keys summary are showed on 
+	startup. Check if we have setlocale() before to try
+	to enable NLS (thanks bug report from ibpalle@hotmail.com).
+	* src/config.*: renamed to src/infconfig.*.
+
+2004-06-25  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/display.c: removed atexit(SDL_Quit), because
+	is dangerous on a dynamic library according to SDL
+	docs.
+	
+2004-06-24  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c: don't init/set_pcm/quit while we
+	are initializing. Final objective is to remove the
+	bug that makes XMMS crash when we quickly
+	enable/disable the plugin (thanks to Cristian Rosa).
+
+2004-06-22  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.8 === 
+	
+	* PLANS: added.
+	* README.non-i386: removed.
+	* src/config.c: if detect old version config file,
+	update it.
+	* configure.ac: we override user variable CFLAGS.
+	Why? read comment there.
+
+2004-06-21  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/Makefile.am: changed -O2 to -O3 flag.
+	* src/config.*: t_config made private. Added
+	functionality to manage window position/size.
+	* src/main: on exit, we save window position/size.
+	
+2004-06-19  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c: broken resizing when MMX disabled
+	was fixed
+
+2004-06-20  Jean Delvare  <khali@linux-fr.org>
+
+	* src/main.c: version info is added to plugin
+	description
+	* src/display.c: on minimize, correct title is showed
+
+2004-06-19  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.7 === 
+	
+	* configure.ac: sets the prefix to the prefix of
+	the working xmms found.
+	MMX support is now disabled by default.
+	
+2004-06-07  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* building files rebuilded with Autoconf 2.59 and
+	Automake 1.85
+
+2004-05-21  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: before try to run macros AM_PATH_XMMS
+	and AM_PATH_SDL, check if xmms-config and sdl-config
+	exists, and show an understandable error. Thanks to
+	Cristian Rosa.
+
+2004-05-19  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: AC_INIT now uses the complete form, 
+	the tarball name is now infinity-plugin.
+	AM_INIT_AUTOMAKE modernized to the no-arguments
+	form, AC_OUTPUT modernized to the no-arguments form.
+	Added checking for some headers and const compiler
+	characteristic.
+	
+2004-05-18  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.6 === 
+	
+	* configure.ac: Fixed pkg-config macro to look for
+	gtk+ package, not gtk. Thanks to Dennis Smith and
+	Andrew Montgomery.
+
+	* src/renderer.c: 
+	- check_events() changed to poll events until the
+	event queue is empty.
+	- usleep() used instead of SDL_Delay().
+	
+2004-05-17  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.5 ===
+
+	* REPORT-BUGS: added
+
+2004-05-15  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac:
+	- Finally I move the gtk and glib flags to be 
+	detected via pkg-config. This fix a building 
+	problem on Debian. Thanks to Cristian Rosa.
+	- Show a warning if the arquitecture is bigendian,
+	because Infinity have no been reported to work on this.
+	- Check for long long type support.
+	- Check for inline support.
+
+	* src/display.c: compute_surface() moved to compute
+	module. Now display_quit() destroy the SDL_mutex
+	created with display_init()
+
+	* src/types.h: added
+	
+2004-05-14  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.4 ===
+
+	* src/renderer.c: Come back to SDL_mutex, because
+	of reports about completely deadlock on some systems.
+	Also use SDL_GetTicks() and SDL_Delay() to limit the 
+	framerate.
+	Accordingly to SDL docs, calling library functions
+	from within an SDL_thread is unsafe.
+
+2004-05-13  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.3 === 
+
+	* src/renderer.c: Added mechanism to send go to
+	sleep the renderer while the window is iconified.
+	
+2004-05-12  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c: Added an SDL event filter to 
+	ignore the VIDEORESIZE event while resizing
+	internal structures. Much better than disable
+	the VIDEORESIZE event with SetEventState
+
+2004-05-11  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/renderer.c:
+	 - Added a mechanism to limit
+	the frames per second rendered. This gives an 
+	incredible performance boost on small windows.
+	 - Moved finished_mutex to a GStaticMutex, which 
+	works inside the renderer body, unlike SDL_mutex
+	(I dunno why, may be because of the special
+	treat of signals on SDL).
+	 - Now the entire body of the render is a CS.
+	 - Too much code clean up on check_events()
+	 - Now interactive mode is enabled via 
+	'--enable-debug' configure option.
+		
+	* src/display.c:
+	- SDL mutex moved to GStaticMutex
+	- added atexit(SDL_Quit) call
+	- too much error control on SDL calls
+	
+	* src/*.c all: strings sended to console, turned
+	non-translatable. In future, only strings showed
+	on windows will be translated.
+
+2004-05-10  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.2 === 
+	
+	* src/compute.c: Added new type vector_field_t.
+	This type have the width and height of the field.
+	The final objective is to remove dependencies on
+	global screen dimension parameters.
+
+	* src/display.c: many functions modified to make
+	use of screen parameters via arguments. Added
+	display_set_pcm_data(), wich is thread safe.
+
+	* src/renderer.c: set SDL to ignore events not
+	relevant to Infinity.
+	
+2004-05-09  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/*.c: changed to show output via g_log using
+	g_message. Glib's docs says that a library must
+	use g_log, not g_print.
+	
+2004-05-08  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac: Added argument to enable/disable
+	compilation of MMX stuff
+
+	* src/renderer.c: some code conditionally compiled
+	depending on MMX_DETECTION macro definition
+
+	* README.non-i386: Added
+
+2004-05-08  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.1 === 
+	
+	* src/renderer.c: now the SDL_VIDEORESIZE is disabled
+	while updating the internal structures, so the
+	user can't resize until Infinity has been effectively
+	resized. This avoid unnecessary resize calculations.
+
+	* src/display.c now display_surface() locks the screen
+	before accesing the pixels, if the surface is on video
+	memory.
+	
+2004-05-07  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	=== Released 0.5.0 ===
+	
+	* src/config.c changed default size to 380x240.
+	Added a tooltip to the Scale Factor option,
+	and another to the Ok button explaining how to
+	switch between fullscreen/window mode.
+
+	* README removed comment about the 8bbp mode. 
+	I consider this deprecated. Also updated the
+	URL of the project site.
+	
+2004-05-06  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* Feature After all this job, now the plugin could be
+	resized!
+	
+	* src/renderer.c Changed to take into account the 
+	screen resize event.
+
+	* src/display.c Added display_screen_resize().
+	init_sdl() changed to allocate memory with g_malloc().
+
+	* src/compute.c Added compute_resize(). Changed
+	compute_interpol_new() constructor to
+	compute_interpol_field_new(width, height).
+
+	* Documentation Doxygen support added.
+	The intention is to document the modules interfaces
+	ONLY, so I comment the headers (except main.c, that of
+	course doesn't a main.h). This way I only document
+	that the modules expose, not that is private to them.
+	The internals of the modules are docummented trough
+	traditional comments.
+	
+	
+2004-05-01  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	*   === Released 0.4.0 === 
+
+	* This release was made it on the new Infinity's
+	SourceForge site
+
+2004-04-13  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* configure.ac added macro to require autoconf >= 2.57 to
+	reconfigure	the package
+
+	* src/renderer.c eliminated global variable vector_field
+
+	* src/display.c added private global variable vector_field
+	and blur() modified to use it. compute_surface() make it inline.
+	Too much code cleanup
+
+	* src/compute.c added constructor and destructor for
+	t_interpol datatype
+	
+2004-04-04  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* src/main.h removed. All his variables moved to static
+	variables on renderer.c
+	
+	* configure.ac AM_PROG_LIBTOOL macro changed for AC_PROG_LIBTOOL.
+	Also AC_DISABLE_STATIC macro used, so now we dont build and
+	install libinfinite.a.
+
+	* src/Makefile.am created the libtool target, so now we automatically
+	update the libtool script if it becomes out-of-date
+
+2004-04-03  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* too much code cleanup. The final objective is to remove
+	every extern declaration and every non-static global variable,
+	and give a non-cyclic dependency graph between modules
+
+	* src/Makefile.am added options
+	AM_CFLAGS = -Wall -Wimplicit -Wunused -Wmissing-prototypes
+	for to force developer to do things more clear
+
+	* src/config.c added. This is for to get a modular way to
+	query options from any module
+
+	* src/file.h added
+	
+	* src/renderer.c now is checked the SDL_QUIT event, so the rende
+	exits when the user close the plugin window
+
+
+2004-04-02  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* README.FreeBSD file added
+	
+	* HISTORY file added
+	
+	* New translations (es es_AR) in fact are both the
+	same. If some spanish want to maintain the 'es'
+	translation, are welcome.
+
+2004-03-31  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* Makefile.am (SUBDIRS): Add m4.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): New variable.
+	* configure.ac (AC_OUTPUT): Add po/Makefile.in,
+
+2004-03-27  Duilio Protti  <dprotti@users.sourceforge.net>
+
+	* Sources moved to src subdirectory
+	
+	* configure.in moved to configure.ac
+	
+	* building files rebuilded with autoconf 2.57 and automake 1.7
+	
+	* configure.ac: checking for AC_C_VOLATILE in compiler characteristics
+	
+	* src/cputest.h added
+	
+	* src/mmx.h added
+
+	* src/main.c: included cputest.h and inlined assembler for to check
+	for MMX instructions presence. This is used on function plug_init for to
+	launch renderer_mmx() thread if this instructions are available.
+	Added comments (in C style, not C++ style).
+
+	* src/renderer.c: function renderer_mmx() added
+
+	* src/display.c function blur_mmx() added
+	
+	* src/display.c function compute_surface_mmx() added
+
+	* src/display.c: added SDL_DOUBLEBUF to VIDEO_FLAGS mask and then in 
+	function display_surface() the call SDL_UpdateRect(screen, 0, 0, 0, 0)
+	changed for	SDL_Flip(screen), which is more efficient if the video board
+	supports doublebuffer flipping in hardware, otherwise the call is
+	equivalent to SDL_UpdateRect(screen, 0, 0, 0, 0).
+	
+	* src/display.c: plot1 and plot2 functions redefined as macros
+
+	* src/display.c: added the call SDL_WM_SetCaption ("infinity", NULL) for
+	to set the window title to "infinity".
+
+v 0.2: Some optimisations, less bugs, better synchronisation, more options.
+
+v 0.11-2:	Infinity now uses automake/autoconf, its installation should not
+			be a problem anymore.
+
+v 0.11: Screenshots, better Makefile.
+
+v 0.1: Original version.

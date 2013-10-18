@@ -1,0 +1,42 @@
+Bug Reports
+===========
+
+If you encounter any bug on Infinity, on the building process, or 
+an inconsistency on the configuration, or just a rendering bug,
+please point your browser to
+
+http://sourceforge.net/tracker/?atid=649740&group_id=108158&func=browse
+
+and fill a bug report. That will take you just a few minutes, and
+will be a lot of help for developers and other users.
+The report will be filled on a single HTML form on the SourceForge.net's
+site of the project, and you don't need to have a user account there
+to submit the report.
+
+This report must include:
+
+- version of Audacity used.
+- version of Infinity used (I still interested on bugs of older versions).
+- version of SDL used.
+- version of Glib used.
+- Linux distribution you use.
+- X server implementation and version (usually XFree86).
+- Graphic card and wich driver it uses.
+- A short description of the conditions on where you running Infinity when
+the bug was encountered. i.e. if other plugins were running when the bug
+appears, if others applications were running, etc.
+- A short description of the bug itself. Specially, you must show, if possible,
+the output that was showed when the bug appears (to get that run Audacity on a
+terminal). If the error is a configure or compile error, send the last output
+showed.
+
+After that, categorize the bug on one of the three categories:
+- building process
+- configuration
+- rendering
+and submit (every one of them are explained on the mentioned page).
+
+And finally, don't doubt, every bug report is important, and will help a lot
+to the development process of Infinity!
+
+

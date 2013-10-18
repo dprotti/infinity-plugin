@@ -1,0 +1,95 @@
+/**
+ * \file main.c
+ *
+ * \brief The main module of Infinity plugin.
+ *
+ */
+
+/*
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Library General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+*/
+#include <string.h>
+#include <audacious/plugin.h>
+#include <gtk/gtk.h>
+
+#include "config.h"
+#include "infconfig.h"
+#include "renderer.h"
+#include "gettext.h"
+
+static void plugin_init (void);
+static void plugin_close (void);
+
+/**
+ * Structure shared with Audacious in order to register and get information
+ * about the plugin.
+ */
+static VisPlugin infinity_vp = {
+	.description 		= "Infinity",
+	.num_pcm_chs_wanted	= 2,
+	.num_freq_chs_wanted	= 0,
+	.init			= plugin_init,
+	.cleanup		= plugin_close,
+	.configure		= config_plugin_config_window,
+	.playback_stop		= NULL,
+	.render_pcm		= renderer_set_pcm_data,
+};
+
+static void plugin_init(void)
+{
+#if ENABLE_NLS
+	(void) setlocale (LC_MESSAGES, "");
+	(void) bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+	(void) textdomain (GETTEXT_PACKAGE);
+#endif
+
+	g_message (_("Infinity commands:\n"
+		     "- Space:\tchange effect.\n"
+		     "- Tab:\t\ttoggle full-screen.\n"
+		     "- Up/Down:\tup/down main volume.\n"
+		     "- Left/Right:\treward/forward actual played song, if any.\n"
+		     "- z:\t\tprevious song.\n"
+		     "- x:\t\tplay.\n"
+		     "- c:\t\tpause.\n"
+		     "- v:\t\tstop.\n"
+		     "- b:\t\tnext song.\n"
+		     "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
+		     "- F11:\t\tscreenshot.\n"
+		     "- F12:\t\tchange palette."));
+	config_plugin_load_prefs ();
+	renderer_set_plugin_info (&infinity_vp);
+	renderer_init ();
+}
+
+static void plugin_close (void)
+{
+	config_plugin_save_prefs ();
+	renderer_finish ();
+}
+
+static void dummy (void)
+{
+}
+
+/*
+ *
+ * Public functions
+ *
+ */
+
+VisPlugin *infinity_vplist[] = { &infinity_vp, NULL };
+
+DECLARE_PLUGIN (infinity, NULL, NULL, NULL, NULL, NULL, NULL, infinity_vplist, NULL);
+

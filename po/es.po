@@ -1,0 +1,221 @@
+# Spanish translations for GNU infinity package.
+# Traducciones al español para el paquete GNU infinity.
+# Copyright (C) 2000 Julien Carme.
+# This file is distributed under the same license as the GNU infinity package.
+# Duilio Javier Protti <dprotti@fceia.unr.edu.ar>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU infinity 0.3.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-01-07 05:01-0500\n"
+"PO-Revision-Date: 2005-07-18 18:38-0300\n"
+"Last-Translator: Duilio Javier Protti <dprotti@fceia.unr.edu.ar>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/main.c:58
+#, fuzzy
+msgid ""
+"Infinity commands:\n"
+"- Space:\tchange effect.\n"
+"- Tab:\t\ttoggle full-screen.\n"
+"- Up/Down:\tup/down main volume.\n"
+"- Left/Right:\treward/forward actual played song, if any.\n"
+"- z:\t\tprevious song.\n"
+"- x:\t\tplay.\n"
+"- c:\t\tpause.\n"
+"- v:\t\tstop.\n"
+"- b:\t\tnext song.\n"
+"- Enter:\tswitch to interactive mode.\n"
+"\t\t(works only if infinity was configured with --enable-debug option)\n"
+"- F11:\t\tscreenshot.\n"
+"- F12:\t\tchange palette."
+msgstr ""
+"Comandos de Infinity:\n"
+"- Espacio:\tcambiar efecto.\n"
+"- Tabulación:\tpasar a/volver de pantalla completa.\n"
+"- Arriba/Abajo:\tsubir/bajar el volumen principal de XMMS.\n"
+"- Izquierda/Derecha: retroceder/adelantar la canción actual, si se está "
+"reproduciendo alguna.\n"
+"- z:\t\tcanción anterior.\n"
+"- x:\t\treproducir.\n"
+"- c:\t\tpausar reproducción.\n"
+"- v:\t\tdetener reproducción.\n"
+"- b:\t\tpróxima canción.\n"
+"- Enter:\tpasar a modo interactivo.\n"
+"\t\t(esto funciona sólo si infinity fue configurado con la opción --enable-"
+"debug)\n"
+"- F11:\t\ttomar una captura de pantalla.\n"
+"- F12:\t\tcambiar paleta actual."
+
+#: src/renderer.c:98
+msgid "We are already initializing"
+msgstr "El plugin ya fue inicializado"
+
+#: src/renderer.c:156
+msgid "The plugin have not yet initialize"
+msgstr "El plugin aún no se ha inicializado"
+
+#: src/display.c:70
+#, fuzzy, c-format
+msgid "Infinity: Couldn't initialize SDL: %s\n"
+msgstr "Infinity: No se puede inicializar SDL: %s\n"
+
+#: src/display.c:73
+#, fuzzy, c-format
+msgid "Infinity: could not init video mode: %s\n"
+msgstr "Infinity: No se puede inicializar el modo de video: %s\n"
+
+#: src/display.c:74
+#, fuzzy
+msgid "Infinity: SDL SetVideoMode() Ok"
+msgstr "Infinity: Inicio de modo de video SDL correcto"
+
+#: src/display.c:278
+#, fuzzy, c-format
+msgid "Infinity: Couldn't set %dx%d video mode: %s\n"
+msgstr "Infinity: No se puede inicializar el modo de video: %s\n"
+
+#: src/display.c:471
+#, c-format
+msgid "Cannot toggle to fullscreen mode: %s"
+msgstr "No se pudo cambiar a modo de pantalla completa: %s"
+
+#: src/display.c:482
+#, c-format
+msgid "Error while saving file %s: %s"
+msgstr "Error al guardar el archivo %s: %s"
+
+#: src/display.c:484
+msgid "saved"
+msgstr "guardado"
+
+#: src/effects.c:24
+#, c-format
+msgid "Could not be opened file %s for saving effects\n"
+msgstr "No se puede abrir el archivo %s para guardar los efectos\n"
+
+#: src/effects.c:44
+#, c-format
+msgid "Could not be opened file %s for loading effects\n"
+msgstr "No se puede abrir el archivo %s para cargar los efectos\n"
+
+#: src/config-dialog.c:38
+msgid "Infinity Configuration"
+msgstr "Configuración de Infinity"
+
+#: src/config-dialog.c:48
+msgid "Parameters"
+msgstr "Parámetros"
+
+#: src/config-dialog.c:66
+msgid "Effect period:"
+msgstr "Período de efecto:"
+
+#: src/config-dialog.c:77
+msgid "Palette period:"
+msgstr "Período de paleta:"
+
+#: src/config-dialog.c:88
+msgid "Scale Factor"
+msgstr "Factor de Escala"
+
+#: src/config-dialog.c:99
+msgid "Maximum Frames per Second:"
+msgstr "Número Máximo de Cuadros por Segundo"
+
+#: src/config-dialog.c:110
+msgid "Show current play title"
+msgstr "Mostrar título de la reproducción actual"
+
+#: src/config-dialog.c:121
+msgid ""
+"Check it if you want to see the current play title on the Infinity's title "
+"bar"
+msgstr ""
+"Márquela si quiere que el título de la reproducción actual aparezca en la "
+"barra de título de Infinity"
+
+#: src/config-dialog.c:147
+msgid "Time to change between an effect and the next one, in milliseconds."
+msgstr ""
+"Tiempo que deberá transcurrir antes de cambiar de efecto, en milisegundos."
+
+#: src/config-dialog.c:162
+msgid "Time to change between a color and the next one, in milliseconds."
+msgstr ""
+"Tiempo que deberá transcurrir antes de cambiar de color, en milisegundos."
+
+#: src/config-dialog.c:177
+msgid ""
+"Change only if the system doesn't have enough power to show the screen at a "
+"reasonably speed/size relation."
+msgstr ""
+"Cambiar solo si el sistema no tiene suficiente potencia como para mostrar la "
+"pantalla a una relación velocidad/tamaño razonable."
+
+#: src/config-dialog.c:190
+msgid "Ok"
+msgstr "Aceptar"
+
+#: src/config-dialog.c:199
+msgid ""
+"For to toggle to fullscreen mode, select the Infinity plugin window, and "
+"press the Tab key. Pressing Tab again will return to window mode."
+msgstr ""
+"Para cambiar a modo de pantalla completa, seleccione la ventana de Infinity "
+"y presione la tecla de tabulación. Presionando esta tecla nuevamente "
+"retornará a modo ventana."
+
+#: src/config-dialog.c:204
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/config-dialog.c:212
+msgid "Apply"
+msgstr "Aplicar"
+
+#~ msgid "About Infinity"
+#~ msgstr "Acerca de Infinity"
+
+#~ msgid "\n"
+#~ msgstr "\n"
+
+#~ msgid "Close"
+#~ msgstr "Cerrar"
+
+#~ msgid "Display"
+#~ msgstr "Pantalla"
+
+#~ msgid "X Resolution"
+#~ msgstr "Resolución en X"
+
+#~ msgid "Y Resolution"
+#~ msgstr "Resolución en Y"
+
+#, fuzzy
+#~ msgid "Infinity: Screen resized to %dx%d pixels^2"
+#~ msgstr "Pantalla redimensionada a %dx%d pixels²\n"
+
+#, fuzzy
+#~ msgid "Infinity: Closing plugin...\n"
+#~ msgstr "Configuración de Infinity"
+
+#, fuzzy
+#~ msgid "Infinity: There is not MMX support\n"
+#~ msgstr "Infinity: No hay soporte MMX"
+
+#, fuzzy
+#~ msgid "Infinity: Looking for Multimedia Extensions Support..."
+#~ msgstr "Infinity: Comprobando soporte de extensiones multimedia..."
+
+#, fuzzy
+#~ msgid " detected"
+#~ msgstr " detectado"
+
+#~ msgid "Closing Infinity...\n"
+#~ msgstr "Cerrando Infinity...\n"

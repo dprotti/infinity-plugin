@@ -1,0 +1,13 @@
+TODO
+====
+
+* Port to Banshee.
+* Add icon.
+* Add an option to disable the screensaver.
+* Save window position on close.
+* Rewrite modules to use a common datatype InfPlugin.
+* Add more translations.
+* Request an 8-bit surface, and make use of the palette's
+  facilities from SDL (probably we must remove 'scale factor'
+  along with this).
+

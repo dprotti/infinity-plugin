@@ -1,0 +1,171 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-11-25 17:44-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/main.c:58
+msgid ""
+"Infinity commands:\n"
+"- Space:\tchange effect.\n"
+"- Tab:\t\ttoggle full-screen.\n"
+"- Up/Down:\tup/down main volume.\n"
+"- Left/Right:\treward/forward actual played song, if any.\n"
+"- z:\t\tprevious song.\n"
+"- x:\t\tplay.\n"
+"- c:\t\tpause.\n"
+"- v:\t\tstop.\n"
+"- b:\t\tnext song.\n"
+"- Enter:\tswitch to interactive mode.\n"
+"\t\t(works only if infinity was configured with --enable-debug option)\n"
+"- F11:\t\tscreenshot.\n"
+"- F12:\t\tchange palette."
+msgstr ""
+
+#: src/renderer.c:103
+msgid "We are already initializing"
+msgstr ""
+
+#: src/renderer.c:166
+msgid "The plugin have not yet initialize"
+msgstr ""
+
+#: src/infconfig.c:292
+msgid "Infinity plugin .ini file not found"
+msgstr ""
+
+#: src/infconfig.c:294
+#, c-format
+msgid "Creating Infinity plugin config directory '%s'"
+msgstr ""
+
+#: src/infconfig.c:297
+#, c-format
+msgid "Cannot save preferences: unable to create directory '%s'"
+msgstr ""
+
+#: src/infconfig.c:319
+msgid "Error saving preferences"
+msgstr ""
+
+#: src/display.c:70
+#, c-format
+msgid "Infinity: Couldn't initialize SDL: %s\n"
+msgstr ""
+
+#: src/display.c:73
+#, c-format
+msgid "Infinity: could not init video mode: %s\n"
+msgstr ""
+
+#: src/display.c:74
+msgid "Infinity: SDL SetVideoMode() Ok"
+msgstr ""
+
+#: src/display.c:278
+#, c-format
+msgid "Infinity: Couldn't set %dx%d video mode: %s\n"
+msgstr ""
+
+#: src/display.c:471
+#, c-format
+msgid "Cannot toggle to fullscreen mode: %s"
+msgstr ""
+
+#: src/display.c:482
+#, c-format
+msgid "Error while saving file %s: %s"
+msgstr ""
+
+#: src/display.c:484
+msgid "saved"
+msgstr ""
+
+#: src/effects.c:24
+#, c-format
+msgid "Could not be opened file %s for saving effects\n"
+msgstr ""
+
+#: src/effects.c:44
+#, c-format
+msgid "Could not be opened file %s for loading effects\n"
+msgstr ""
+
+#: src/config-dialog.c:38
+msgid "Infinity Configuration"
+msgstr ""
+
+#: src/config-dialog.c:49
+msgid "Parameters"
+msgstr ""
+
+#: src/config-dialog.c:67
+msgid "Effect period:"
+msgstr ""
+
+#: src/config-dialog.c:78
+msgid "Palette period:"
+msgstr ""
+
+#: src/config-dialog.c:89
+msgid "Scale Factor"
+msgstr ""
+
+#: src/config-dialog.c:100
+msgid "Maximum Frames per Second:"
+msgstr ""
+
+#: src/config-dialog.c:111
+msgid "Show current play title"
+msgstr ""
+
+#: src/config-dialog.c:122
+msgid ""
+"Check it if you want to see the current play title on the Infinity's title "
+"bar"
+msgstr ""
+
+#: src/config-dialog.c:149
+msgid "Time to change between an effect and the next one, in milliseconds."
+msgstr ""
+
+#: src/config-dialog.c:164
+msgid "Time to change between a color and the next one, in milliseconds."
+msgstr ""
+
+#: src/config-dialog.c:179
+msgid ""
+"Change only if the system doesn't have enough power to show the screen at a "
+"reasonably speed/size relation."
+msgstr ""
+
+#: src/config-dialog.c:192
+msgid "Ok"
+msgstr ""
+
+#: src/config-dialog.c:201
+msgid ""
+"For to toggle to fullscreen mode, select the Infinity plugin window, and "
+"press the Tab key. Pressing Tab again will return to window mode."
+msgstr ""
+
+#: src/config-dialog.c:206
+msgid "Cancel"
+msgstr ""
+
+#: src/config-dialog.c:214
+msgid "Apply"
+msgstr ""

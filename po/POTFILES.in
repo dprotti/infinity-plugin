@@ -1,0 +1,10 @@
+# List of source files containing translatable strings.
+
+# Package source files
+src/main.c
+src/renderer.c
+src/cputest.c
+src/infconfig.c
+src/display.c
+src/effects.c
+src/config-dialog.c

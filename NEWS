@@ -1,0 +1,144 @@
+Release: 0.7.1
+Date: 2011-11-24
+
+Re-enabled navigation keys and fullscreen mode, configuration through
+Preferences dialog, settings saved to disk to keep preferences between
+different runs, and many other internal updates to catch up with
+software ecosystem of 2011.
+
+Release: 0.7.0beta1
+Date: 2009-04-18
+
+A long time has past. XMMS is not available anymore in major
+distros. Infinity then moves to the newer Audacious media
+player based on the old good XMMS. This beta does not
+support navigation keys in interactive mode and also does
+not support configuration of plugin parameters.
+
+Release: 0.6.2
+Date: 2005-07-18
+
+An option was added to let see the current play title on the
+Infinity's title bar. Also there is support now for the new
+vectorization features which comes with GCC 4.
+
+Release: 0.6.1
+Date: 2005-04-15
+
+This release is bugfix focused, it doesn't include any new feature.
+Some modules have been examined in depth using tools like splint and
+valgrind, many cleanups have been performed and two serious bugs have
+been fixed: a memory leak and a too early released semaphore. This
+release also fix bugs #1105207 and #1106762 related to 64 bit
+architectures.
+
+Release: 0.6.0
+Date: 2004-11-12
+
+Now is possible to change the maximum frames per second through
+the configure dialog. Also the plugin can be disabled by just
+closing the plugin window, and all the current parameters are
+automatically saved. A building problem on Fedora Core 2 have
+been fixed, and best of all: finally MMX's related bug #1059004
+have been fixed, so now Infinity comes with MMX support enabled
+by default.
+
+Release: 0.5.9
+Date: 2004-09-21
+
+Now xmms playback can be controlled when focus is on infinity
+(even on fullscreen) through the "zxcvb" keys. Also could be 
+set the main volume and songs could be forward/reward positioned,
+all this with the arrow keys. A major building problem with
+Fedora Core 2 was fixed.
+
+Release: 0.5.8
+Date: 2004-06-22
+
+Now window size is saved on close. Problem with window
+resizing when using MMX extensions was fixed. Correct
+title is showed on iconified window, version info is
+showed on XMMS configuration window, same config file
+can be used safely between versions. A development
+mailing list was created.
+
+Release: 0.5.7
+Date: 2004-06-19
+
+Major bugfix release. Finally the long-live bug that cause
+colors to be displayed completely broken on some systems 
+was removed, disabling MMX support by default.
+
+The problem is that XMMS also uses MMX extensions, and 
+floating point registers and MMX registers are overlaped
+(they are exactly the same). So, if there is a context switch
+while infinity is using MMX registers (an before to finish
+and call emms() to come back to fp mode), the processor
+is yielded to XMMS, and then when the control comes back to
+infinity, probably the MMX registers are completely trashed,
+if XMMS has performed any fp operation.
+
+Release: 0.5.6
+Date: 2004-05-18
+
+Two building problems were fixed. A new mechanism to check
+SDL events and go idle was introduced.
+
+Release: 0.5.5
+Date: 2004-05-17
+
+Minor bugfix release. Fixes a building problem on
+Debian distro (and may be others). Now uses pkg-config
+to get the compiler flags. Also fixes a memory leak 
+when enable/disable Infinity from XMMS. Also some code
+cleanup, a new system to report bugs, and the most 
+important: the recently created web page of Infinity.
+Take a look at the screenshots there.
+
+Release: 0.5.4
+Date: 2004-05-14
+
+Major bugfix release. Fixes problem of completely
+deadlock when XMMS go to play on some systems. Also
+window closing is now disabled, so only XMMS 
+enable/disables the plugin.
+
+Release: 0.5.3
+Date: 2004-05-13
+
+Now, when the window is iconified, the plugin just go 
+sleep and don't consume cpu time. Also, there is a 
+limit on the frames/second that the plugin computes, 
+so if the window is small or the system very fast, 
+just take the timeslice it needs an yields the 
+processor to another process.
+
+Release: 0.5.1
+2004-05-10 19:01
+
+Now the configure script includes the option 'disable-mmx'
+to turn off the MMX detection support, so the plugin
+would be compile on any platform.
+
+Release: 0.5.0
+Date: 2004-05-07
+
+The new version 0.5.0 of Infinity gives the user the
+capability to resize the window on the fly just with
+the mouse. It also include, for the developers,
+structured doxygen-like comments on the code, so now
+the documentation could be generated automatically
+from sources.
+
+Release: 0.4.0 
+Date: 2004-05-04
+Summary: First release on SourceForge.net
+
+Infinity is a visualization plugin for the XMMS audio
+player. It was originally written by Julien Carme,
+and is actually maintained by Duilio Protti. This is
+the first release on SourceForge.net, and includes
+rewritten routines for to take advantages of MMX
+instructions set. Infinity plugin doesn't require
+3D hardware acceleration support.
+
