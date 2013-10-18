@@ -29,25 +29,44 @@
 #include "renderer.h"
 #include "gettext.h"
 
-static void plugin_init (void);
-static void plugin_close (void);
+static bool_t plugin_init  (void);
+static void   plugin_close (void);
+static void   clear        (void);
 
-/**
- * Structure shared with Audacious in order to register and get information
- * about the plugin.
+/*
+ * Registers plugin with Audacious.
  */
-static VisPlugin infinity_vp = {
-	.description 		= "Infinity",
-	.num_pcm_chs_wanted	= 2,
-	.num_freq_chs_wanted	= 0,
+AUD_VIS_PLUGIN (
+	.name 			= "Infinity",
 	.init			= plugin_init,
 	.cleanup		= plugin_close,
+	.take_message		= NULL,
+	.about			= NULL, // TODO
 	.configure		= config_plugin_config_window,
-	.playback_stop		= NULL,
-	.render_pcm		= renderer_set_pcm_data,
-};
+	.settings		= NULL, // TODO
+	//.playback_stop		= NULL,
 
-static void plugin_init(void)
+	/* reset internal state and clear display */
+	.clear			= clear,
+
+	/* 512 frames of a single-channel PCM signal */
+	.render_mono_pcm	= NULL,
+
+	/* 512 frames of an interleaved multi-channel PCM signal */
+	.render_multi_pcm	= renderer_render_multi_pcm,
+
+	/* intensity of frequencies 1/512, 2/512, ..., 256/512 of sample rate */
+	.render_freq		= NULL,
+
+	/* GtkWidget * (* get_widget) (void); */
+	.get_widget		= NULL
+);
+
+static void clear (void) {
+	g_message ("TODO implement clear()");
+}
+
+static bool_t plugin_init (void)
 {
 #if ENABLE_NLS
 	(void) setlocale (LC_MESSAGES, "");
@@ -69,8 +88,8 @@ static void plugin_init(void)
 		     "- F11:\t\tscreenshot.\n"
 		     "- F12:\t\tchange palette."));
 	config_plugin_load_prefs ();
-	renderer_set_plugin_info (&infinity_vp);
 	renderer_init ();
+        return TRUE;
 }
 
 static void plugin_close (void)
@@ -78,18 +97,4 @@ static void plugin_close (void)
 	config_plugin_save_prefs ();
 	renderer_finish ();
 }
-
-static void dummy (void)
-{
-}
-
-/*
- *
- * Public functions
- *
- */
-
-VisPlugin *infinity_vplist[] = { &infinity_vp, NULL };
-
-DECLARE_PLUGIN (infinity, NULL, NULL, NULL, NULL, NULL, NULL, infinity_vplist, NULL);
 

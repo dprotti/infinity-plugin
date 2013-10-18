@@ -23,8 +23,6 @@
 #include "infconfig.h"
 #include "gettext.h"
 
-
-
 #define wrap(a) ( a < 0 ? 0 : ( a > 255 ? 255 : a )) 
 #define assign_max(p,a) ( *p <= a ? *p = a : 0 )
 
@@ -36,13 +34,10 @@
  */
 #define VIDEO_FLAGS ((Uint32)(SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF | SDL_RESIZABLE))
 
-
 typedef struct sincos {
     gint32 i;
     gfloat *f;
 } sincos_t;
-
-
 
 static gint16 pcm_data[2][512];
 static SDL_mutex *pcm_data_mutex;
@@ -62,8 +57,6 @@ static gint16 current_colors[256];
 
 static byte* surface1;
 
-
-
 static void init_sdl (gint32 width, gint32 height, gint32 scale) 
 {
     if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0)
@@ -75,7 +68,6 @@ static void init_sdl (gint32 width, gint32 height, gint32 scale)
     (void)SDL_ShowCursor (0);
     (void)SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 }
-
 
 static void generate_colors()
 {
@@ -101,8 +93,6 @@ static void generate_colors()
 	}
     }
 }
-
-
 
 static void display_surface ()
 
@@ -158,13 +148,11 @@ static void display_surface ()
 	    (void)SDL_Flip (screen);
 }
 
-
 #define	plot1(x,y,c)\
 \
 	if ((x)>0 && (x)<scr_par.width-3 && (y)>0 && (y)<scr_par.height-3)\
 		assign_max(&(surface1)[(x)+(y)*scr_par.width],(c))\
 \
-
 
 #define plot2(x,y,c)\
 {\
@@ -178,12 +166,10 @@ static void display_surface ()
 	}\
 }\
 
-
 #define SWAP(x,y)\
 	x ^= y;\
 	y ^= x;\
 	x ^= y;
-
 
 static void line (gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 {
@@ -233,11 +219,9 @@ static void line (gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-
-/*--------------------------------*/
-/*        Public functions        */
-/*--------------------------------*/
-
+/*
+ * Public functions
+ */
 
 void display_init (void)
 {
@@ -254,7 +238,6 @@ void display_init (void)
 	compute_generate_vector_field (vector_field);
 }
 
-
 void display_quit (void)
 {
 	compute_vector_field_destroy (vector_field);
@@ -265,7 +248,6 @@ void display_quit (void)
 	screen = NULL;
 	SDL_Quit ();
 }
-
 
 void display_resize (gint32 width, gint32 height)
 {
@@ -284,16 +266,19 @@ void display_resize (gint32 width, gint32 height)
 	compute_generate_vector_field (vector_field);
 }
 
-
-inline void display_set_pcm_data (gint16 data[2][512])
+inline void display_set_pcm_data (const float * data, int channels)
 {
+	if (channels != 2) {
+		g_critical ("Unsupported number of channels (%d)\n", channels);
+		return;
+	}
 	/* begin CS */
 	g_return_if_fail (SDL_mutexP (pcm_data_mutex) >= 0);
+	// TODO check this out, different types here...
 	memcpy (pcm_data, data, 2*512*sizeof(gint16));
 	g_return_if_fail (SDL_mutexV (pcm_data_mutex) >= 0);
 	/* end CS */
 }
-
 
 void change_color (gint32 t2, gint32 t1, gint32 w)
 {
@@ -308,14 +293,12 @@ void change_color (gint32 t2, gint32 t1, gint32 w)
 	}
 }
 
-
 inline void display_blur (guint32 vector_index)
 {
 	surface1 = compute_surface (&(vector_field->vector[vector_index]),
 				    vector_field->width, vector_field->height);
 	display_surface();
 }
-
 
 #if MMX_DETECTION
 inline void display_blur_mmx (guint32 vector_index)
@@ -325,7 +308,6 @@ inline void display_blur_mmx (guint32 vector_index)
 	display_surface();
 }
 #endif
-
 
 void spectral (t_effect* current_effect)
 {
@@ -436,7 +418,6 @@ void spectral (t_effect* current_effect)
 		     current_effect->spectral_color);
 }
 
-
 /**
  * \todo current_effect->curve_color must be a byte. This is related to
  * t_effect typo.
@@ -464,13 +445,11 @@ void curve (t_effect* current_effect)
 	current_effect->x_curve = k;
 }
 
-
 void display_toggle_fullscreen (void)
 {
 	if (SDL_WM_ToggleFullScreen (screen) < 0)
 		g_warning (_("Cannot toggle to fullscreen mode: %s"), SDL_GetError());
 }
-
 
 void display_save_screen (void)
 {
@@ -483,7 +462,6 @@ void display_save_screen (void)
 	else
 		g_message (_("saved"));
 }
-
 
 inline void display_save_effect (t_effect *effect)
 {

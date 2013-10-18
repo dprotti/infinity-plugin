@@ -23,7 +23,6 @@
 #include "mmx.h"
 #endif
 
-
 typedef struct t_coord {
     gint32 x,y;
 } t_coord;
@@ -32,13 +31,10 @@ typedef struct t_complex {
     gfloat x,y;
 } t_complex;
 
-
 static t_screen_parameters scr_par;
 
 static byte* surface1;
 static byte* surface2;
-
-
 
 static inline t_complex fct (t_complex a,guint32 n,gint32 p1,gint32 p2)   /* p1 et p2:0-4 */
 {
@@ -145,7 +141,6 @@ static inline t_complex fct (t_complex a,guint32 n,gint32 p1,gint32 p2)   /* p1 
     return b;
 }
 
-
 /* We are trusting here on vector_field != NULL !!! */
 static inline void compute_generate_sector (guint32 g, guint32 f, guint32 p1, guint32 p2,
                                             guint32 debut, guint32 step, vector_field_t *vector_field)
@@ -189,12 +184,9 @@ static inline void compute_generate_sector (guint32 g, guint32 f, guint32 p1, gu
     }
 }
 
-
-
-/*--------------------------------*/
-/*        Public functions        */
-/*--------------------------------*/
-
+/*
+ * Public functions
+ */
 
 void compute_init (void)
 {
@@ -216,7 +208,6 @@ void compute_resize (gint32 width, gint32 height)
     surface2 = (byte*) g_malloc ((gulong)(scr_par.width+1) * (scr_par.height+1));
 }
 
-
 vector_field_t *compute_vector_field_new (gint32 width, gint32 height)
 {
     vector_field_t *field;
@@ -227,7 +218,6 @@ vector_field_t *compute_vector_field_new (gint32 width, gint32 height)
     field->height = height;
     return field;
 }
-
 
 void compute_vector_field_destroy (vector_field_t *vector_field)
 {
@@ -258,7 +248,6 @@ void compute_generate_vector_field (vector_field_t *vector_field)
 	    compute_generate_sector (f, f, 2, 2, i, 10, vector_field);
     }
 }
-
 
 inline byte *compute_surface (t_interpol* vector, gint32 width, gint32 height) 
 {
@@ -291,7 +280,6 @@ inline byte *compute_surface (t_interpol* vector, gint32 width, gint32 height)
 
     return surface1;
 }
-
 
 #if MMX_DETECTION
 inline byte *compute_surface_mmx (t_interpol* vector, gint32 width, gint32 height)

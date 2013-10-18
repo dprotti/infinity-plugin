@@ -29,10 +29,7 @@
 #include "compute.h"
 #include "effects.h"
 
-
 #define NB_PALETTES 5
-
-
 
 /**
  * Initializes the display related structures.
@@ -42,9 +39,8 @@
  * It also initializes the SDL library.
  *
  * \warning Because this function initializes the SDL
- * library, must be called before to perform any SDL
- * operation and must not be called when SDL was already
- * started.
+ * library, must be called before any SDL operation and
+ * must not be called when SDL was already started.
  */
 void display_init (void);
 
@@ -78,12 +74,11 @@ void display_resize (gint32 width, gint32 height);
  *
  * This function makes a copy of \a data.
  *
- * \warning This function locks a mutex, take that
- * into account.
+ * \warning Be aware that this function locks a mutex.
  *
  * \see display_quit().
  */
-void display_set_pcm_data (gint16 data[2][512]);
+void display_set_pcm_data (const float * data, int channels);
 
 void display_show (void);
 
@@ -103,6 +98,5 @@ void display_toggle_fullscreen (void);
 void display_save_screen (void);
 void display_save_effect (t_effect *effect);
 void display_load_random_effect (t_effect *effect);
-
 
 #endif /* __INFINITY_DISPLAY__ */

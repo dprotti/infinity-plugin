@@ -10,7 +10,6 @@ static t_effect effects[100];
 static gint32 nb_effects = 0;
 static gboolean initialized = FALSE;
 
-
 void effects_save_effect (t_effect *effect)
 {
 	gchar datafile[256], path[256];
@@ -29,7 +28,6 @@ void effects_save_effect (t_effect *effect)
 		fputc (*((byte*)effect+i), f);
 	fclose (f);
 }
-
 
 void effects_load_effects (void)
 {

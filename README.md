@@ -9,7 +9,7 @@ playing sound.
 Requirements
 ------------
 
-- Audacious >= 3.2 (http://audacious-media-player.org/)
+- Audacious >= 3.1 (http://audacious-media-player.org/)
 - SDL >= 1.0.6
 - Glib >= 2.8
 - Gtk+ >= 2.8

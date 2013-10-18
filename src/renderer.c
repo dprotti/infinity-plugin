@@ -38,11 +38,9 @@
 #include "cputest.h"
 #endif
 
-
 #define wrap(a)		( a < 0 ? 0 : ( a > 255 ? 255 : a ))
 #define next_effect()	(t_last_effect += 1)
 #define next_color()	(t_last_color += 1)
-
 
 typedef struct t_general_parameters {
 	gint32 t_between_effects;
@@ -51,7 +49,6 @@ typedef struct t_general_parameters {
 
 typedef gint32 t_color;
 typedef gint32 t_num_effect;
-
 
 static t_screen_parameters scr_par;
 
@@ -72,8 +69,6 @@ static gboolean first_xevent;
 static gchar *current_title;
 static GTimer *title_timer;
 
-/* VisPlugin structure that holds info shared with Audacious */
-static VisPlugin *plugin;
 static SDL_Thread *thread;
 
 static DBusGConnection * connection = NULL;
@@ -87,11 +82,8 @@ static int renderer_mmx (void *);
 #endif
 static void set_title (void);
 
-
 /*
- *
  * Public functions
- *
  */
 
 void renderer_init (void)
@@ -157,13 +149,12 @@ void renderer_init (void)
 		thread = SDL_CreateThread (renderer,NULL);
 }
 
-
 void renderer_finish (void)
 {
 	gint32 try;
     
 	if (initializing) {
-		g_warning (_("The plugin have not yet initialize"));
+		g_warning (_("The plugin have not yet initialized"));
 		try = 0;
 		while (initializing) {
 			g_usleep (1000000);
@@ -176,7 +167,7 @@ void renderer_finish (void)
 	SDL_WaitThread (thread, NULL);
 	SDL_DestroyMutex (resizing_mutex);
 	/*
-	 * Take some time to let it know renderer_set_pcm_data()
+	 * Take some time to let it know renderer_render_multi_pcm()
 	 * that must not call display_set_pcm_data().
 	 * If it do that while calling display_quit(),
 	 * we could make Audacious crash, because display_quit
@@ -192,30 +183,15 @@ void renderer_finish (void)
 	g_message ("Infinity: Closing...");
 }
 
-
-void renderer_set_plugin_info (VisPlugin *vplugin)
-{
-	g_return_if_fail (vplugin != NULL);
-
-	if (initializing)
-		return;
-	plugin = vplugin;
-}
-
-
-void renderer_set_pcm_data (gint16 data[2][512])
+void renderer_render_multi_pcm (const float * data, int channels)
 {
 	if (!initializing && !quiting)
-		display_set_pcm_data (data);
+		display_set_pcm_data (data, channels);
 }
 
-
 /*
- *
  * Private functions
- *
  */
-
 
 static gint32 event_filter (const SDL_Event *event)
 {
@@ -230,8 +206,7 @@ static gint32 event_filter (const SDL_Event *event)
 		if (resizing) {
 			g_return_val_if_fail (SDL_UnlockMutex (resizing_mutex) >= 0, 0);
 			/*
-			 * VIDEORESIZE event is dropped
-			 * from the event queue
+			 * VIDEORESIZE event dropped from event queue
 			 */
 			return 0;
 		} else {
@@ -261,16 +236,11 @@ static gint32 event_filter (const SDL_Event *event)
 	return 1;
 }
 
-
 static gint disable_func (gpointer data)
 {
-	g_return_val_if_fail (plugin != NULL, FALSE);
-
-	plugin->disable_plugin (plugin);
-
+	renderer_finish();
 	return FALSE;
 }
-
 
 static void check_events ()
 {
@@ -284,7 +254,6 @@ static void check_events ()
 
 	if (config_get_show_title()) {
 		if (g_timer_elapsed (title_timer, NULL) > 1.0) {
-			g_return_if_fail (plugin != NULL);
 			if (audacious_remote_is_playing (dbus_proxy)) {
 				if (current_title)
 					g_free (current_title);
@@ -448,7 +417,6 @@ static void check_events ()
 #endif /* INFINITY_DEBUG */
 }
 
-
 static int renderer (void *arg)
 {
 	gint32 render_time, now;
@@ -529,7 +497,6 @@ static int renderer (void *arg)
 
 	return 0;
 }
-
 
 #if MMX_DETECTION
 static int renderer_mmx (void *arg)
@@ -618,3 +585,4 @@ static void set_title (void)
 {
 	SDL_WM_SetCaption (current_title, "Infinity");
 }
+

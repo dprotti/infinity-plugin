@@ -3,7 +3,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
 
-
 #include "main.h"
 #include "renderer.h"
 

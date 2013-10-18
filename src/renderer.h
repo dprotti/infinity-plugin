@@ -1,8 +1,8 @@
 /**
  * \file renderer.h
  *
- * \brief This module control the rendering process and his interaction
- * with the events that affects the application.
+ * \brief Controls the rendering process and its interaction with application
+ * events.
  */
 
 /*
@@ -23,43 +23,26 @@
 #ifndef	__INFINITY_RENDERER__
 #define __INFINITY_RENDERER__
 
-#include <audacious/plugin.h>
 #include <glib.h>
 
-
 /**
- * Initializes the rendering process.
+ * Initializes rendering process.
  *
- * It reads the plugin's configuration parameters and launchs
- * a thread on which almost all the job of the plugin will be
- * done.
+ * Reads configuration parameters and launchs a thread where most of the
+ * plugin job gets done.
  */
 void renderer_init (void);
 
 /**
- * Closes the rendering process.
+ * Closes rendering process.
  */
 void renderer_finish (void);
 
-/*
- * Set a reference to a structure where there is the
- * information about the plugin.
- *
- * @param vplugin Must be a non NULL reference to an
- * Audacity VisPlugin structure properly initialized.
- *
- * \see <xmms/plugin.h>
- */
-void renderer_set_plugin_info (VisPlugin *vplugin);
-
 /**
- * Copy the actual PCM data from Audacity.
+ * Copies PCM data from Audacity.
  *
- * It is supposed that this function is called periodically
- * by Audacity copying the PCM data which corresponds to the 
- * current sound played.
+ * Called periodically by Audacity with actual PCM data.
  */
-void renderer_set_pcm_data (gint16 data[2][512]);
-
+void renderer_render_multi_pcm (const float * data, int channels);
 
 #endif /* __INFINITY_RENDERER__ */
