@@ -10,22 +10,39 @@ by
 Infinity is a visualization plugin that generates light effects according to a
 playing sound.
 
-To run the plugin, 
-- run audacious
-- enter the Preferences menu (Ctrl-P)
-- choose Plugins on the left
-- choose Visualization tab on the right frame
-- mark Infinity checkbox
-- press Tab if you want to enter Full-Screen mode
-- to stop it, press Tab again and disable it.
+Requirements
+------------
 
-You don't need to be root to enter the full-screen mode.
+- Audacious >= 3.2 (http://audacious-media-player.org/)
+- SDL >= 1.0.6
+- Glib >= 2.8
+- Gtk+ >= 2.8
 
-There are two different modes in the plugin. Default mode is non-interactive.
+Install
+-------
+
+- ./configure --prefix=/usr (or whatever your prefix is)
+- make
+- sudo make install
+
+Run
+---
+
+- start Audacious
+- enter menu View -> Visualizations
+- mark Infinity
+- play your favorite songs
+
+To enter/leave Full-Screen mode press Tab key.
+
+Modes
+-----
+
+The plugin has two modes. Default is non-interactive.
 
 - Non-Interactive Mode:
 
-States and palettes periodically switches, in a random sequence.
+States and palettes periodically switches in a random sequence.
 
 If you run Audacity from a terminal the following command keys will display on
 terminal when Infinity loads:
@@ -61,16 +78,10 @@ You can control the effects using keys:
   - mouse:  change curve 2 position  
   - F11:    screenshot
 
-Dependencies
-------------
-
-Audacious >= 3.2
-SDL >= 1.0.6
-Glib >= 2.8
-Gtk+ >= 2.8
-
 Known Bugs
 ----------
+
+As of 0.8.0beta1 the settings window and the about dialog does not work.
 
 If you have problems finding locale.h header file, try to configure with
 --disable-nls option.
