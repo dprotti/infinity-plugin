@@ -92,6 +92,11 @@ In Ubuntu systems over AMD64 architectures, try running configure with
 If you found a bug please report it at
 <https://github.com/dprotti/infinity-plugin/issues>.
 
+Old Versions
+------------
+
+Releases older than 0.8.0beta1 can be found at Sourceforge: <https://sourceforge.net/projects/infinity-plugin/>
+
 Contributions
 -------------
 
