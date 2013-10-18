@@ -131,7 +131,7 @@ version_check() {
     done
     if [ "$vc_status" != 0 ]; then
 	printerr "***Error***: You must have $vc_package $vc_comparator $vc_min_version installed"
-	printerr "  to build $PKG_NAME.  Download the appropriate package for"
+	printerr "  to build $PKG_NAME.  Download the appropriate package"
 	printerr "  from your distribution or get the source tarball at"
         printerr "    $vc_source"
 	printerr
