@@ -1,33 +1,34 @@
 Infinity Visualization Plugin
 -----------------------------
 
-http://infinity-plugin.sf.net
+https://github.com/dprotti/infinity-plugin
 
-by Julien Carme (c) 2000
-  Duilio Protti (c) 2004 - 2011
+by
+- Julien Carme (c) 2000
+- Duilio Protti (c) 2004 - 2013
 
 Infinity is a visualization plugin that generates light effects according to a
 playing sound.
 
 To run the plugin, 
--run audacious
--enter the Preferences menu (Ctrl-P)
--choose Plugins on the left
--choose Visualization tab on the right frame
--mark Infinity checkbox
--press Tab if you want to enter Full-Screen mode
--to stop it, press Tab again and disable it.
+- run audacious
+- enter the Preferences menu (Ctrl-P)
+- choose Plugins on the left
+- choose Visualization tab on the right frame
+- mark Infinity checkbox
+- press Tab if you want to enter Full-Screen mode
+- to stop it, press Tab again and disable it.
 
 You don't need to be root to enter the full-screen mode.
 
 There are two different modes in the plugin. Default mode is non-interactive.
 
--Non-Interactive Mode:
+- Non-Interactive Mode:
 
-States and palettes are selected randomly, and change sometimes.
+States and palettes periodically switches, in a random sequence.
 
-The following command keys will be shown when Infinity loads. If you want to
-see it, start Audacity from a terminal.
+If you run Audacity from a terminal the following command keys will display on
+terminal when Infinity loads:
 
   Keys:
   - Space:	change effect.
@@ -44,11 +45,9 @@ see it, start Audacity from a terminal.
   - F11:   	screenshot.
   - F12:   	change palette.
 
--Interactive Mode:
+- Interactive Mode:
 
-You can control the effect:
-
-  Keys:
+You can control the effects using keys:
 
   - F12:    change palette.
   - Tab:    toggle full-screen.
@@ -62,50 +61,28 @@ You can control the effect:
   - mouse:  change curve 2 position  
   - F11:    screenshot
 
-SDL
----
+Dependencies
+------------
 
-You must have installed SDL 1.0.6 or above to run the plugin.
+Audacious >= 3.2
+SDL >= 1.0.6
+Glib >= 2.8
+Gtk+ >= 2.8
 
 Known Bugs
 ----------
 
-Your X system has to be at least in 16 bpp to make this program work. If you
-have more than 16 bpp, it should work but may be very slow. The Preferences
-cannot be changed while the plugin is enabled.
-
 If you have problems finding locale.h header file, try to configure with
 --disable-nls option.
 
-If you found a bug on this program, please take five minutes of your time and
-fill a bug report on the project's site <http://infinity-plugin.sf.net>.
-The author will work to solve the problem.
+In Ubuntu systems over AMD64 architectures, try running configure with
+--prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu
+
+If you found a bug please report it at
+<https://github.com/dprotti/infinity-plugin/issues>.
 
 Contributions
 -------------
 
-This project as of 2011 welcomes people that makes translations and people
-to make binary distributions. Translations are easy because of the gettext
-system, and because Infinity have just a few translatable strings (and that
-will not change, this is a plugin so doesn't have a rich user interface).
-Both translations and binary packages are very important because the intended
-audience are end users, so we aim to leave things as simple as possible.
-
-If you want to keep track of Infinity development, subscribe to the development
-mailing list at:
-
-http://lists.sourceforge.net/mailman/listinfo/infinity-plugin-devel
-
-You don't need to be a project developer to subscribe.
-
-New Features
-------------
-
-If you like any new feature on this program, please fill a feature request
-or directly submit a patch to SourceForge's project site at:
-
-http://sourceforge.net/projects/infinity-plugin
-
-
-Duilio J. Protti.
-
+Your help is welcome, either coding, translating or building binary (distro)
+packages.
