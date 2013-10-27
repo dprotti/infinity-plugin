@@ -18,7 +18,7 @@ void effects_save_effect (t_effect *effect)
     
 	g_assert (effect);
 	/** TODO Remove hardcoded path */
-	f = fopen ("/usr/share/audacious/infinite_states","a");
+	f = fopen ("/usr/local/share/audacious/infinite_states","a");
 	if (f == NULL) {
 		g_warning (_("Could not be opened file %s for saving effects\n"),
 			   datafile);
@@ -37,7 +37,7 @@ void effects_load_effects (void)
 	gint32 finished = 0;
 	gint32 i, b, c, d, e;
 
-	f = fopen ("/usr/share/audacious/infinite_states","r");
+	f = fopen ("/usr/local/share/audacious/infinite_states","r");
 	if (f == NULL) {
 		g_warning (_("Could not be opened file %s for loading effects\n"),
 			   datafile);
