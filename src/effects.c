@@ -12,25 +12,25 @@ static t_effect effects[100];
 static gint32 nb_effects = 0;
 static gboolean initialized = FALSE;
 
-void effects_save_effect (t_effect *effect)
+void effects_save_effect(t_effect *effect)
 {
 	gchar datafile[256], path[256];
 	FILE *f;
 	gint32 i;
-    
-	g_assert (effect);
+
+	g_assert(effect);
 	f = fopen (EFFECTS_FILE,"a");
 	if (f == NULL) {
 		g_warning (_("Cannot open file %s for saving effects\n"),
 			   EFFECTS_FILE);
-		return ;
+		return;
 	}
-	for (i = 0; i < sizeof(t_effect); i++) 
-		fputc (*((byte*)effect+i), f);
-	fclose (f);
+	for (i = 0; i < sizeof(t_effect); i++)
+		fputc(*((byte *)effect + i), f);
+	fclose(f);
 }
 
-void effects_load_effects (void)
+void effects_load_effects(void)
 {
 	gchar path[255];
 	gchar datafile[255];
@@ -42,13 +42,13 @@ void effects_load_effects (void)
 	if (f == NULL) {
 		g_warning (_("Cannot open file %s for loading effects\n"),
 			   EFFECTS_FILE);
-		return ;
+		return;
 	}
 	while (!finished) {
-		byte* ptr_effect = (byte*)&effects[nb_effects];
-		for (i=0;i < sizeof(t_effect); i+=4) {
-			b=fgetc(f);
-			if (b!=EOF) {
+		byte *ptr_effect = (byte *)&effects[nb_effects];
+		for (i = 0; i < sizeof(t_effect); i += 4) {
+			b = fgetc(f);
+			if (b != EOF) {
 				c = fgetc(f);
 				assert(c != EOF);
 				d = fgetc(f);
@@ -56,39 +56,39 @@ void effects_load_effects (void)
 				e = fgetc(f);
 				assert(e != EOF);
 #if BYTE_ORDER == BIG_ENDIAN
-				ptr_effect[i]=(byte)e;
-				ptr_effect[i+1]=(byte)d;
-				ptr_effect[i+2]=(byte)c;
-				ptr_effect[i+3]=(byte)b;
+				ptr_effect[i] = (byte)e;
+				ptr_effect[i + 1] = (byte)d;
+				ptr_effect[i + 2] = (byte)c;
+				ptr_effect[i + 3] = (byte)b;
 #else
-				ptr_effect[i]=(byte)b;
-				ptr_effect[i+1]=(byte)c;
-				ptr_effect[i+2]=(byte)d;
-				ptr_effect[i+3]=(byte)e;
+				ptr_effect[i] = (byte)b;
+				ptr_effect[i + 1] = (byte)c;
+				ptr_effect[i + 2] = (byte)d;
+				ptr_effect[i + 3] = (byte)e;
 #endif
-			} else
-				finished=1;
+			} else {
+				finished = 1;
+			}
 		}
-		nb_effects+=1;
+		nb_effects += 1;
 	}
 	nb_effects -= 1;
-	fclose (f);
+	fclose(f);
 }
 
-void effects_load_random_effect (t_effect *effect)
+void effects_load_random_effect(t_effect *effect)
 {
 	gint32 trash;
 
 	if (!initialized) {
-		srand (trash);
+		srand(trash);
 		initialized = TRUE;
 	}
 	if (nb_effects > 0) {
 		gint32 num_effect = rand() % nb_effects;
 		gint32 i;
-        
-		for (i = 0; i < sizeof(t_effect); i++) {
-			*((byte*)effect+i) = *((byte*)(&effects[num_effect])+i);
-		}
+
+		for (i = 0; i < sizeof(t_effect); i++)
+			*((byte *)effect + i) = *((byte *)(&effects[num_effect]) + i);
 	}
 }
