@@ -58,8 +58,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
 		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	case 1:
 		an = 0.015 * (p1 - 2) + 0.002;
@@ -70,8 +70,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
 		fact = (sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	case 2:
 		an = 0.002;
@@ -82,8 +82,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
 		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	case 3:
 		an = (sin(sqrt(a.x * a.x + a.y * a.y) / 20) / 20) + 0.002;
@@ -94,8 +94,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
 		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	case 4:
 		an = 0.002;
@@ -106,8 +106,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
 		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	case 5:
 		b.x = a.x * 1.02;
@@ -121,8 +121,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		fact = 1 + cos(atan(a.x / (a.y + 0.00001)) * 6) * 0.02;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
-		b.x = (b.x * fact);
-		b.y = (b.y * fact);
+		b.x *= fact;
+		b.y *= fact;
 		break;
 	default:
 		b.x = (gfloat)0.0;

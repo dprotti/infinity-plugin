@@ -43,8 +43,8 @@
 #endif
 
 #define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
-#define next_effect()   (t_last_effect += 1)
-#define next_color()    (t_last_color += 1)
+#define next_effect()   (t_last_effect++)
+#define next_color()    (t_last_color++)
 
 typedef struct t_general_parameters {
 	gint32	t_between_effects;
@@ -359,7 +359,7 @@ static void check_events()
 				if (t_last_color > 32) {
 					t_last_color = 0;
 					old_color = color;
-					color = (color + 1) % NB_PALETTES;
+					color = ++color % NB_PALETTES;
 				}
 				break;
 			case SDLK_SPACE:

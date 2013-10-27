@@ -70,9 +70,9 @@ void effects_load_effects(void)
 				finished = 1;
 			}
 		}
-		nb_effects += 1;
+		nb_effects++;
 	}
-	nb_effects -= 1;
+	nb_effects--;
 	fclose(f);
 }
 

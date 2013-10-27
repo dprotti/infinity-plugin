@@ -83,8 +83,6 @@ static void generate_colors()
 			color_table[k][i].r = (Uint8)(colors[k][0][0] * i);
 			color_table[k][i].g = (Uint8)(colors[k][0][1] * i);
 			color_table[k][i].b = (Uint8)(colors[k][0][2] * i);
-		}
-		for (i = 0; i < 128; i++) {
 			color_table[k][i + 128].r = (Uint8)(colors[k][0][0] * 127 + colors[k][1][0] * i);
 			color_table[k][i + 128].g = (Uint8)(colors[k][0][1] * 127 + colors[k][1][1] * i);
 			color_table[k][i + 128].b = (Uint8)(colors[k][0][2] * 127 + colors[k][1][2] * i);
