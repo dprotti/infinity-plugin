@@ -166,24 +166,24 @@ if test x"$GCC" = xyes; then
 fi
 
 AC_ARG_ENABLE([vectorization],
-            AS_HELP_STRING([--enable-vectorization],[Turn on vectorization optimizations (gcc 4 only) @<:@default=enabled@:>@]),
+            AS_HELP_STRING([--enable-vectorization],[Turn on vectorization optimizations (gcc >= 4 only) @<:@default=enabled@:>@]),
 	    [vectorization=$enableval],
 	    [vectorization=yes])
 
-AC_MSG_CHECKING([whether to activate vectorization under gcc 4])
+AC_MSG_CHECKING([whether to activate vectorization under gcc >= 4])
 if test x"$vectorization" = xyes; then
   AC_MSG_RESULT([yes])
   if test x"$GCC" = xno; then
     AC_MSG_ERROR([You are not using a gcc compiler])
   else
-    # On some distros, there are snapshots available as gcc4
+    # Some distros call gcc 4.x as gcc4
     if test -z "$ac_cv_prog_CC" || test x"$CC" = xgcc4; then
       our_gcc="$CC"
     else
       our_gcc="$ac_cv_prog_CC"
     fi
     case `$our_gcc --version | sed -e 's,\..*,.,' -e q` in
-      *4.)
+      *4. | *5.)
         INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -ftree-vectorize"
 	case "$target_cpu" in
 	  i*86|ia64*)
