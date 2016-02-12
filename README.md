@@ -9,7 +9,8 @@ playing sound.
 Requirements
 ------------
 
-- Audacious >= 3.1 (http://audacious-media-player.org/)
+- Audacious >= 3.5 (http://audacious-media-player.org/)
+- Audclient >= 3.5 (Audacious D-BUS remote control library)
 - SDL >= 1.0.6
 - Glib >= 2.8
 - Gtk+ >= 2.8
@@ -92,7 +93,7 @@ Authors
 -------
 
 - Julien Carme (c) 2000 Original author
-- Duilio Protti (C) 2004 - 2013 <dprotti@users.sourceforge.net> Actual maintainer
+- Duilio Protti (C) 2004 - Present : Current maintainer
 - John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
 - Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
 - Will Tatam (C) 2004 <wtatam@premierit.com> Online source RPMs <http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/>

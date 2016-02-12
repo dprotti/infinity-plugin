@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([Infinity plugin],[0.8.0beta1],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
+AC_INIT([Infinity plugin],[0.8.0beta2],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
 AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
 
 INF_MSG_MMX_NOT_ALLOWED="
@@ -81,9 +81,13 @@ PKG_CHECK_MODULES(DBUSGLIB1, dbus-glib-1 >= 0.92,,)
 AC_SUBST(DBUSGLIB1)
 AC_SUBST(DBUSGLIB1)
 
-PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.1,,)
+PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.5,,)
 AC_SUBST(AUDACIOUS_LIBS)
 AC_SUBST(AUDACIOUS_CFLAGS)
+
+PKG_CHECK_MODULES(AUDCLIENT, audclient >= 3.5,,)
+AC_SUBST(AUDCLIENT_LIBS)
+AC_SUBST(AUDCLIENT_CFLAGS)
 
 AC_PATH_PROG(SDL_CONFIG, [sdl-config], [no])
 if test x$SDL_CONFIG = xno ; then
@@ -224,9 +228,9 @@ AC_CONFIG_FILES([Makefile
 AC_OUTPUT
 
 echo "
-=========================================================
+==============================================================
 Infinity Plugin for the Audacious Player -- version $VERSION
-=========================================================
+==============================================================
 
 Install path           : ${libdir}
 Compiler               : ${CC}
