@@ -6,6 +6,8 @@
 #include <gettext.h>
 #include <assert.h>
 
+#define EFFECTS_FILE	(DATADIR "/infinite_states")
+
 static t_effect effects[100];
 static gint32 nb_effects = 0;
 static gboolean initialized = FALSE;
@@ -17,11 +19,10 @@ void effects_save_effect (t_effect *effect)
 	gint32 i;
     
 	g_assert (effect);
-	/** TODO Remove hardcoded path */
-	f = fopen ("/usr/local/share/audacious/infinite_states","a");
+	f = fopen (EFFECTS_FILE,"a");
 	if (f == NULL) {
-		g_warning (_("Could not be opened file %s for saving effects\n"),
-			   datafile);
+		g_warning (_("Cannot open file %s for saving effects\n"),
+			   EFFECTS_FILE);
 		return ;
 	}
 	for (i = 0; i < sizeof(t_effect); i++) 
@@ -37,10 +38,10 @@ void effects_load_effects (void)
 	gint32 finished = 0;
 	gint32 i, b, c, d, e;
 
-	f = fopen ("/usr/local/share/audacious/infinite_states","r");
+	f = fopen (EFFECTS_FILE,"r");
 	if (f == NULL) {
-		g_warning (_("Could not be opened file %s for loading effects\n"),
-			   datafile);
+		g_warning (_("Cannot open file %s for loading effects\n"),
+			   EFFECTS_FILE);
 		return ;
 	}
 	while (!finished) {

@@ -11,7 +11,7 @@ localedir = $(infinity_datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
 AM_CFLAGS = @CFLAGS@ @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
-	@GLIB_CFLAGS@ @DBUSGLIB1_CFLAGS@ $(INF_CFLAGS_EXTRA)
+	@GLIB_CFLAGS@ @DBUSGLIB1_CFLAGS@ $(INF_CFLAGS_EXTRA) -DDATADIR='"$(datadir)"'
 
 libinfinite_la_LDFLAGS = -export-dynamic -avoid-version
 libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @AUDCLIENT_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@ @DBUSGLIB1_LIBS@
