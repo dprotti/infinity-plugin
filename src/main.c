@@ -23,11 +23,16 @@
 #include <string.h>
 #include <audacious/plugin.h>
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 
 #include "config.h"
 #include "infconfig.h"
 #include "renderer.h"
-#include "gettext.h"
+
+static const char infinity_about[] =
+	N_("Infinity Visualization Plugin for Audacious\n\n"
+		"Version " PACKAGE_VERSION "\n\n"
+		"https://github.com/dprotti/infinity-plugin");
 
 static bool_t plugin_init  (void);
 static void   plugin_close (void);
@@ -41,9 +46,9 @@ AUD_VIS_PLUGIN (
 	.init			= plugin_init,
 	.cleanup		= plugin_close,
 	.take_message		= NULL,
-	.about			= NULL, // TODO
+	.about			= NULL,
+	.about_text		= infinity_about,
 	.configure		= config_plugin_config_window,
-	//.settings		= NULL, // TODO
 	//.playback_stop		= NULL,
 
 	/* reset internal state and clear display */
