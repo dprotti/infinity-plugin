@@ -21,7 +21,11 @@
 #include <dbus/dbus.h>
 
 #include <audacious/audctrl.h>
+#include <audacious/playlist.h>
+#include <audacious/drct.h>
+
 #include <audacious/dbus.h>
+
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
@@ -245,7 +249,7 @@ static gint disable_func (gpointer data)
 static void check_events ()
 {
 	SDL_Event event;
-	//gint volume;
+	gint volume;
 
 	/*XEvent *xevent;
 	  XWindowChanges changes;
@@ -254,10 +258,10 @@ static void check_events ()
 
 	if (config_get_show_title()) {
 		if (g_timer_elapsed (title_timer, NULL) > 1.0) {
-			if (audacious_remote_is_playing (dbus_proxy)) {
+			if (aud_drct_get_playing () && aud_drct_get_ready ()) {
 				if (current_title)
 					g_free (current_title);
-				current_title = g_strdup (audacious_remote_get_playlist_title (dbus_proxy, audacious_remote_get_playlist_pos (dbus_proxy)));
+				current_title = g_strdup (aud_playlist_entry_get_title(aud_playlist_get_playing (), aud_playlist_get_position(aud_playlist_get_playing ()), FALSE));
 				set_title();
 			}
 			else {
@@ -316,43 +320,40 @@ static void check_events ()
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				 if (audacious_remote_is_playing (dbus_proxy))
-					audacious_remote_jump_to_time (dbus_proxy,
-								  audacious_remote_get_output_time (dbus_proxy) + 5000);
+				 if (aud_drct_get_playing () && aud_drct_get_ready ())
+				 	aud_drct_seek (aud_drct_get_time () + 5000);
 				break;
 			case SDLK_LEFT:
-				if (audacious_remote_is_playing (dbus_proxy))
-					audacious_remote_jump_to_time (dbus_proxy,
-								  audacious_remote_get_output_time (dbus_proxy) - 5000);
+				if (aud_drct_get_playing () && aud_drct_get_ready ())
+					aud_drct_seek (aud_drct_get_time () - 5000);
 				break;
-			/* FIXME Audacious freezes when buttons are pressed in a quick sequence
 			case SDLK_UP:
-				volume = audacious_remote_get_main_volume (dbus_proxy);
+				aud_drct_get_volume_main(&volume);
 				g_message(_("Increasing volume to %d"), volume + 5);
-				audacious_remote_set_main_volume (dbus_proxy, volume + 5);
+				aud_drct_set_volume_main(volume + 5);
 				break;
 			case SDLK_DOWN:
-				volume = audacious_remote_get_main_volume (dbus_proxy);
+				aud_drct_get_volume_main(&volume);
 				g_message(_("Decreasing volume to %d"), volume - 5);
-				audacious_remote_set_main_volume (dbus_proxy, volume - 5);
-				break;*/
+				aud_drct_set_volume_main(volume - 5);
+				break;
 			case SDLK_TAB:
 				display_toggle_fullscreen ();
 				break;
 			case SDLK_z:
-				audacious_remote_playlist_prev (dbus_proxy);
+				aud_drct_pl_prev();
 				break;
 			case SDLK_x:
-				audacious_remote_play (dbus_proxy);
+				aud_drct_play();
 				break;
 			case SDLK_c:
-				audacious_remote_pause (dbus_proxy);
+				aud_drct_pause();
 				break;
 			case SDLK_v:
-				audacious_remote_stop (dbus_proxy);
+				aud_drct_stop();
 				break;
 			case SDLK_b:
-				audacious_remote_playlist_next (dbus_proxy);
+				aud_drct_pl_next();
 				break;
 			case SDLK_F11:
 				display_save_screen ();

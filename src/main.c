@@ -43,7 +43,7 @@ AUD_VIS_PLUGIN (
 	.take_message		= NULL,
 	.about			= NULL, // TODO
 	.configure		= config_plugin_config_window,
-	.settings		= NULL, // TODO
+	//.settings		= NULL, // TODO
 	//.playback_stop		= NULL,
 
 	/* reset internal state and clear display */
