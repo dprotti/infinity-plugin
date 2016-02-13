@@ -1,15 +1,15 @@
 Infinity Visualization Plugin
 =============================
 
-https://github.com/dprotti/infinity-plugin
+Plugin for [Audacious](http://audacious-media-player.org/) player that generates light effects
+according to a playing sound.
 
-Infinity is a visualization plugin that generates light effects according to a
-playing sound.
+![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
 ------------
 
-- Audacious >= 3.5 (http://audacious-media-player.org/)
+- Audacious >= 3.5
 - Audclient >= 3.5 (Audacious D-BUS remote control library)
 - SDL >= 1.0.6
 - Glib >= 2.8
