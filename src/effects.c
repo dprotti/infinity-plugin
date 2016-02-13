@@ -14,7 +14,6 @@ static gboolean initialized = FALSE;
 
 void effects_save_effect(t_effect *effect)
 {
-	gchar datafile[256], path[256];
 	FILE *f;
 	gint32 i;
 
@@ -32,8 +31,6 @@ void effects_save_effect(t_effect *effect)
 
 void effects_load_effects(void)
 {
-	gchar path[255];
-	gchar datafile[255];
 	FILE *f;
 	gint32 finished = 0;
 	gint32 i, b, c, d, e;
@@ -81,6 +78,7 @@ void effects_load_random_effect(t_effect *effect)
 	gint32 trash;
 
 	if (!initialized) {
+		#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 		srand(trash);
 		initialized = TRUE;
 	}
