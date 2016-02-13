@@ -19,8 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-#ifndef	__INFINITY_EFFECTS__
+ */
+#ifndef __INFINITY_EFFECTS__
 #define __INFINITY_EFFECTS__
 
 
@@ -33,31 +33,31 @@
  * \todo document structure fields. Some of them are two big, byte
  * would be enough for some of them.
  */
-typedef struct { 
-    gint32 num_effect; /**< The number of the effect */
-    gint32 x_curve; 
-    gint32 curve_color;
-    gint32 curve_amplitude;	
-    gint32 spectral_amplitude;
-    gint32 spectral_color;
-    gint32 mode_spectre;
-    gint32 spectral_shift;
+typedef struct {
+	gint32	num_effect; /**< The number of the effect */
+	gint32	x_curve;
+	gint32	curve_color;
+	gint32	curve_amplitude;
+	gint32	spectral_amplitude;
+	gint32	spectral_color;
+	gint32	mode_spectre;
+	gint32	spectral_shift;
 } t_effect;
 
 /**
  * Saves the given effect pointed by \a effect to disk.
  *
- * The effect are saved to the file 
+ * The effect are saved to the file
  * {prefix}/share/xmms/infinity_states, where {prefix} is
  * usually /usr or /usr/local.
  *
  * @param effect Must be a non NULL reference to a ::t_effect
  * object.
  */
-void effects_save_effect (t_effect *effect);
+void effects_save_effect(t_effect *effect);
 
-void effects_load_effects (void);
-void effects_load_random_effect (t_effect *effect);
+void effects_load_effects(void);
+void effects_load_random_effect(t_effect *effect);
 
 
 #endif /* __INFINITY_EFFECTS__ */

@@ -19,7 +19,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
+ */
 #include <string.h>
 #include <audacious/plugin.h>
 #include <gtk/gtk.h>
@@ -34,72 +34,72 @@ static const char infinity_about[] =
 		"Version " PACKAGE_VERSION "\n\n"
 		"https://github.com/dprotti/infinity-plugin");
 
-static bool_t plugin_init  (void);
-static void   plugin_close (void);
-static void   clear        (void);
+static bool_t plugin_init(void);
+static void   plugin_close(void);
+static void   clear(void);
 
 /*
  * Registers plugin with Audacious.
  */
-AUD_VIS_PLUGIN (
-	.name 			= "Infinity",
-	.init			= plugin_init,
-	.cleanup		= plugin_close,
-	.take_message		= NULL,
+AUD_VIS_PLUGIN(
+	.name = "Infinity",
+	.init = plugin_init,
+	.cleanup = plugin_close,
+	.take_message = NULL,
 	.about			= NULL,
 	.about_text		= infinity_about,
-	.configure		= config_plugin_config_window,
-	//.playback_stop		= NULL,
+	.configure = config_plugin_config_window,
+                        //.playback_stop		= NULL,
 
-	/* reset internal state and clear display */
-	.clear			= clear,
+                        /* reset internal state and clear display */
+	.clear = clear,
 
-	/* 512 frames of a single-channel PCM signal */
-	.render_mono_pcm	= NULL,
+        /* 512 frames of a single-channel PCM signal */
+	.render_mono_pcm = NULL,
 
-	/* 512 frames of an interleaved multi-channel PCM signal */
-	.render_multi_pcm	= renderer_render_multi_pcm,
+        /* 512 frames of an interleaved multi-channel PCM signal */
+	.render_multi_pcm = renderer_render_multi_pcm,
 
-	/* intensity of frequencies 1/512, 2/512, ..., 256/512 of sample rate */
-	.render_freq		= NULL,
+        /* intensity of frequencies 1/512, 2/512, ..., 256/512 of sample rate */
+	.render_freq = NULL,
 
-	/* GtkWidget * (* get_widget) (void); */
-	.get_widget		= NULL
-);
+        /* GtkWidget * (* get_widget) (void); */
+	.get_widget = NULL
+	);
 
-static void clear (void) {
-	g_message ("TODO implement clear()");
+static void clear(void)
+{
+	g_message("TODO implement clear()");
 }
 
-static bool_t plugin_init (void)
+static bool_t plugin_init(void)
 {
 #if ENABLE_NLS
-	(void) setlocale (LC_MESSAGES, "");
-	(void) bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-	(void) textdomain (GETTEXT_PACKAGE);
+	(void)setlocale(LC_MESSAGES, "");
+	(void)bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
+	(void)textdomain(GETTEXT_PACKAGE);
 #endif
 
-	g_message (_("Infinity commands:\n"
-		     "- Space:\tchange effect.\n"
-		     "- Tab:\t\ttoggle full-screen.\n"
-		     "- Up/Down:\tup/down main volume.\n"
-		     "- Left/Right:\treward/forward actual played song, if any.\n"
-		     "- z:\t\tprevious song.\n"
-		     "- x:\t\tplay.\n"
-		     "- c:\t\tpause.\n"
-		     "- v:\t\tstop.\n"
-		     "- b:\t\tnext song.\n"
-		     "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
-		     "- F11:\t\tscreenshot.\n"
-		     "- F12:\t\tchange palette."));
-	config_plugin_load_prefs ();
-	renderer_init ();
-        return TRUE;
+	g_message(_("Infinity commands:\n"
+		    "- Space:\tchange effect.\n"
+		    "- Tab:\t\ttoggle full-screen.\n"
+		    "- Up/Down:\tup/down main volume.\n"
+		    "- Left/Right:\treward/forward actual played song, if any.\n"
+		    "- z:\t\tprevious song.\n"
+		    "- x:\t\tplay.\n"
+		    "- c:\t\tpause.\n"
+		    "- v:\t\tstop.\n"
+		    "- b:\t\tnext song.\n"
+		    "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
+		    "- F11:\t\tscreenshot.\n"
+		    "- F12:\t\tchange palette."));
+	config_plugin_load_prefs();
+	renderer_init();
+	return TRUE;
 }
 
-static void plugin_close (void)
+static void plugin_close(void)
 {
-	config_plugin_save_prefs ();
-	renderer_finish ();
+	config_plugin_save_prefs();
+	renderer_finish();
 }
-

@@ -19,8 +19,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-*/
-#ifndef	__INFINITY_DISPLAY__
+ */
+#ifndef __INFINITY_DISPLAY__
 #define __INFINITY_DISPLAY__
 
 #include <SDL/SDL.h>
@@ -42,7 +42,7 @@
  * library, must be called before any SDL operation and
  * must not be called when SDL was already started.
  */
-void display_init (void);
+void display_init(void);
 
 /**
  * Closes the display module.
@@ -54,10 +54,10 @@ void display_init (void);
  * inside this function, because display_set_pcm_data()
  * could be bloqued on a mutex, mutex that display_quit()
  * will destroy!
- * 
+ *
  * \see display_init().
  */
-void display_quit (void);
+void display_quit(void);
 
 /**
  * Change the size of the display to the new dimension
@@ -67,7 +67,7 @@ void display_quit (void);
  * screen is resized (i.e. when is resized the window where
  * the screen is embedded in).
  */
-void display_resize (gint32 width, gint32 height);
+void display_resize(gint32 width, gint32 height);
 
 /**
  * Set \a data as the data PCM data of this module.
@@ -78,25 +78,25 @@ void display_resize (gint32 width, gint32 height);
  *
  * \see display_quit().
  */
-void display_set_pcm_data (const float * data, int channels);
+void display_set_pcm_data(const float *data, int channels);
 
-void display_show (void);
+void display_show(void);
 
-void change_color (gint32 old_p, gint32 p, gint32 w);
-void display_blur (guint32 vector_index);
-void display_blur_mmx (guint32 vector_index);
-void spectral (t_effect* current_effect);
-void curve (t_effect* current_effect);
+void change_color(gint32 old_p, gint32 p, gint32 w);
+void display_blur(guint32 vector_index);
+void display_blur_mmx(guint32 vector_index);
+void spectral(t_effect *current_effect);
+void curve(t_effect *current_effect);
 
 /**
  * Makes the plugin screen switch to full screen mode.
  *
  * \see display_init().
  */
-void display_toggle_fullscreen (void);
+void display_toggle_fullscreen(void);
 
-void display_save_screen (void);
-void display_save_effect (t_effect *effect);
-void display_load_random_effect (t_effect *effect);
+void display_save_screen(void);
+void display_save_effect(t_effect *effect);
+void display_load_random_effect(t_effect *effect);
 
 #endif /* __INFINITY_DISPLAY__ */
