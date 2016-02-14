@@ -8,9 +8,7 @@
 #include "gettext.h"
 #include "config-dialog.h"
 
-//#define DEFAULT_WIDTH                         500
 #define DEFAULT_WIDTH                   512
-//#define DEFAULT_HEIGHT                        375
 #define DEFAULT_HEIGHT                  288
 #define DEFAULT_TIME_EFFECT             100
 #define DEFAULT_TIME_PALETTE            100
@@ -201,13 +199,12 @@ static void connect_callbacks(ConfigDialog *configure_dialog)
 void config_plugin_load_prefs(void)
 {
 	gint value;
-	//gboolean bvalue;
 	GKeyFile *kf;
 	gchar *config_file_path;
 	gboolean error, must_update, config_file_usable;
 
 	kf = g_key_file_new();
-	config_file_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_FILE, 0);
+	config_file_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_FILE, NULL);
 	config_file_usable = g_key_file_load_from_file(kf, config_file_path, G_KEY_FILE_KEEP_COMMENTS, NULL);
 	error = must_update = FALSE;
 	if (config_file_usable) {
@@ -275,8 +272,8 @@ void config_plugin_save_prefs(void)
 	gsize length;
 
 	kf = g_key_file_new();
-	config_dir_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_DIR, 0);
-	config_file_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_FILE, 0);
+	config_dir_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_DIR, NULL);
+	config_file_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_FILE, NULL);
 	ok = g_key_file_load_from_file(kf, config_file_path, G_KEY_FILE_KEEP_COMMENTS, NULL);
 	if (!ok) {
 		g_message(_("Infinity plugin .ini file not found"));

@@ -359,7 +359,7 @@ static void check_events()
 				if (t_last_color > 32) {
 					t_last_color = 0;
 					old_color = color;
-					color = ++color % NB_PALETTES;
+					color = (color + 1) % NB_PALETTES;
 				}
 				break;
 			case SDLK_SPACE:

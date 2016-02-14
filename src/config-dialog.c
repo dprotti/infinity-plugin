@@ -1,5 +1,6 @@
 #include "config.h"
 #include "config-dialog.h"
+#include "infconfig.h"
 #include "gettext.h"
 
 

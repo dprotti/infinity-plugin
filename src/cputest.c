@@ -138,17 +138,17 @@ int mm_support_check_and_show()
 	}
 	msg = g_strdup("Infinity: Looking for Multimedia Extensions Support...");
 	if (r & MM_MMX) {
-		tmp = g_strconcat(msg, " MMX", 0);
+		tmp = g_strconcat(msg, " MMX", NULL);
 		g_free(msg);
 		msg = tmp;
 	}
 	if (r & MM_3DNOW) {
-		tmp = g_strconcat(msg, " 3DNOW", 0);
+		tmp = g_strconcat(msg, " 3DNOW", NULL);
 		g_free(msg);
 		msg = tmp;
 	}
 	if (r & MM_MMXEXT) {
-		tmp = g_strconcat(msg, " MMX2", 0);
+		tmp = g_strconcat(msg, " MMX2", NULL);
 		g_free(msg);
 		msg = tmp;
 	}
@@ -165,10 +165,10 @@ int mm_support_check_and_show()
  * msg = tmp;
  * }
  */
-	tmp = g_strconcat(msg, " detected", 0);
+	tmp = g_strconcat(msg, " detected", NULL);
 	g_free(msg);
 	msg = tmp;
-	g_message(msg);
+	g_message("%s", msg);
 	g_free(msg);
 
 	return r;

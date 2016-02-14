@@ -69,6 +69,8 @@
  * initializer for static 'char[]' or 'const char[]' variables.  */
 #define gettext_noop(String) String
 
+#ifndef _
 #define _(String)       (gettext(String))
+#endif
 
 #endif /* _LIBGETTEXT_H */
