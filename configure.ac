@@ -4,52 +4,12 @@ AC_PREREQ(2.61)
 AC_INIT([Infinity plugin],[0.8.0beta2],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
 AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
 
-INF_MSG_MMX_NOT_ALLOWED="
-	You have requested MMX detection support, but this feature is not
-	allowed for your target architecture"
-
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PREFIX_PROGRAM(audacious)
 
-AC_CANONICAL_HOST
-
-inf_host_mips=no
-inf_host_alpha=no
-inf_host_sparc=no
-inf_host_ix86=no
-inf_host_powerpc=no
-
-case "$host_cpu" in
-	mips)           inf_host_mips=yes;;
-	alpha)          inf_host_alpha=yes;;
-	sparc)          inf_host_sparc=yes;;
-	i*86)           inf_host_ix86=yes;;
-       	powerpc|ppc)    inf_host_powerpc=yes;;
-	*)		inf_host_arch_unknown=yes;;
-esac
-
-inf_target_mips=no
-inf_target_alpha=no
-inf_target_sparc=no
-inf_target_ix86=no
-inf_target_powerpc=no
-
-inf_target_64bit=no
-
 AC_CANONICAL_TARGET
-
-case "$target_cpu" in
-	mips)           inf_target_mips=yes;;
-	alpha)          inf_target_alpha=yes;;
-	sparc)          inf_target_sparc=yes;;
-	i*86)           inf_target_ix86=yes;;
-	ia64*)		inf_target_ix86=yes
-			inf_target_64bit=yes;;
-       	powerpc|ppc)    inf_target_powerpc=yes;;
-	*)		inf_target_arch_unknown=yes;;
-esac
 
 # Check for programs.
 AC_PROG_CC
@@ -68,7 +28,7 @@ else
   AC_MSG_ERROR([*** pkg-config too old; version 0.14 or better required.])
 fi
 
-# Check for libraries.
+# Check some dependencies
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.8,,)
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
@@ -127,17 +87,11 @@ AC_CHECK_FUNCS([floor setlocale sqrt setlocale])
 AC_ARG_ENABLE([mmx],
             AS_HELP_STRING([--enable-mmx],[Turn on MMX detection support @<:@default=enabled@:>@]),
 	    [mmx=$enableval],
-	    [mmx=yes])
-dnl MMX extensions are allowed only on 32 bit Intel machines
+	    [mmx=no])
 AC_MSG_CHECKING([whether to enable MMX detection support])
 if test x$mmx = xyes; then
-  if test x$inf_target_ix86 = xyes && test x$inf_target_64bit = xno; then
-    AC_MSG_RESULT([yes])
-    AC_DEFINE([MMX_DETECTION], [1], [Activate MMX Extensions support])
-  else
-    AC_MSG_RESULT([no])
-    AC_MSG_WARN([$INF_MSG_MMX_NOT_ALLOWED])
-  fi
+  AC_MSG_RESULT([yes])
+  AC_DEFINE([MMX_DETECTION], [1], [Activate MMX Extensions support])
 else
   AC_MSG_RESULT([no])
 fi
@@ -150,7 +104,7 @@ AC_ARG_ENABLE([debug],
 AC_MSG_CHECKING([whether to activate debugging])
 if test "$debug" = yes; then
   AC_MSG_RESULT([yes])
-  AC_DEFINE([INFINITY_DEBUG], [1], [Activate Infinity's debugging])
+  AC_DEFINE([INFINITY_DEBUG], [1], [Activate Infinity debugging])
 else
   AC_MSG_RESULT([no])
 fi
@@ -187,7 +141,10 @@ if test x"$vectorization" = xyes; then
       our_gcc="$ac_cv_prog_CC"
     fi
     case `$our_gcc --version | sed -e 's,\..*,.,' -e q` in
-      *4. | *5.)
+      *2. | *3.)
+        AC_MSG_ERROR([You need gcc version 4 or newer to build with vectorization optimizations])
+        ;;
+      *)
         INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -ftree-vectorize"
 	case "$target_cpu" in
 	  i*86|ia64*)
@@ -200,9 +157,6 @@ if test x"$vectorization" = xyes; then
 	  *)
 	    ;;
 	esac
-        ;;
-      *)
-        AC_MSG_ERROR([You need at least a gcc version 4 to build with vectorization optimizations])
         ;;
     esac
   fi

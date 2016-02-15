@@ -7,6 +7,6 @@ TODO
 * Add an option to disable the screensaver
 * Save window position on close
 * Rewrite modules to use a common datatype InfPlugin
+* Remove config.h.in from repo?
 * Update to Automake 15 ?
-* Add target Gmusicbrowser ?
 
