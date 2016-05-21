@@ -28,5 +28,5 @@ libinfinite_la_SOURCES = \
 
 INCLUDES = -I$(top_srcdir)/src -I$(top_builddir)
 
-EXTRA_DIST = infinite_states maintest.c spectrum.c
+EXTRA_DIST = infinite_states
 
