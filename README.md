@@ -11,7 +11,7 @@ Requirements
 
 - Audacious >= 3.5
 - Audclient >= 3.5 (Audacious D-BUS remote control library)
-- SDL >= 1.0.6
+- 1.0.6 <= SDL < 2
 - Glib >= 2.8
 - Gtk+ >= 2.8
 
