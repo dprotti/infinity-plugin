@@ -10,14 +10,17 @@ infinity_datadir = @datadir@
 localedir = $(infinity_datadir)/locale
 DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 
-AM_CFLAGS = @CFLAGS@ @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
+COMMON_FLAGS = @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
 	@GLIB_CFLAGS@ @DBUSGLIB1_CFLAGS@ $(INF_CFLAGS_EXTRA) -DDATADIR='"$(datadir)"'
 
-libinfinite_la_LDFLAGS = -export-dynamic -avoid-version
+AM_CFLAGS = @CFLAGS@ $(COMMON_FLAGS)
+AM_CXXFLAGS = @CXXFLAGS@ $(COMMON_FLAGS)
+
+libinfinite_la_LDFLAGS = ${CXX}
 libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @AUDCLIENT_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@ @DBUSGLIB1_LIBS@
 libinfinite_la_SOURCES = \
-	main.c \
-	renderer.c renderer.h\
+	main.cc \
+	renderer.cc renderer.h\
 	compute.c compute.h \
 	display.c display.h \
 	infconfig.c infconfig.h\

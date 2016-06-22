@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([Infinity plugin],[0.8.0beta2],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
+AC_INIT([Infinity plugin],[0.9.0alpha],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
 AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
 
 AC_CONFIG_HEADER(config.h)
@@ -12,7 +12,7 @@ AC_PREFIX_PROGRAM(audacious)
 AC_CANONICAL_TARGET
 
 # Check for programs.
-AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_INSTALL
 
 AC_DISABLE_STATIC
@@ -121,6 +121,7 @@ INF_CFLAGS_EXTRA=''
 
 if test x"$GCC" = xyes; then
   INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -Wall -Wimplicit -Wunused -Wmissing-prototypes"
+  CXXFLAGS="${CXXFLAGS} -std=c++11"
 fi
 
 AC_ARG_ENABLE([vectorization],
@@ -166,6 +167,19 @@ fi
 
 AC_SUBST(INF_CFLAGS_EXTRA)
 
+dnl Prevent symbol collisions
+dnl =========================
+if test "x$HAVE_MSWINDOWS" = "xyes" ; then
+    EXPORT="__declspec(dllexport)"
+elif test "x$GCC" = "xyes" ; then
+    CFLAGS="$CFLAGS -fvisibility=hidden"
+    CXXFLAGS="$CXXFLAGS -fvisibility=hidden"
+    EXPORT="__attribute__((visibility(\"default\")))"
+else
+    AC_MSG_ERROR([Unknown syntax for EXPORT keyword])
+fi
+AC_DEFINE_UNQUOTED([EXPORT], [$EXPORT], [Compiler syntax for export of public symbols])
+
 AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libSDL.so",
 # Ubuntu on AMD64 puts libraries into x86_64-linux-gnu/
   libdir="${libdir}/x86_64-linux-gnu/audacious/Visualization",
@@ -188,7 +202,8 @@ Infinity Plugin for the Audacious Player -- version $VERSION
 
 Install path           : ${libdir}
 Compiler               : ${CC}
-CFLAGS		       : ${INF_CFLAGS_EXTRA} ${CFLAGS}
+CFLAGS                 : ${INF_CFLAGS_EXTRA} ${CFLAGS}
+CXXFLAGS               : ${CXXFLAGS}
 Debug enabled          : ${debug}
 MMX Extensions support : ${mmx}
 "

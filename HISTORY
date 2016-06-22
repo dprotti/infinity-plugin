@@ -8,3 +8,5 @@ In October 2003 I've found this plugin and I thought it was really
 beautiful so I decided to improve it by adding MMX support and
 created a project in Sourceforge.
 In 2013 the project was moved into Github.
+In 2016 code moved from 100% C to mix of C / C++ to match Audacious
+3.6 API.

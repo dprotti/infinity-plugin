@@ -21,59 +21,54 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include <string.h>
-#include <audacious/plugin.h>
+#include <libaudcore/plugin.h>
+#include <libaudcore/preferences.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 
+extern "C" {
 #include "config.h"
 #include "gettext.h"
 #include "infconfig.h"
 #include "renderer.h"
+}
 
-static const char infinity_about[] =
+static const char about_text[] =
 	N_("Infinity Visualization Plugin for Audacious\n\n"
 		"Version " PACKAGE_VERSION "\n\n"
 		"https://github.com/dprotti/infinity-plugin");
 
-static bool_t plugin_init(void);
-static void   plugin_close(void);
-static void   clear(void);
+static const PreferencesWidget prefs_widgets[] = {
+    WidgetLabel ("<b>Coming soon...</b>")
+};
 
-/*
- * Registers plugin with Audacious.
- */
-AUD_VIS_PLUGIN(
-	.name = "Infinity",
-	.init = plugin_init,
-	.cleanup = plugin_close,
-	.take_message = NULL,
-	.about			= NULL,
-	.about_text		= infinity_about,
-	.configure = config_plugin_config_window,
-                        //.playback_stop		= NULL,
+static const PluginPreferences preferences = {{prefs_widgets}};
 
-                        /* reset internal state and clear display */
-	.clear = clear,
+class InfinityPlugin : VisPlugin {
 
-        /* 512 frames of a single-channel PCM signal */
-	.render_mono_pcm = NULL,
+public:
+    static constexpr PluginInfo info = {
+        N_("Infinity"),
+        PACKAGE,
+        about_text,
+        & preferences
+    };
 
-        /* 512 frames of an interleaved multi-channel PCM signal */
-	.render_multi_pcm = renderer_render_multi_pcm,
+    constexpr InfinityPlugin () : VisPlugin (info, Visualizer::MultiPCM) {}
 
-        /* intensity of frequencies 1/512, 2/512, ..., 256/512 of sample rate */
-	.render_freq = NULL,
+    bool init ();
+    void cleanup ();
 
-        /* GtkWidget * (* get_widget) (void); */
-	.get_widget = NULL
-	);
+    //void * get_gtk_widget ();
 
-static void clear(void)
-{
-	g_message("TODO implement clear()");
-}
+    void clear ();
+    void render_multi_pcm (const float * pcm, int channels);
+};
 
-static bool_t plugin_init(void)
+
+EXPORT InfinityPlugin aud_plugin_instance;
+
+bool InfinityPlugin::init(void)
 {
 #if ENABLE_NLS
 	(void)setlocale(LC_MESSAGES, "");
@@ -99,8 +94,18 @@ static bool_t plugin_init(void)
 	return TRUE;
 }
 
-static void plugin_close(void)
+void InfinityPlugin::clear ()
 {
+	g_message("TODO implement clear()");
+}
+
+void InfinityPlugin::cleanup(void)
+{
+	g_message("cleanup()");
 	config_plugin_save_prefs();
 	renderer_finish();
+}
+
+void InfinityPlugin::render_multi_pcm (const float * pcm, int channels) {
+	renderer_render_multi_pcm(pcm, channels);
 }

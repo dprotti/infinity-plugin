@@ -20,10 +20,10 @@
 #include <gtk/gtk.h>
 #include <dbus/dbus.h>
 
-#include <audacious/audctrl.h>
-#include <audacious/playlist.h>
-#include <audacious/drct.h>
+#include <libaudcore/playlist.h>
+#include <libaudcore/drct.h>
 
+#include <audacious/audctrl.h>
 #include <audacious/dbus.h>
 
 
@@ -31,6 +31,7 @@
 #include <SDL/SDL_thread.h>
 /*#include <SDL/SDL_syswm.h>*/
 
+extern "C" {
 #include "config.h"
 #include "gettext.h"
 #include "renderer.h"
@@ -41,6 +42,7 @@
 #if MMX_DETECTION
 #include "cputest.h"
 #endif
+}
 
 #define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define next_effect()   (t_last_effect++)
@@ -92,15 +94,15 @@ static void set_title(void);
 void renderer_init(void)
 {
 	GError *error = NULL;
-	gint32 try;
+	gint32 _try;
 
 	if (initializing) {
 		g_warning(_("We are already initializing"));
-		try = 0;
+		_try = 0;
 		while (initializing) {
 			g_usleep(1000000);
 			(void)sleep(1);
-			if (try++ > 10)
+			if (_try++ > 10)
 				return;
 		}
 	}
@@ -154,14 +156,14 @@ void renderer_init(void)
 
 void renderer_finish(void)
 {
-	gint32 try;
+	gint32 _try;
 
 	if (initializing) {
 		g_warning(_("The plugin have not yet initialized"));
-		try = 0;
+		_try = 0;
 		while (initializing) {
 			g_usleep(1000000);
-			if (try++ > 10)
+			if (_try++ > 10)
 				return;
 		}
 	}
@@ -259,14 +261,14 @@ static void check_events()
 			if (aud_drct_get_playing() && aud_drct_get_ready()) {
 				if (current_title)
 					g_free(current_title);
-				current_title = g_strdup(aud_playlist_entry_get_title(aud_playlist_get_playing(), aud_playlist_get_position(aud_playlist_get_playing()), FALSE));
-				set_title();
+				String title = aud_playlist_get_title(aud_playlist_get_playing());
+				current_title = g_strdup(title.to_raw());
 			} else {
 				if (current_title)
 					g_free(current_title);
 				current_title = g_strdup("Infinity");
-				set_title();
 			}
+			set_title();
 			g_timer_reset(title_timer);
 		}
 	}
@@ -325,12 +327,12 @@ static void check_events()
 					aud_drct_seek(aud_drct_get_time() - 5000);
 				break;
 			case SDLK_UP:
-				aud_drct_get_volume_main(&volume);
+				volume = aud_drct_get_volume_main();
 				g_message(_("Increasing volume to %d"), volume + 5);
 				aud_drct_set_volume_main(volume + 5);
 				break;
 			case SDLK_DOWN:
-				aud_drct_get_volume_main(&volume);
+				volume = aud_drct_get_volume_main();
 				g_message(_("Decreasing volume to %d"), volume - 5);
 				aud_drct_set_volume_main(volume - 5);
 				break;
