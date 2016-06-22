@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-REQUIRED_AUTOMAKE_VERSION=1.9
+REQUIRED_AUTOMAKE_VERSION=1.14
 
 PKG_NAME="Infinity Visualization Plugin"
 
@@ -25,9 +25,6 @@ REQUIRED_AUTOCONF_VERSION=${REQUIRED_AUTOCONF_VERSION:-2.61}
 REQUIRED_AUTOMAKE_VERSION=${REQUIRED_AUTOMAKE_VERSION:-1.9}
 REQUIRED_LIBTOOL_VERSION=${REQUIRED_LIBTOOL_VERSION:-1.4.3}
 REQUIRED_PKG_CONFIG_VERSION=${REQUIRED_PKG_CONFIG_VERSION:-0.14.0}
-#REQUIRED_GTK_DOC_VERSION=${REQUIRED_GTK_DOC_VERSION:-1.0}
-#REQUIRED_DOC_COMMON_VERSION=${REQUIRED_DOC_COMMON_VERSION:-2.3.0}
-#REQUIRED_GNOME_DOC_UTILS_VERSION=${REQUIRED_GNOME_DOC_UTILS_VERSION:-0.4.2}
 
 # a list of required m4 macros.  Package can set an initial value
 REQUIRED_M4MACROS=${REQUIRED_M4MACROS:-}
@@ -287,12 +284,6 @@ for configure_ac in $configure_files; do
     if grep "^PKG_CHECK_MODULES" $configure_ac >/dev/null; then
 	want_pkg_config=true
     fi
-    if grep "^GTK_DOC_CHECK" $configure_ac >/dev/null; then
-	want_gtk_doc=true
-    fi
-    if grep "^GNOME_DOC_INIT" $configure_ac >/dev/null; then
-        want_gnome_doc_utils=true
-    fi
 
     # check that AM_MAINTAINER_MODE is used
     if grep "^AM_MAINTAINER_MODE" $configure_ac >/dev/null; then
@@ -301,17 +292,6 @@ for configure_ac in $configure_files; do
 
     if grep "^YELP_HELP_INIT" $configure_ac >/dev/null; then
         require_m4macro yelp.m4
-    fi
-
-    # check to make sure gnome-common macros can be found ...
-    if grep "^GNOME_COMMON_INIT" $configure_ac >/dev/null ||
-       grep "^GNOME_DEBUG_CHECK" $configure_ac >/dev/null ||
-       grep "^GNOME_MAINTAINER_MODE_DEFINES" $configure_ac >/dev/null; then
-        require_m4macro gnome-common.m4
-    fi
-    if grep "^GNOME_COMPILE_WARNINGS" $configure_ac >/dev/null ||
-       grep "^GNOME_CXX_WARNINGS" $configure_ac >/dev/null; then
-        require_m4macro gnome-compiler-flags.m4
     fi
 done
 
@@ -322,16 +302,7 @@ version_check autoconf AUTOCONF 'autoconf2.50 autoconf autoconf-2.53' $REQUIRED_
     "http://ftp.gnu.org/pub/gnu/autoconf/autoconf-$REQUIRED_AUTOCONF_VERSION.tar.gz"
 AUTOHEADER=`echo $AUTOCONF | sed s/autoconf/autoheader/`
 
-case $REQUIRED_AUTOMAKE_VERSION in
-    1.4*) automake_progs="automake-1.4" ;;
-    1.5*) automake_progs="automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6 automake-1.5" ;;
-    1.6*) automake_progs="automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6" ;;
-    1.7*) automake_progs="automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7" ;;
-    1.8*) automake_progs="automake-1.11 automake-1.10 automake-1.9 automake-1.8" ;;
-    1.9*) automake_progs="automake-1.11 automake-1.10 automake-1.9" ;;
-    1.10*) automake_progs="automake-1.11 automake-1.10" ;;
-    1.11*) automake_progs="automake-1.11" ;;
-esac
+automake_progs="automake-1.15 automake-1.14 automake-1.13 automake-1.12 automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6 automake-1.5"
 version_check automake AUTOMAKE "$automake_progs" $REQUIRED_AUTOMAKE_VERSION \
     "http://ftp.gnu.org/pub/gnu/automake/automake-$REQUIRED_AUTOMAKE_VERSION.tar.gz"
 ACLOCAL=`echo $AUTOMAKE | sed s/automake/aclocal/`
@@ -346,22 +317,6 @@ if $want_pkg_config; then
     version_check pkg-config PKG_CONFIG pkg-config $REQUIRED_PKG_CONFIG_VERSION \
         "'http://www.freedesktop.org/software/pkgconfig/releases/pkgconfig-$REQUIRED_PKG_CONFIG_VERSION.tar.gz"
     require_m4macro pkg.m4
-fi
-
-if $want_gtk_doc; then
-    version_check gtk-doc GTKDOCIZE gtkdocize $REQUIRED_GTK_DOC_VERSION \
-        "http://ftp.gnome.org/pub/GNOME/sources/gtk-doc/"
-    require_m4macro gtk-doc.m4
-fi
-
-if $want_gnome_doc_utils; then
-    version_check gnome-doc-utils GNOME_DOC_PREPARE gnome-doc-prepare $REQUIRED_GNOME_DOC_UTILS_VERSION \
-        "http://ftp.gnome.org/pub/GNOME/sources/gnome-doc-utils/"
-fi
-
-if [ "x$USE_COMMON_DOC_BUILD" = "xyes" ]; then
-    version_check gnome-common DOC_COMMON gnome-doc-common \
-        $REQUIRED_DOC_COMMON_VERSION " "
 fi
 
 check_m4macros
@@ -396,20 +351,6 @@ for configure_ac in $configure_files; do
 	    $LIBTOOLIZE --force --copy || exit 1
 	fi
 
-	if grep "^GTK_DOC_CHECK" $basename >/dev/null; then
-	    printbold "Running $GTKDOCIZE..."
-	    $GTKDOCIZE --copy || exit 1
-	fi
-
-	if [ "x$USE_COMMON_DOC_BUILD" = "xyes" ]; then
-	    printbold "Running gnome-doc-common..."
-	    gnome-doc-common --copy || exit 1
-	fi
-	if grep "^GNOME_DOC_INIT" $basename >/dev/null; then
-	    printbold "Running $GNOME_DOC_PREPARE..."
-	    $GNOME_DOC_PREPARE --force --copy || exit 1
-	fi
-
         # Now run aclocal to pull in any additional macros needed
 
 	# if the AC_CONFIG_MACRO_DIR() macro is used, pass that
@@ -420,10 +361,6 @@ for configure_ac in $configure_files; do
 	fi
 	printbold "Running $ACLOCAL..."
 	$ACLOCAL $m4dir $ACLOCAL_FLAGS || exit 1
-
-	if grep "GNOME_AUTOGEN_OBSOLETE" aclocal.m4 >/dev/null; then
-	    printerr "*** obsolete gnome macros were used in $configure_ac"
-	fi
 
 	# Now that all the macros are sorted, run autoconf and autoheader ...
 	printbold "Running $AUTOCONF..."
