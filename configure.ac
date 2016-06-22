@@ -109,14 +109,6 @@ else
   AC_MSG_RESULT([no])
 fi
 
-# Internationalization
-ALL_LINGUAS="es es_AR"
-GETTEXT_PACKAGE=infinity
-AC_SUBST(GETTEXT_PACKAGE)
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [GETTEXT package name])
-AM_GLIB_GNU_GETTEXT
-#AC_PROG_INTLTOOL
-
 INF_CFLAGS_EXTRA=''
 
 if test x"$GCC" = xyes; then
@@ -167,8 +159,7 @@ fi
 
 AC_SUBST(INF_CFLAGS_EXTRA)
 
-dnl Prevent symbol collisions
-dnl =========================
+# Define EXPORT
 if test "x$HAVE_MSWINDOWS" = "xyes" ; then
     EXPORT="__declspec(dllexport)"
 elif test "x$GCC" = "xyes" ; then
@@ -191,8 +182,7 @@ AC_SUBST(libdir)
 AC_SUBST(pkglibdir)
 
 AC_CONFIG_FILES([Makefile
-		 po/Makefile.in
-                 src/Makefile])
+  src/Makefile])
 AC_OUTPUT
 
 echo "

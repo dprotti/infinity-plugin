@@ -21,7 +21,6 @@
 #include "config.h"
 #include "display.h"
 #include "infconfig.h"
-#include "gettext.h"
 
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
@@ -60,11 +59,11 @@ static byte *surface1;
 static void init_sdl(gint32 width, gint32 height, gint32 scale)
 {
 	if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0)
-		g_error(_("Infinity: Couldn't initialize SDL: %s\n"), SDL_GetError());
+		g_error("Infinity: Couldn't initialize SDL: %s\n", SDL_GetError());
 	screen = SDL_SetVideoMode(width * scale, height * scale, 16, VIDEO_FLAGS);
 	if (screen == NULL)
-		g_error(_("Infinity: could not init video mode: %s\n"), SDL_GetError());
-	g_message(_("Infinity: SDL SetVideoMode() Ok"));
+		g_error("Infinity: could not init video mode: %s\n", SDL_GetError());
+	g_message("Infinity: SDL SetVideoMode() Ok");
 	(void)SDL_ShowCursor(0);
 	(void)SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 }
@@ -253,7 +252,7 @@ void display_resize(gint32 width, gint32 height)
 				  scr_par.height * scr_par.scale,
 				  16, VIDEO_FLAGS);
 	if (screen == NULL)
-		g_error(_("Infinity: Couldn't set %dx%d video mode: %s\n"),
+		g_error("Infinity: Couldn't set %dx%d video mode: %s\n",
 			scr_par.width * scr_par.scale, scr_par.height * scr_par.scale,
 			SDL_GetError());
 	compute_vector_field_destroy(vector_field);
@@ -445,7 +444,7 @@ void curve(t_effect *current_effect)
 void display_toggle_fullscreen(void)
 {
 	if (SDL_WM_ToggleFullScreen(screen) < 0)
-		g_warning(_("Cannot toggle to fullscreen mode: %s"), SDL_GetError());
+		g_warning("Cannot toggle to fullscreen mode: %s", SDL_GetError());
 }
 
 void display_save_screen(void)
@@ -455,9 +454,9 @@ void display_save_screen(void)
 	(void)snprintf(name, 255, "screenshot%i%s", rand() % 1000000, ".bmp");
 	name[255] = '\0';
 	if (SDL_SaveBMP(screen, name) < 0)
-		g_warning(_("Error while saving file %s: %s"), name, SDL_GetError());
+		g_warning("Error while saving file %s: %s", name, SDL_GetError());
 	else
-		g_message(_("saved"));
+		g_message("saved");
 }
 
 inline void display_save_effect(t_effect *effect)

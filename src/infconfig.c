@@ -5,7 +5,6 @@
 
 #include "config.h"
 #include "infconfig.h"
-#include "gettext.h"
 #include "config-dialog.h"
 
 #define DEFAULT_WIDTH                   512
@@ -276,11 +275,11 @@ void config_plugin_save_prefs(void)
 	config_file_path = g_strconcat(g_get_home_dir(), INFINITY_CONFIG_FILE, NULL);
 	ok = g_key_file_load_from_file(kf, config_file_path, G_KEY_FILE_KEEP_COMMENTS, NULL);
 	if (!ok) {
-		g_message(_("Infinity plugin .ini file not found"));
+		g_message("Infinity plugin .ini file not found");
 		if (!g_file_test(config_dir_path, G_FILE_TEST_EXISTS)) {
-			g_message(_("Creating Infinity plugin config directory '%s'"), INFINITY_CONFIG_DIR);
+			g_message("Creating Infinity plugin config directory '%s'", INFINITY_CONFIG_DIR);
 			if (g_mkdir_with_parents(config_dir_path, S_IRWXU) != 0) {
-				g_warning(_("Cannot save preferences: unable to create directory '%s'"), config_dir_path);
+				g_warning("Cannot save preferences: unable to create directory '%s'", config_dir_path);
 				g_free(config_file_path);
 				g_free(config_dir_path);
 				g_key_file_free(kf);
@@ -301,7 +300,7 @@ void config_plugin_save_prefs(void)
 	preferences = g_key_file_to_data(kf, &length, NULL);
 	ok = g_file_set_contents(config_file_path, preferences, length, NULL);
 	if (!ok)
-		g_warning(_("Error saving preferences"));
+		g_warning("Error saving preferences");
 	g_free(preferences);
 	g_free(config_file_path);
 	g_free(config_dir_path);
@@ -334,12 +333,6 @@ gboolean config_is_initialized(void)
 
 void config_plugin_config_window(void)
 {
-#if ENABLE_NLS
-	setlocale(LC_MESSAGES, "");
-	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	textdomain(GETTEXT_PACKAGE);
-#endif
-
 	if (configure_dialog) {
 		set_config_values(configure_dialog);
 		config_dialog_show(configure_dialog);

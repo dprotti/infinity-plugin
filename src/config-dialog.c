@@ -1,7 +1,6 @@
 #include "config.h"
 #include "config-dialog.h"
 #include "infconfig.h"
-#include "gettext.h"
 
 
 ConfigDialog *config_dialog_new(void)
@@ -28,15 +27,9 @@ ConfigDialog *config_dialog_new(void)
 	GtkWidget *button_cancel;
 	GtkWidget *button_apply;
 
-#if ENABLE_NLS
-	setlocale(LC_MESSAGES, "");
-	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	textdomain(GETTEXT_PACKAGE);
-#endif
-
 	window_main = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_object_set_data(GTK_OBJECT(window_main), "window_main", window_main);
-	gtk_window_set_title(GTK_WINDOW(window_main), _("Infinity Configuration"));
+	gtk_window_set_title(GTK_WINDOW(window_main), "Infinity Configuration");
 	gtk_window_set_type_hint(GTK_WINDOW(window_main), GDK_WINDOW_TYPE_HINT_DIALOG);
 
 	vbox_main = gtk_vbox_new(FALSE, 0);
@@ -47,7 +40,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_container_add(GTK_CONTAINER(window_main), vbox_main);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox_main), 2);
 
-	frame_general = gtk_frame_new(_("Parameters"));
+	frame_general = gtk_frame_new("Parameters");
 	gtk_widget_ref(frame_general);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "frame_general", frame_general,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -65,7 +58,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_table_set_row_spacings(GTK_TABLE(table_general), 2);
 	gtk_table_set_col_spacings(GTK_TABLE(table_general), 2);
 
-	label_effect = gtk_label_new(_("Effect period:"));
+	label_effect = gtk_label_new("Effect period:");
 	gtk_widget_ref(label_effect);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "label_effect", label_effect,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -76,7 +69,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_misc_set_alignment(GTK_MISC(label_effect), 0, 0.5);
 	gtk_misc_set_padding(GTK_MISC(label_effect), 1, 0);
 
-	label_palette = gtk_label_new(_("Palette period:"));
+	label_palette = gtk_label_new("Palette period:");
 	gtk_widget_ref(label_palette);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "label_palette", label_palette,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -87,7 +80,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_misc_set_alignment(GTK_MISC(label_palette), 0, 0.5);
 	gtk_misc_set_padding(GTK_MISC(label_palette), 1, 0);
 
-	label_scale_factor = gtk_label_new(_("Scale Factor"));
+	label_scale_factor = gtk_label_new("Scale Factor");
 	gtk_widget_ref(label_scale_factor);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "label_scale_factor", label_scale_factor,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -98,7 +91,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_misc_set_alignment(GTK_MISC(label_scale_factor), 0, 0.5);
 	gtk_misc_set_padding(GTK_MISC(label_scale_factor), 1, 0);
 
-	label_fps = gtk_label_new(_("Maximum Frames per Second:"));
+	label_fps = gtk_label_new("Maximum Frames per Second:");
 	gtk_widget_ref(label_fps);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "label_fps", label_fps,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -109,7 +102,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_misc_set_alignment(GTK_MISC(label_fps), 0, 0.5);
 	gtk_misc_set_padding(GTK_MISC(label_fps), 1, 0);
 
-	checkbutton_show_title = gtk_check_button_new_with_label(_("Show current play title"));
+	checkbutton_show_title = gtk_check_button_new_with_label("Show current play title");
 	gtk_widget_ref(checkbutton_show_title);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "checkbutton_show_title", checkbutton_show_title,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -120,8 +113,8 @@ ConfigDialog *config_dialog_new(void)
 
 	tooltips = gtk_tooltips_new();
 	gtk_tooltips_set_tip(tooltips, checkbutton_show_title,
-			     _("Check it if you want to see the current play "
-			       "title on the Infinity's title bar"), NULL);
+			     "Check it if you want to see the current play "
+			       "title on the Infinity's title bar", NULL);
 
 	//spinbutton_fps_adj = gtk_adjustment_new (30, 5, 150, 1, 10, 0);
 	spinbutton_fps_adj = gtk_adjustment_new(config_get_fps(), 5, 150, 1, 10, 0);
@@ -147,8 +140,8 @@ ConfigDialog *config_dialog_new(void)
 	gtk_scale_set_digits(GTK_SCALE(hscale_effect), 0);
 
 	gtk_tooltips_set_tip(tooltips, hscale_effect,
-			     _("Time to change between an effect and the "
-			       "next one, in milliseconds."), NULL);
+			     "Time to change between an effect and the "
+			       "next one, in milliseconds.", NULL);
 
 	hscale_palette = gtk_hscale_new(GTK_ADJUSTMENT(gtk_adjustment_new(100, 50, 400, 0, 0, 0)));
 	gtk_widget_ref(hscale_palette);
@@ -162,8 +155,8 @@ ConfigDialog *config_dialog_new(void)
 	gtk_scale_set_digits(GTK_SCALE(hscale_palette), 0);
 
 	gtk_tooltips_set_tip(tooltips, hscale_palette,
-			     _("Time to change between a color and the "
-			       "next one, in milliseconds."), NULL);
+			     "Time to change between a color and the "
+			       "next one, in milliseconds.", NULL);
 
 	hscale_scale_factor = gtk_hscale_new(GTK_ADJUSTMENT(gtk_adjustment_new(1, 1, 2, 0, 0, 0)));
 	gtk_widget_ref(hscale_scale_factor);
@@ -177,9 +170,9 @@ ConfigDialog *config_dialog_new(void)
 	gtk_scale_set_digits(GTK_SCALE(hscale_scale_factor), 0);
 
 	gtk_tooltips_set_tip(tooltips, hscale_scale_factor,
-			     _("Change only if the system doesn't have "
+			     "Change only if the system doesn't have "
 			       "enough power to show the screen at "
-			       "a reasonably speed/size relation."), NULL);
+			       "a reasonably speed/size relation.", NULL);
 
 	hbuttonbox_main = gtk_hbutton_box_new();
 	gtk_widget_ref(hbuttonbox_main);
@@ -190,7 +183,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_container_set_border_width(GTK_CONTAINER(hbuttonbox_main), 2);
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(hbuttonbox_main), GTK_BUTTONBOX_END);
 
-	button_ok = gtk_button_new_with_label(_("Ok"));
+	button_ok = gtk_button_new_with_label("Ok");
 	gtk_widget_ref(button_ok);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "button_ok", button_ok,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -199,12 +192,12 @@ ConfigDialog *config_dialog_new(void)
 	GTK_WIDGET_SET_FLAGS(button_ok, GTK_CAN_DEFAULT);
 
 	gtk_tooltips_set_tip(tooltips, button_ok,
-			     _("For to toggle to fullscreen mode, select "
+			     "For to toggle to fullscreen mode, select "
 			       "the Infinity plugin window, and press "
 			       "the Tab key. Pressing Tab again will return "
-			       "to window mode."), NULL);
+			       "to window mode.", NULL);
 
-	button_cancel = gtk_button_new_with_label(_("Cancel"));
+	button_cancel = gtk_button_new_with_label("Cancel");
 	gtk_widget_ref(button_cancel);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "button_cancel", button_cancel,
 				 (GtkDestroyNotify)gtk_widget_unref);
@@ -212,7 +205,7 @@ ConfigDialog *config_dialog_new(void)
 	gtk_container_add(GTK_CONTAINER(hbuttonbox_main), button_cancel);
 	GTK_WIDGET_SET_FLAGS(button_cancel, GTK_CAN_DEFAULT);
 
-	button_apply = gtk_button_new_with_label(_("Apply"));
+	button_apply = gtk_button_new_with_label("Apply");
 	gtk_widget_ref(button_apply);
 	gtk_object_set_data_full(GTK_OBJECT(window_main), "button_apply", button_apply,
 				 (GtkDestroyNotify)gtk_widget_unref);

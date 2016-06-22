@@ -24,9 +24,6 @@ srcdir=${srcdir:-.}
 REQUIRED_AUTOCONF_VERSION=${REQUIRED_AUTOCONF_VERSION:-2.61}
 REQUIRED_AUTOMAKE_VERSION=${REQUIRED_AUTOMAKE_VERSION:-1.9}
 REQUIRED_LIBTOOL_VERSION=${REQUIRED_LIBTOOL_VERSION:-1.4.3}
-REQUIRED_GETTEXT_VERSION=${REQUIRED_GETTEXT_VERSION:-0.10.40}
-REQUIRED_GLIB_GETTEXT_VERSION=${REQUIRED_GLIB_GETTEXT_VERSION:-2.2.0}
-#REQUIRED_INTLTOOL_VERSION=${REQUIRED_INTLTOOL_VERSION:-0.25}
 REQUIRED_PKG_CONFIG_VERSION=${REQUIRED_PKG_CONFIG_VERSION:-0.14.0}
 #REQUIRED_GTK_DOC_VERSION=${REQUIRED_GTK_DOC_VERSION:-1.0}
 #REQUIRED_DOC_COMMON_VERSION=${REQUIRED_DOC_COMMON_VERSION:-2.3.0}
@@ -271,9 +268,6 @@ check_m4macros() {
 forbid_m4macro gnome-cxx-check.m4
 
 want_libtool=false
-want_gettext=false
-want_glib_gettext=false
-want_intltool=false
 want_pkg_config=false
 want_gtk_doc=false
 want_gnome_doc_utils=false
@@ -289,16 +283,6 @@ for configure_ac in $configure_files; do
     if grep "^A[CM]_PROG_LIBTOOL" $configure_ac >/dev/null ||
        grep "^LT_INIT" $configure_ac >/dev/null; then
 	want_libtool=true
-    fi
-    if grep "^AM_GNU_GETTEXT" $configure_ac >/dev/null; then
-	want_gettext=true
-    fi
-    if grep "^AM_GLIB_GNU_GETTEXT" $configure_ac >/dev/null; then
-	want_glib_gettext=true
-    fi
-    if grep "^AC_PROG_INTLTOOL" $configure_ac >/dev/null ||
-       grep "^IT_PROG_INTLTOOL" $configure_ac >/dev/null; then
-	want_intltool=true
     fi
     if grep "^PKG_CHECK_MODULES" $configure_ac >/dev/null; then
 	want_pkg_config=true
@@ -358,24 +342,6 @@ if $want_libtool; then
     require_m4macro libtool.m4
 fi
 
-if $want_gettext; then
-    version_check gettext GETTEXTIZE gettextize $REQUIRED_GETTEXT_VERSION \
-        "http://ftp.gnu.org/pub/gnu/gettext/gettext-$REQUIRED_GETTEXT_VERSION.tar.gz"
-    require_m4macro gettext.m4
-fi
-
-if $want_glib_gettext; then
-    version_check glib-gettext GLIB_GETTEXTIZE glib-gettextize $REQUIRED_GLIB_GETTEXT_VERSION \
-        "ftp://ftp.gtk.org/pub/gtk/v2.2/glib-$REQUIRED_GLIB_GETTEXT_VERSION.tar.gz"
-    require_m4macro glib-gettext.m4
-fi
-
-if $want_intltool; then
-    version_check intltool INTLTOOLIZE intltoolize $REQUIRED_INTLTOOL_VERSION \
-        "http://ftp.gnome.org/pub/GNOME/sources/intltool/"
-    require_m4macro intltool.m4
-fi
-
 if $want_pkg_config; then
     version_check pkg-config PKG_CONFIG pkg-config $REQUIRED_PKG_CONFIG_VERSION \
         "'http://www.freedesktop.org/software/pkgconfig/releases/pkgconfig-$REQUIRED_PKG_CONFIG_VERSION.tar.gz"
@@ -430,24 +396,6 @@ for configure_ac in $configure_files; do
 	    $LIBTOOLIZE --force --copy || exit 1
 	fi
 
-	if grep "^AM_GLIB_GNU_GETTEXT" $basename >/dev/null; then
-	    printbold "Running $GLIB_GETTEXTIZE... Ignore non-fatal messages."
-	    echo "no" | $GLIB_GETTEXTIZE --force --copy || exit 1
-	elif grep "^AM_GNU_GETTEXT" $basename >/dev/null; then
-	   if grep "^AM_GNU_GETTEXT_VERSION" $basename > /dev/null; then
-	   	printbold "Running autopoint..."
-		autopoint --force || exit 1
-	   else
-	    	printbold "Running $GETTEXTIZE... Ignore non-fatal messages."
-	    	echo "no" | $GETTEXTIZE --force --copy || exit 1
-	   fi
-	fi
-
-	if grep "^AC_PROG_INTLTOOL" $basename >/dev/null ||
-           grep "^IT_PROG_INTLTOOL" $basename >/dev/null; then
-	    printbold "Running $INTLTOOLIZE..."
-	    $INTLTOOLIZE --force --copy --automake || exit 1
-	fi
 	if grep "^GTK_DOC_CHECK" $basename >/dev/null; then
 	    printbold "Running $GTKDOCIZE..."
 	    $GTKDOCIZE --copy || exit 1

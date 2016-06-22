@@ -3,7 +3,6 @@
 #include <glib.h>
 
 #include <effects.h>
-#include <gettext.h>
 #include <assert.h>
 
 #define EFFECTS_FILE	(DATADIR "/infinite_states")
@@ -20,7 +19,7 @@ void effects_save_effect(t_effect *effect)
 	g_assert(effect);
 	f = fopen (EFFECTS_FILE,"a");
 	if (f == NULL) {
-		g_warning (_("Cannot open file %s for saving effects\n"),
+		g_warning ("Cannot open file %s for saving effects\n",
 			   EFFECTS_FILE);
 		return;
 	}
@@ -37,7 +36,7 @@ void effects_load_effects(void)
 
 	f = fopen (EFFECTS_FILE,"r");
 	if (f == NULL) {
-		g_warning (_("Cannot open file %s for loading effects\n"),
+		g_warning ("Cannot open file %s for loading effects\n",
 			   EFFECTS_FILE);
 		return;
 	}

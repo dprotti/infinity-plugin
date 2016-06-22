@@ -1,6 +1,5 @@
 #include "config.h"
 #include "cputest.h"
-#include "gettext.h"
 #include "glib.h"
 
 

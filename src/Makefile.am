@@ -27,7 +27,7 @@ libinfinite_la_SOURCES = \
 	config-dialog.c config-dialog.h\
 	effects.c effects.h\
 	cputest.c cputest.h\
-	mmx.h gettext.h types.h
+	mmx.h types.h
 
 INCLUDES = -I$(top_srcdir)/src -I$(top_builddir)
 

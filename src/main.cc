@@ -28,15 +28,14 @@
 
 extern "C" {
 #include "config.h"
-#include "gettext.h"
 #include "infconfig.h"
 #include "renderer.h"
 }
 
 static const char about_text[] =
-	N_("Infinity Visualization Plugin for Audacious\n\n"
-		"Version " PACKAGE_VERSION "\n\n"
-		"https://github.com/dprotti/infinity-plugin");
+	"Infinity Visualization Plugin for Audacious\n\n"
+	"Version " PACKAGE_VERSION "\n\n"
+	"https://github.com/dprotti/infinity-plugin";
 
 static const PreferencesWidget prefs_widgets[] = {
     WidgetLabel ("<b>Coming soon...</b>")
@@ -48,7 +47,7 @@ class InfinityPlugin : VisPlugin {
 
 public:
     static constexpr PluginInfo info = {
-        N_("Infinity"),
+        "Infinity",
         PACKAGE,
         about_text,
         & preferences
@@ -70,13 +69,7 @@ EXPORT InfinityPlugin aud_plugin_instance;
 
 bool InfinityPlugin::init(void)
 {
-#if ENABLE_NLS
-	(void)setlocale(LC_MESSAGES, "");
-	(void)bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	(void)textdomain(GETTEXT_PACKAGE);
-#endif
-
-	g_message(_("Infinity commands:\n"
+	g_message("Infinity commands:\n"
 		    "- Space:\tchange effect.\n"
 		    "- Tab:\t\ttoggle full-screen.\n"
 		    "- Up/Down:\tup/down main volume.\n"
@@ -88,7 +81,7 @@ bool InfinityPlugin::init(void)
 		    "- b:\t\tnext song.\n"
 		    "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
 		    "- F11:\t\tscreenshot.\n"
-		    "- F12:\t\tchange palette."));
+		    "- F12:\t\tchange palette.");
 	config_plugin_load_prefs();
 	renderer_init();
 	return TRUE;

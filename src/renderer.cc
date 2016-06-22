@@ -33,7 +33,6 @@
 
 extern "C" {
 #include "config.h"
-#include "gettext.h"
 #include "renderer.h"
 #include "infconfig.h"
 #include "effects.h"
@@ -97,7 +96,7 @@ void renderer_init(void)
 	gint32 _try;
 
 	if (initializing) {
-		g_warning(_("We are already initializing"));
+		g_warning("We are already initializing");
 		_try = 0;
 		while (initializing) {
 			g_usleep(1000000);
@@ -159,7 +158,7 @@ void renderer_finish(void)
 	gint32 _try;
 
 	if (initializing) {
-		g_warning(_("The plugin have not yet initialized"));
+		g_warning("The plugin have not yet initialized");
 		_try = 0;
 		while (initializing) {
 			g_usleep(1000000);
@@ -328,12 +327,12 @@ static void check_events()
 				break;
 			case SDLK_UP:
 				volume = aud_drct_get_volume_main();
-				g_message(_("Increasing volume to %d"), volume + 5);
+				g_message("Increasing volume to %d", volume + 5);
 				aud_drct_set_volume_main(volume + 5);
 				break;
 			case SDLK_DOWN:
 				volume = aud_drct_get_volume_main();
-				g_message(_("Decreasing volume to %d"), volume - 5);
+				g_message("Decreasing volume to %d", volume - 5);
 				aud_drct_set_volume_main(volume - 5);
 				break;
 			case SDLK_TAB:
