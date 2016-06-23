@@ -20,7 +20,7 @@
 
 #include "config.h"
 #include "display.h"
-#include "infconfig.h"
+#include "prefs.h"
 
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)

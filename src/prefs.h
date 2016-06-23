@@ -19,6 +19,7 @@
 
 #include <glib.h>
 
+#define CFGID "infinity"
 
 /*
  * This structure is intended to be used for every module
@@ -38,26 +39,13 @@ typedef struct _t_screen_parameters {
 } t_screen_parameters;
 
 
-/*
- * Read user preferences from ~/.xmms/config file
- */
-void config_plugin_load_prefs(void);
-
-void config_plugin_save_prefs(void);
-
-void config_set_default_values(void);
+void config_save_prefs(void);
 
 /*
  * \return TRUE if config_plugin_load_prefs() or
  * config_set_default_values() has been called.
  */
 gboolean config_is_initialized(void);
-
-/*
- * Open a window to let the user choose and
- * save your options.
- */
-void config_plugin_config_window(void);
 
 void config_set_x(gint32 value);
 void config_set_y(gint32 value);

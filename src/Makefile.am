@@ -23,8 +23,7 @@ libinfinite_la_SOURCES = \
 	renderer.cc renderer.h\
 	compute.c compute.h \
 	display.c display.h \
-	infconfig.c infconfig.h\
-	config-dialog.c config-dialog.h\
+	prefs.c prefs.h\
 	effects.c effects.h\
 	cputest.c cputest.h\
 	mmx.h types.h
@@ -32,4 +31,3 @@ libinfinite_la_SOURCES = \
 INCLUDES = -I$(top_srcdir)/src -I$(top_builddir)
 
 EXTRA_DIST = infinite_states
-

@@ -34,7 +34,7 @@
 extern "C" {
 #include "config.h"
 #include "renderer.h"
-#include "infconfig.h"
+#include "prefs.h"
 #include "effects.h"
 #include "display.h"
 
@@ -230,7 +230,7 @@ static gint32 event_filter(const SDL_Event *event)
 		}
 		break;
 	case SDL_QUIT:
-		config_plugin_save_prefs();
+		config_save_prefs();
 		break;
 	default:
 		break;
