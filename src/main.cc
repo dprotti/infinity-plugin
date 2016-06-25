@@ -72,6 +72,7 @@ public:
 
 private:
 	void load_settings ();
+	void save_settings();
 };
 
 EXPORT InfinityPlugin aud_plugin_instance;
@@ -104,7 +105,7 @@ void InfinityPlugin::clear ()
 void InfinityPlugin::cleanup(void)
 {
 	g_message("Infinity: cleanup()");
-	config_save_prefs();
+	save_settings();
 	renderer_finish();
 }
 
@@ -135,4 +136,10 @@ void InfinityPlugin::load_settings(void)
 	config_set_sres(aud_get_int(CFGID, "scale_factor"));
 	config_set_fps(aud_get_int(CFGID, "max_fps"));
 	config_set_show_title(aud_get_bool(CFGID, "show_title"));
+}
+
+void InfinityPlugin::save_settings(void)
+{
+	aud_set_int(CFGID, "width", config_get_xres());
+	aud_set_int(CFGID, "height", config_get_yres());
 }
