@@ -5,11 +5,6 @@ data_DATA = infinite_states
 
 datadir = $(prefix)/share/audacious
 
-# translations go into infinity's own directory not in audacious directory
-infinity_datadir = @datadir@
-localedir = $(infinity_datadir)/locale
-DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
-
 COMMON_FLAGS = @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
 	@GLIB_CFLAGS@ $(INF_CFLAGS_EXTRA) -DDATADIR='"$(datadir)"'
 

@@ -58,7 +58,7 @@ AM_PATH_SDL(1.0.6,,AC_MSG_ERROR([*** SDL >= 1.0.6 not installed - please install
 
 # Check for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([libintl.h locale.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 
 # Check for typedefs, structures, and compiler characteristics.
 AC_C_VOLATILE
@@ -77,7 +77,7 @@ else
 fi
 	    
 # Check for library functions.
-AC_CHECK_FUNCS([floor setlocale sqrt setlocale])
+AC_CHECK_FUNCS([floor sqrt])
 
 # Arguments to specify certain features.
 AC_ARG_ENABLE([mmx],
