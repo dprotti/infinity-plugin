@@ -1,12 +1,12 @@
 TODO
 ====
 
+* Provide Ubuntu package
+* Save window position on close
+* Remove config.h.in from repo?
+* Remove prefs.c
+* Update to SDL 2?
+* Compile on Windows
 * Fix MMX
-* Revamp configuration dialog
 * Add icon
 * Add an option to disable the screensaver
-* Save window position on close
-* Rewrite modules to use a common datatype InfPlugin
-* Remove config.h.in from repo?
-* Update to Automake 15 ?
-
