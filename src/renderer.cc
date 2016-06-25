@@ -20,8 +20,10 @@
 #include <gtk/gtk.h>
 #include <dbus/dbus.h>
 
-#include <libaudcore/playlist.h>
 #include <libaudcore/drct.h>
+#include <libaudcore/playlist.h>
+#include <libaudcore/plugins.h>
+#include <libaudcore/runtime.h>
 
 #include <audacious/audctrl.h>
 #include <audacious/dbus.h>
@@ -34,7 +36,7 @@
 extern "C" {
 #include "config.h"
 #include "renderer.h"
-#include "infconfig.h"
+#include "prefs.h"
 #include "effects.h"
 #include "display.h"
 
@@ -47,18 +49,12 @@ extern "C" {
 #define next_effect()   (t_last_effect++)
 #define next_color()    (t_last_color++)
 
-typedef struct t_general_parameters {
-	gint32	t_between_effects;
-	gint32	t_between_colors;
-} t_general_parameters;
-
 typedef gint32 t_color;
 typedef gint32 t_num_effect;
 
 static t_screen_parameters scr_par;
 
 static t_effect current_effect;
-static t_general_parameters gen_par;
 static t_color color, old_color, t_last_color;
 static t_num_effect t_last_effect;
 
@@ -87,9 +83,6 @@ static int renderer_mmx(void *);
 #endif
 static void set_title(void);
 
-/*
- * Public functions
- */
 void renderer_init(void)
 {
 	GError *error = NULL;
@@ -109,9 +102,6 @@ void renderer_init(void)
 	scr_par.width = config_get_xres();
 	scr_par.height = config_get_yres();
 	scr_par.scale = config_get_sres();
-
-	gen_par.t_between_effects = config_get_teff();
-	gen_par.t_between_colors = config_get_tcol();
 
 	old_color = 0;
 	color = 0;
@@ -156,7 +146,10 @@ void renderer_init(void)
 void renderer_finish(void)
 {
 	gint32 _try;
+	PluginHandle * plugin;
 
+	if (finished)
+		return;
 	if (initializing) {
 		g_warning("The plugin have not yet initialized");
 		_try = 0;
@@ -184,6 +177,10 @@ void renderer_finish(void)
 	display_quit();
 	g_timer_destroy(title_timer);
 	g_object_unref(dbus_proxy);
+
+	plugin = aud_plugin_lookup_basename("libinfinite");
+	aud_plugin_enable(plugin, false);
+
 	g_message("Infinity: Closing...");
 }
 
@@ -230,7 +227,7 @@ static gint32 event_filter(const SDL_Event *event)
 		}
 		break;
 	case SDL_QUIT:
-		config_plugin_save_prefs();
+		// ignore it. let handle it in check_events()
 		break;
 	default:
 		break;
@@ -416,17 +413,25 @@ static void check_events()
 #endif  /* INFINITY_DEBUG */
 }
 
+// log calling line to improve bug reports
+static gint32 calculate_frame_length(gint32 fps, int line) {
+	gint32 frame_length = (gint32)(((1.0 / fps) * 1000));
+	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", line, fps);
+	return frame_length;
+}
+
 static int renderer(void *arg)
 {
 	gint32 render_time, now;
 	gint32 frame_length;
 	gint32 idle_time;
 	gint32 fps, new_fps;
+	gint32 t_between_effects, t_between_colors;
 
-	/* We suppose here that config module have been initialized */
-	fps = config_get_fps();
-	frame_length = (gint32)((1.0 / config_get_fps()) * 1000);
-	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+	fps = aud_get_int(CFGID, "max_fps");
+	frame_length = calculate_frame_length(fps, __LINE__);
+	t_between_effects = aud_get_int(CFGID, "effect_time");
+	t_between_colors = aud_get_int(CFGID, "palette_time");
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -456,36 +461,39 @@ static int renderer(void *arg)
 			change_color(old_color, color, t_last_color * 8);
 		next_color();
 		next_effect();
-		if (t_last_effect % gen_par.t_between_effects == 0) {
+		if (t_last_effect % t_between_effects == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
+				t_between_effects = aud_get_int(CFGID, "effect_time");
 			}
 #else
 			display_load_random_effect(&current_effect);
 			t_last_effect = 0;
+			t_between_effects = aud_get_int(CFGID, "effect_time");
 #endif
 		}
-		if (t_last_color % gen_par.t_between_colors == 0) {
+		if (t_last_color % t_between_colors == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;
+				t_between_colors = aud_get_int(CFGID, "palette_time");
 			}
 #else
 			old_color = color;
 			color = rand() % NB_PALETTES;
 			t_last_color = 0;
+			t_between_colors = aud_get_int(CFGID, "palette_time");
 #endif
 		}
 
-		new_fps = config_get_fps();
+		new_fps = aud_get_int(CFGID, "max_fps");
 		if (new_fps != fps) {
 			fps = new_fps;
-			frame_length = (gint32)(((1.0 / fps) * 1000));
-			g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+			frame_length = calculate_frame_length(fps, __LINE__);
 		}
 
 		now = (gint32)SDL_GetTicks();
@@ -503,11 +511,12 @@ static int renderer_mmx(void *arg)
 	gint32 frame_length;
 	gint32 idle_time;
 	gint32 fps, new_fps;
+	gint32 t_between_effects, t_between_colors;
 
-	/* We suppose here that config module have been initialized */
-	fps = config_get_fps();
-	frame_length = ((1.0 / fps) * 1000);
-	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+	fps = aud_get_int(CFGID, "max_fps");
+	frame_length = calculate_frame_length(fps, __LINE__);
+	t_between_effects = aud_get_int(CFGID, "effect_time");
+	t_between_colors = aud_get_int(CFGID, "palette_time");
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -537,36 +546,39 @@ static int renderer_mmx(void *arg)
 			change_color(old_color, color, t_last_color * 8);
 		next_color();
 		next_effect();
-		if (t_last_effect % gen_par.t_between_effects == 0) {
+		if (t_last_effect % t_between_effects == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
+				t_between_effects = aud_get_int(CFGID, "effect_time");
 			}
 #else
 			display_load_random_effect(&current_effect);
 			t_last_effect = 0;
+			t_between_effects = aud_get_int(CFGID, "effect_time");
 #endif
 		}
-		if (t_last_color % gen_par.t_between_colors == 0) {
+		if (t_last_color % t_between_colors == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;
+				t_between_colors = aud_get_int(CFGID, "palette_time");
 			}
 #else
 			old_color = color;
 			color = rand() % NB_PALETTES;
 			t_last_color = 0;
+			t_between_colors = aud_get_int(CFGID, "palette_time");
 #endif
 		}
 
-		new_fps = config_get_fps();
+		new_fps = aud_get_int(CFGID, "max_fps");
 		if (new_fps != fps) {
 			fps = new_fps;
-			frame_length = ((1.0 / fps) * 1000);
-			g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+			frame_length = calculate_frame_length(fps, __LINE__);
 		}
 
 		now = SDL_GetTicks();

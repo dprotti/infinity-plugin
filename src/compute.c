@@ -18,7 +18,7 @@
 
 #include "config.h"
 #include "compute.h"
-#include "infconfig.h"
+#include "prefs.h"
 #ifdef MMX_DETECTION
 #include "mmx.h"
 #endif
