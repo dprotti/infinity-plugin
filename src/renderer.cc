@@ -49,18 +49,12 @@ extern "C" {
 #define next_effect()   (t_last_effect++)
 #define next_color()    (t_last_color++)
 
-typedef struct t_general_parameters {
-	gint32	t_between_effects;
-	gint32	t_between_colors;
-} t_general_parameters;
-
 typedef gint32 t_color;
 typedef gint32 t_num_effect;
 
 static t_screen_parameters scr_par;
 
 static t_effect current_effect;
-static t_general_parameters gen_par;
 static t_color color, old_color, t_last_color;
 static t_num_effect t_last_effect;
 
@@ -108,9 +102,6 @@ void renderer_init(void)
 	scr_par.width = config_get_xres();
 	scr_par.height = config_get_yres();
 	scr_par.scale = config_get_sres();
-
-	gen_par.t_between_effects = config_get_teff();
-	gen_par.t_between_colors = config_get_tcol();
 
 	old_color = 0;
 	color = 0;
@@ -424,7 +415,7 @@ static void check_events()
 
 // log calling line to improve bug reports
 static gint32 calculate_frame_length(gint32 fps, int line) {
-	gint32 frame_length = frame_length = (gint32)(((1.0 / fps) * 1000));
+	gint32 frame_length = (gint32)(((1.0 / fps) * 1000));
 	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", line, fps);
 	return frame_length;
 }
@@ -435,9 +426,12 @@ static int renderer(void *arg)
 	gint32 frame_length;
 	gint32 idle_time;
 	gint32 fps, new_fps;
+	gint32 t_between_effects, t_between_colors;
 
 	fps = aud_get_int(CFGID, "max_fps");
 	frame_length = calculate_frame_length(fps, __LINE__);
+	t_between_effects = aud_get_int(CFGID, "effect_time");
+	t_between_colors = aud_get_int(CFGID, "palette_time");
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -467,28 +461,32 @@ static int renderer(void *arg)
 			change_color(old_color, color, t_last_color * 8);
 		next_color();
 		next_effect();
-		if (t_last_effect % gen_par.t_between_effects == 0) {
+		if (t_last_effect % t_between_effects == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
+				t_between_effects = aud_get_int(CFGID, "effect_time");
 			}
 #else
 			display_load_random_effect(&current_effect);
 			t_last_effect = 0;
+			t_between_effects = aud_get_int(CFGID, "effect_time");
 #endif
 		}
-		if (t_last_color % gen_par.t_between_colors == 0) {
+		if (t_last_color % t_between_colors == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;
+				t_between_colors = aud_get_int(CFGID, "palette_time");
 			}
 #else
 			old_color = color;
 			color = rand() % NB_PALETTES;
 			t_last_color = 0;
+			t_between_colors = aud_get_int(CFGID, "palette_time");
 #endif
 		}
 
@@ -513,9 +511,12 @@ static int renderer_mmx(void *arg)
 	gint32 frame_length;
 	gint32 idle_time;
 	gint32 fps, new_fps;
+	gint32 t_between_effects, t_between_colors;
 
 	fps = aud_get_int(CFGID, "max_fps");
 	frame_length = calculate_frame_length(fps, __LINE__);
+	t_between_effects = aud_get_int(CFGID, "effect_time");
+	t_between_colors = aud_get_int(CFGID, "palette_time");
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -545,28 +546,32 @@ static int renderer_mmx(void *arg)
 			change_color(old_color, color, t_last_color * 8);
 		next_color();
 		next_effect();
-		if (t_last_effect % gen_par.t_between_effects == 0) {
+		if (t_last_effect % t_between_effects == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
+				t_between_effects = aud_get_int(CFGID, "effect_time");
 			}
 #else
 			display_load_random_effect(&current_effect);
 			t_last_effect = 0;
+			t_between_effects = aud_get_int(CFGID, "effect_time");
 #endif
 		}
-		if (t_last_color % gen_par.t_between_colors == 0) {
+		if (t_last_color % t_between_colors == 0) {
 #ifdef INFINITY_DEBUG
 			if (!mode_interactif) {
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;
+				t_between_colors = aud_get_int(CFGID, "palette_time");
 			}
 #else
 			old_color = color;
 			color = rand() % NB_PALETTES;
 			t_last_color = 0;
+			t_between_colors = aud_get_int(CFGID, "palette_time");
 #endif
 		}
 

@@ -38,8 +38,12 @@ static const char about_text[] =
 	"https://github.com/dprotti/infinity-plugin";
 
 static const PreferencesWidget prefs_fps[] = {
-	WidgetLabel ("<b>Maximum Frames per Second</b>"),
-	WidgetSpin ("Rate:", WidgetInt (CFGID, "max_fps"), {10, 120, 1, "fps"})
+	WidgetLabel ("<b>Frames per second</b>"),
+	WidgetSpin ("Max. :", WidgetInt (CFGID, "max_fps"), {10, 120, 1, "fps"}),
+	WidgetLabel ("<b>How often change effect</b>"),
+	WidgetSpin ("Every", WidgetInt (CFGID, "effect_time"), {50, 500, 5, "frames   "}),
+	WidgetLabel ("<b>How often change colors</b>"),
+	WidgetSpin ("Every", WidgetInt (CFGID, "palette_time"), {50, 500, 5, "frames   "})
 };
 
 static const PreferencesWidget prefs_widgets[] = {
