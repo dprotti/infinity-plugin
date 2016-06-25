@@ -1,10 +1,3 @@
-/**
- * \file renderer.h
- *
- * \brief Controls the rendering process and its interaction with application
- * events.
- */
-
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,7 +18,7 @@
 
 #include <glib.h>
 
-/**
+/*
  * Initializes rendering process.
  *
  * Reads configuration parameters and launchs a thread where most of the
@@ -33,12 +26,12 @@
  */
 void renderer_init(void);
 
-/**
+/*
  * Closes rendering process.
  */
 void renderer_finish(void);
 
-/**
+/*
  * Copies PCM data from Audacity.
  *
  * Called periodically by Audacity with actual PCM data.

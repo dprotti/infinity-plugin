@@ -1,10 +1,3 @@
-/**
- * \file compute.h
- *
- * \brief This modules is responsible for calculate the screen that
- * will be showed.
- */
-
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -23,44 +16,38 @@
 #ifndef __INFINITY_COMPUTE__
 #define __INFINITY_COMPUTE__
 
-
 #include "types.h"
-
 
 #define NB_FCT 7
 #define PI 3.14159
 
-
-/**
+/*
  * Represents the interpollation information.
  */
 typedef struct {
-	guint32 coord;  /**< Coordinates of the top left pixel. */
-	guint32 weight; /**< 32 bits = 4*8 = weights of the four corners */
+	guint32 coord;  /* Coordinates of the top left pixel. */
+	guint32 weight; /* 32 bits = 4*8 = weights of the four corners */
 } t_interpol;
 
-
-/**
+/*
  * Represents a field of interpollation vectors.
  *
- * \warning Don't use width*height*sizeof(::t_interpol) for
+ * Warning: don't use width*height*sizeof(::t_interpol) for
  * to calculate the memory size of an object of this type
  * because this is actually not true.
  */
 typedef struct {
-	gint32		width;  /**< number of vectors */
-	gint32		height; /**< length of each vector */
-	t_interpol *	vector; /**< pointer to the vector field */
+	gint32		width;  /* number of vectors */
+	gint32		height; /* length of each vector */
+	t_interpol *	vector; /* pointer to the vector field */
 } vector_field_t;
-
-
 
 /*
  * The constructor of the ::vector_field_t type.
  */
 vector_field_t *compute_vector_field_new(int width, int height);
 
-/**
+/*
  * The destructor of the ::vector_field_t type.
  *
  * @param vector_field Must be non NULL pointer to a
@@ -68,13 +55,13 @@ vector_field_t *compute_vector_field_new(int width, int height);
  */
 void compute_vector_field_destroy(vector_field_t *vector_field);
 
-/**
+/*
  * It frees any allocated resource and mades clenaup work.
  */
 void compute_quit(void);
 
-/**
- * Initializes this module.
+/*
+ * Initialize this module.
  *
  * For to do this the user configuration options are readed and
  * internals structures setting accordingly. If this options
@@ -83,10 +70,10 @@ void compute_quit(void);
  */
 void compute_init(void);
 
-/**
- * Tells the module that the screen has been resized.
+/*
+ * Tell the module that the screen has been resized.
  *
- * \warning May be this will be deprecated.
+ * Warning: may be this will be deprecated.
  */
 void compute_resize(gint32 width, gint32 height);
 

@@ -1,10 +1,3 @@
-/**
- * \file effects.h
- *
- * \brief This module implements the effects that will be drawed
- * to the screen.
- */
-
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,14 +20,14 @@
 #include <types.h>
 
 
-/**
+/*
  * Represents effect related information.
  *
- * \todo document structure fields. Some of them are two big, byte
+ * TODO document structure fields. Some of them are two big, byte
  * would be enough for some of them.
  */
 typedef struct {
-	gint32	num_effect; /**< The number of the effect */
+	gint32	num_effect; /* The number of the effect */
 	gint32	x_curve;
 	gint32	curve_color;
 	gint32	curve_amplitude;
@@ -44,7 +37,7 @@ typedef struct {
 	gint32	spectral_shift;
 } t_effect;
 
-/**
+/*
  * Saves the given effect pointed by \a effect to disk.
  *
  * The effect are saved to the file

@@ -35,14 +35,14 @@ typedef struct _t_screen_parameters {
 	gint32	width;
 	gint32	height;
 	gint32	scale;
-	gint32	bpp; /**< bytes per pixels. */
+	gint32	bpp; /* bytes per pixels. */
 } t_screen_parameters;
 
 
 void config_save_prefs(void);
 
 /*
- * \return TRUE if config_plugin_load_prefs() or
+ * Return TRUE if config_plugin_load_prefs() or
  * config_set_default_values() has been called.
  */
 gboolean config_is_initialized(void);

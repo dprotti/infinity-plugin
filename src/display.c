@@ -25,12 +25,6 @@
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
 
-/*
- * SDL_HWSURFACE  Surface is in video memory
- * SDL_HWPALETTE  Surface has exclusive palette
- * SDL_DOUBLEBUF  Set up double-buffered video mode
- * SDL_RESIZABLE  This video mode may be resized
- */
 #define VIDEO_FLAGS ((Uint32)(SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF | SDL_RESIZABLE))
 
 typedef struct sincos {
@@ -90,7 +84,6 @@ static void generate_colors()
 }
 
 static void display_surface()
-
 {
 	gint32 i, j;
 	gint16 *pdest;
@@ -215,9 +208,6 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-/*
- * Public functions
- */
 void display_init(void)
 {
 	scr_par.width = config_get_xres();
@@ -414,8 +404,8 @@ void spectral(t_effect *current_effect)
 	}
 }
 
-/**
- * \todo current_effect->curve_color must be a byte. This is related to
+/*
+ * TODO current_effect->curve_color must be a byte. This is related to
  * t_effect typo.
  */
 void curve(t_effect *current_effect)

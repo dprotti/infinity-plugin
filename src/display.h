@@ -1,10 +1,3 @@
-/**
- * \file display.h
- *
- * \brief This module implements the necessary functions to draw
- * to the screen.
- */
-
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,20 +24,20 @@
 
 #define NB_PALETTES 5
 
-/**
+/*
  * Initializes the display related structures.
  *
  * This function reads the user configuration options
  * and set his internal data structures accordingly.
  * It also initializes the SDL library.
  *
- * \warning Because this function initializes the SDL
+ * Warning: because this function initializes the SDL
  * library, must be called before any SDL operation and
  * must not be called when SDL was already started.
  */
 void display_init(void);
 
-/**
+/*
  * Closes the display module.
  *
  * It also closes the SDL library.
@@ -55,13 +48,13 @@ void display_init(void);
  * could be bloqued on a mutex, mutex that display_quit()
  * will destroy!
  *
- * \see display_init().
+ * See display_init().
  */
 void display_quit(void);
 
-/**
+/*
  * Change the size of the display to the new dimension
- * \a width x \a height.
+ * width x height.
  *
  * It is supposed that this must be called when the display
  * screen is resized (i.e. when is resized the window where
@@ -69,14 +62,14 @@ void display_quit(void);
  */
 void display_resize(gint32 width, gint32 height);
 
-/**
- * Set \a data as the data PCM data of this module.
+/*
+ * Set data as the data PCM data of this module.
  *
- * This function makes a copy of \a data.
+ * This function makes a copy of data.
  *
- * \warning Be aware that this function locks a mutex.
+ * Warning: be aware that this function locks a mutex.
  *
- * \see display_quit().
+ * See display_quit().
  */
 void display_set_pcm_data(const float *data, int channels);
 
@@ -88,10 +81,10 @@ void display_blur_mmx(guint32 vector_index);
 void spectral(t_effect *current_effect);
 void curve(t_effect *current_effect);
 
-/**
- * Makes the plugin screen switch to full screen mode.
+/*
+ * Makes the plugin screen switch to full-screen mode.
  *
- * \see display_init().
+ * See display_init().
  */
 void display_toggle_fullscreen(void);
 
