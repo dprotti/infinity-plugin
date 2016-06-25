@@ -38,37 +38,37 @@ static const char about_text[] =
 	"https://github.com/dprotti/infinity-plugin";
 
 static const PreferencesWidget prefs_fps[] = {
-    WidgetLabel ("<b>Maximum Frames per Second</b>"),
-    WidgetSpin ("Rate:", WidgetInt (CFGID, "max_fps"), {10, 120, 1, "fps"})
+	WidgetLabel ("<b>Maximum Frames per Second</b>"),
+	WidgetSpin ("Rate:", WidgetInt (CFGID, "max_fps"), {10, 120, 1, "fps"})
 };
 
 static const PreferencesWidget prefs_widgets[] = {
 	WidgetBox ({{prefs_fps}}),
-    //WidgetSeparator (),
-    //WidgetBox ({{...}})
+	//WidgetSeparator (),
+	//WidgetBox ({{...}})
 };
 
 static const PluginPreferences preferences = {{prefs_widgets}};
 
 class InfinityPlugin : VisPlugin {
 public:
-    static constexpr PluginInfo info = {
-        "Infinity",
-        PACKAGE,
-        about_text,
-        & preferences
-    };
+	static constexpr PluginInfo info = {
+		"Infinity",
+		PACKAGE,
+		about_text,
+		& preferences
+	};
 
-    constexpr InfinityPlugin () : VisPlugin (info, Visualizer::MultiPCM) {}
+	constexpr InfinityPlugin () : VisPlugin (info, Visualizer::MultiPCM) {}
 
-    bool init ();
-    void cleanup ();
+	bool init ();
+	void cleanup ();
 
 	// No gtk window, SDL creates its own window.
 	// void * get_gtk_widget ();
 
-    void clear ();
-    void render_multi_pcm (const float * pcm, int channels);
+	void clear ();
+	void render_multi_pcm (const float * pcm, int channels);
 
 private:
 	void load_settings ();
@@ -80,18 +80,18 @@ EXPORT InfinityPlugin aud_plugin_instance;
 bool InfinityPlugin::init(void)
 {
 	g_message("Infinity commands:\n"
-		    "- Space:\tchange effect.\n"
-		    "- Tab:\t\ttoggle full-screen.\n"
-		    "- Up/Down:\tup/down main volume.\n"
-		    "- Left/Right:\treward/forward actual played song, if any.\n"
-		    "- z:\t\tprevious song.\n"
-		    "- x:\t\tplay.\n"
-		    "- c:\t\tpause.\n"
-		    "- v:\t\tstop.\n"
-		    "- b:\t\tnext song.\n"
-		    "- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
-		    "- F11:\t\tscreenshot.\n"
-		    "- F12:\t\tchange palette.");
+			"- Space:\tchange effect.\n"
+			"- Tab:\t\ttoggle full-screen.\n"
+			"- Up/Down:\tup/down main volume.\n"
+			"- Left/Right:\treward/forward actual played song, if any.\n"
+			"- z:\t\tprevious song.\n"
+			"- x:\t\tplay.\n"
+			"- c:\t\tpause.\n"
+			"- v:\t\tstop.\n"
+			"- b:\t\tnext song.\n"
+			"- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
+			"- F11:\t\tscreenshot.\n"
+			"- F12:\t\tchange palette.");
 	load_settings();
 	renderer_init();
 	return TRUE;
