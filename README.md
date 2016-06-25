@@ -22,6 +22,7 @@ sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev 
 Install
 -------
 
+- **[Download](https://github.com/dprotti/infinity-plugin/releases/latest/)**
 - ./configure --prefix=/usr (or whatever your prefix is)
 - make
 - sudo make install
