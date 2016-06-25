@@ -63,6 +63,10 @@ public:
 
     bool init ();
     void cleanup ();
+
+	// No gtk window, SDL creates its own window.
+	// void * get_gtk_widget ();
+
     void clear ();
     void render_multi_pcm (const float * pcm, int channels);
 
@@ -94,12 +98,12 @@ bool InfinityPlugin::init(void)
 
 void InfinityPlugin::clear ()
 {
-	g_message("[Infinity] clear()");
+	g_message("Infinity: clear()");
 }
 
 void InfinityPlugin::cleanup(void)
 {
-	g_message("[Infinity] cleanup()");
+	g_message("Infinity: cleanup()");
 	config_save_prefs();
 	renderer_finish();
 }

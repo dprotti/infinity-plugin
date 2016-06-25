@@ -20,8 +20,9 @@
 #include <gtk/gtk.h>
 #include <dbus/dbus.h>
 
-#include <libaudcore/playlist.h>
 #include <libaudcore/drct.h>
+#include <libaudcore/playlist.h>
+#include <libaudcore/plugins.h>
 
 #include <audacious/audctrl.h>
 #include <audacious/dbus.h>
@@ -87,9 +88,6 @@ static int renderer_mmx(void *);
 #endif
 static void set_title(void);
 
-/*
- * Public functions
- */
 void renderer_init(void)
 {
 	GError *error = NULL;
@@ -156,7 +154,10 @@ void renderer_init(void)
 void renderer_finish(void)
 {
 	gint32 _try;
+	PluginHandle * plugin;
 
+	if (finished)
+		return;
 	if (initializing) {
 		g_warning("The plugin have not yet initialized");
 		_try = 0;
@@ -184,6 +185,10 @@ void renderer_finish(void)
 	display_quit();
 	g_timer_destroy(title_timer);
 	g_object_unref(dbus_proxy);
+
+	plugin = aud_plugin_lookup_basename("libinfinite");
+	aud_plugin_enable(plugin, false);
+
 	g_message("Infinity: Closing...");
 }
 
@@ -230,7 +235,7 @@ static gint32 event_filter(const SDL_Event *event)
 		}
 		break;
 	case SDL_QUIT:
-		config_save_prefs();
+		// ignore it. let handle it in check_events()
 		break;
 	default:
 		break;
