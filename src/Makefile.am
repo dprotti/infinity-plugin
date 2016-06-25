@@ -10,6 +10,7 @@ COMMON_FLAGS = @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
 
 AM_CFLAGS = @CFLAGS@ $(COMMON_FLAGS)
 AM_CXXFLAGS = @CXXFLAGS@ $(COMMON_FLAGS)
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)
 
 libinfinite_la_LDFLAGS = ${CXX}
 libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @AUDCLIENT_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@
@@ -22,7 +23,5 @@ libinfinite_la_SOURCES = \
 	effects.c effects.h\
 	cputest.c cputest.h\
 	mmx.h types.h
-
-INCLUDES = -I$(top_srcdir)/src -I$(top_builddir)
 
 EXTRA_DIST = infinite_states

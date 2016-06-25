@@ -2,14 +2,14 @@
 
 AC_PREREQ(2.61)
 AC_INIT([Infinity plugin],[0.9.0alpha],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
+AC_CANONICAL_TARGET
+
 AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
 
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PREFIX_PROGRAM(audacious)
-
-AC_CANONICAL_TARGET
 
 # Check for programs.
 AC_PROG_CXX
