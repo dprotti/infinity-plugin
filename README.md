@@ -1,8 +1,8 @@
-Infinity Visualization Plugin
-=============================
+Infinity
+========
 
-Plugin for [Audacious](http://audacious-media-player.org/) player that generates light effects
-according to a playing sound.
+Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
+It generates beautiful light effects.
 
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
@@ -31,6 +31,8 @@ Run
 - play your favorite songs
 
 To enter/leave Full-Screen mode press Tab key.
+
+![Screenshot of Infinity Settings](../screenshots/screenshot-settings.png?raw=true "Infinity Settings")
 
 Add New Effects
 ---------------
@@ -87,11 +89,6 @@ You can control the effects using keys:
 Known Bugs
 ----------
 
-As of 0.8.0beta1 the settings window and the about dialog does not work.
-
-If you have problems finding locale.h header file, try to configure with
---disable-nls option.
-
 In Ubuntu systems over AMD64 architectures, try running configure with
 --prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu
 
@@ -119,5 +116,4 @@ Releases older than 0.8.0beta1 can be found at Sourceforge: <https://sourceforge
 Contributions
 -------------
 
-Your help is welcome, either coding, translating or building binary (distro)
-packages.
+Your help is welcome either coding, testing or building distro packages.
