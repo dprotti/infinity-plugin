@@ -4,5 +4,5 @@ SUBDIRS = src
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = mkinstalldirs Doxyfile REPORT-BUGS PLANS
+EXTRA_DIST = mkinstalldirs REPORT-BUGS PLANS README.md
 
