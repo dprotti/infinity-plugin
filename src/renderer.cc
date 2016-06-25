@@ -23,6 +23,7 @@
 #include <libaudcore/drct.h>
 #include <libaudcore/playlist.h>
 #include <libaudcore/plugins.h>
+#include <libaudcore/runtime.h>
 
 #include <audacious/audctrl.h>
 #include <audacious/dbus.h>
@@ -421,6 +422,13 @@ static void check_events()
 #endif  /* INFINITY_DEBUG */
 }
 
+// log calling line to improve bug reports
+static gint32 calculate_frame_length(gint32 fps, int line) {
+	gint32 frame_length = frame_length = (gint32)(((1.0 / fps) * 1000));
+	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", line, fps);
+	return frame_length;
+}
+
 static int renderer(void *arg)
 {
 	gint32 render_time, now;
@@ -428,10 +436,8 @@ static int renderer(void *arg)
 	gint32 idle_time;
 	gint32 fps, new_fps;
 
-	/* We suppose here that config module have been initialized */
-	fps = config_get_fps();
-	frame_length = (gint32)((1.0 / config_get_fps()) * 1000);
-	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+	fps = aud_get_int(CFGID, "max_fps");
+	frame_length = calculate_frame_length(fps, __LINE__);
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -486,11 +492,10 @@ static int renderer(void *arg)
 #endif
 		}
 
-		new_fps = config_get_fps();
+		new_fps = aud_get_int(CFGID, "max_fps");
 		if (new_fps != fps) {
 			fps = new_fps;
-			frame_length = (gint32)(((1.0 / fps) * 1000));
-			g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+			frame_length = calculate_frame_length(fps, __LINE__);
 		}
 
 		now = (gint32)SDL_GetTicks();
@@ -509,10 +514,8 @@ static int renderer_mmx(void *arg)
 	gint32 idle_time;
 	gint32 fps, new_fps;
 
-	/* We suppose here that config module have been initialized */
-	fps = config_get_fps();
-	frame_length = ((1.0 / fps) * 1000);
-	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+	fps = aud_get_int(CFGID, "max_fps");
+	frame_length = calculate_frame_length(fps, __LINE__);
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -567,11 +570,10 @@ static int renderer_mmx(void *arg)
 #endif
 		}
 
-		new_fps = config_get_fps();
+		new_fps = aud_get_int(CFGID, "max_fps");
 		if (new_fps != fps) {
 			fps = new_fps;
-			frame_length = ((1.0 / fps) * 1000);
-			g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", __LINE__, fps);
+			frame_length = calculate_frame_length(fps, __LINE__);
 		}
 
 		now = SDL_GetTicks();
