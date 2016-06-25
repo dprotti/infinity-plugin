@@ -18,16 +18,11 @@
 #include <unistd.h>
 #include <glib.h>
 #include <gtk/gtk.h>
-#include <dbus/dbus.h>
 
 #include <libaudcore/drct.h>
 #include <libaudcore/playlist.h>
 #include <libaudcore/plugins.h>
 #include <libaudcore/runtime.h>
-
-#include <audacious/audctrl.h>
-#include <audacious/dbus.h>
-
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
@@ -72,9 +67,6 @@ static GTimer *title_timer;
 
 static SDL_Thread *thread;
 
-static DBusGConnection *connection = NULL;
-static DBusGProxy *dbus_proxy = NULL;
-
 static gint32 event_filter(const SDL_Event *event);
 static void check_events();
 static int renderer(void *);
@@ -85,7 +77,6 @@ static void set_title(void);
 
 void renderer_init(void)
 {
-	GError *error = NULL;
 	gint32 _try;
 
 	if (initializing) {
@@ -121,11 +112,6 @@ void renderer_init(void)
 	title_timer = g_timer_new();
 	g_timer_start(title_timer);
 	display_load_random_effect(&current_effect);
-
-	connection = dbus_g_bus_get(DBUS_BUS_SESSION, &error);
-	dbus_proxy = dbus_g_proxy_new_for_name(connection, AUDACIOUS_DBUS_SERVICE,
-					       AUDACIOUS_DBUS_PATH,
-					       AUDACIOUS_DBUS_INTERFACE);
 
 	(void)SDL_EventState((Uint8)SDL_ALLEVENTS, SDL_IGNORE);
 	(void)SDL_EventState((Uint8)SDL_VIDEORESIZE, SDL_ENABLE);
@@ -176,7 +162,6 @@ void renderer_finish(void)
 	g_usleep(10000 * SDL_TIMESLICE);
 	display_quit();
 	g_timer_destroy(title_timer);
-	g_object_unref(dbus_proxy);
 
 	plugin = aud_plugin_lookup_basename("libinfinite");
 	aud_plugin_enable(plugin, false);

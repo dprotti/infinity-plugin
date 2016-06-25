@@ -10,10 +10,14 @@ Requirements
 ------------
 
 - Audacious >= 3.5
-- Audclient >= 3.5 (Audacious D-BUS remote control library)
+- Audclient >= 3.5 (Audacious remote control library)
 - 1.0.6 <= SDL < 2
 - Glib >= 2.8
 - Gtk+ >= 2.8
+
+*** Install deps in Ubuntu ***
+
+sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
 
 Install
 -------
@@ -30,7 +34,7 @@ Run
 - mark Infinity
 - play your favorite songs
 
-To enter/leave Full-Screen mode press Tab key.
+Enter / leave full-screen by pressing Tab.
 
 ![Screenshot of Infinity Settings](../screenshots/screenshot-settings.png?raw=true "Infinity Settings")
 
