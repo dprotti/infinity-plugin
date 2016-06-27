@@ -15,7 +15,7 @@ Requirements
 - Glib >= 2.8
 - Gtk+ >= 2.8
 
-** Install deps in Ubuntu **
+**Install deps in Ubuntu**
 
 sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
 
