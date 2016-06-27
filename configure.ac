@@ -1,10 +1,15 @@
 ## Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.61)
-AC_INIT([Infinity plugin],[0.9.0alpha1],[dprotti@users.sourceforge.net],[infinity-plugin-4-audacious])
+AC_PREREQ(2.65)
+AC_INIT([Infinity plugin],[0.9.0alpha],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin-4-audacious],[https://github.com/dprotti/infinity-plugin])
+AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([1.9.0 dist-bzip2])
+AM_INIT_AUTOMAKE([1.15 -Wno-portability no-dist-gzip dist-xz tar-ustar])
+
+# Support silent build rules. Disable by either passing --disable-silent-rules
+# to configure or passing V=1 to make
+AM_SILENT_RULES([yes])
 
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_MACRO_DIR([m4])

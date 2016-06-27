@@ -15,15 +15,23 @@ Requirements
 - Glib >= 2.8
 - Gtk+ >= 2.8
 
-*** Install deps in Ubuntu ***
+** Install deps in Ubuntu **
 
 sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
 
-Install
+Install from tarball
 -------
 
 - **[Download](https://github.com/dprotti/infinity-plugin/releases/latest/)**
-- ./configure --prefix=/usr (or whatever your prefix is)
+- ./configure
+- make
+- sudo make install
+
+Install from repo
+-------
+
+- git clone https://github.com/dprotti/infinity-plugin
+- ./autogen.sh --prefix=/usr (or whatever your prefix is)
 - make
 - sudo make install
 
