@@ -2,22 +2,21 @@ Infinity
 ========
 
 Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
-It generates beautiful light effects.
+It generates beautiful light effects. Supports full-screen mode, mouse resizing and preferences
+saving.
 
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
 ------------
 
-- Audacious >= 3.5
-- Audclient >= 3.5 (Audacious remote control library)
-- 1.0.6 <= SDL < 2
-- Glib >= 2.8
-- Gtk+ >= 2.8
+Audacious >= 3.5, Audclient >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.8, Gtk+ >= 2.8
 
 **Install deps in Ubuntu**
 
+```
 sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
+```
 
 Install from tarball
 -------
@@ -38,72 +37,22 @@ Install from repo
 Run
 ---
 
-- start Audacious
-- enter menu View -> Visualizations
-- mark Infinity
-- play your favorite songs
+Audacious -> View -> Visualizations -> Infinity
 
-Enter / leave full-screen by pressing Tab.
+Enter / leave full-screen by pressing `Tab`.
 
 ![Screenshot of Infinity Settings](../screenshots/screenshot-settings.png?raw=true "Infinity Settings")
 
-Add New Effects
----------------
+Playing Around
+--------------
 
-- Build with --enable-debug and install
-- Run Audacious on console
-- Go to interactive mode (see next section) and experiment
-- Press key 'm' for saving current effect to disk (will persist amongst Audacious sessions)
-
-Modes
------
-
-The plugin has two modes. Default is Non-Interactive.
-
-**Non-Interactive Mode**:
-
-States and palettes periodically switches in a random sequence.
-
-If you run Audacity from a terminal the following command keys will display on
-terminal when Infinity loads:
-
-  Keys:
-  - Space:	change effect
-  - Tab:   	toggle full-screen
-  - Up/Down:	up/down audacity main volume
-  - Left/Right:	reward/forward actual played song, if any
-  - z:		previous song
-  - x:		play
-  - c:		pause
-  - v:		stop
-  - b:		next song
-  - Enter:	switch to interactive mode
-  		(works only if infinity was configured with --enable-debug option)
-  - F11:   	screenshot
-  - F12:   	change palette
-
-**Interactive Mode**:
-
-You can control the effects using keys:
-
-  - F12:    change palette
-  - Tab:    toggle full-screen
-  - Enter:  switch to non-interactive mode
-  - F1-F10: choose transformation vector field
-  - a,z:    change curve 1 lighting
-  - q,s:    change curve 2 lighting
-  - e,r:    change curve 1 amplitude
-  - d,f:    change curve 2 amplitude  
-  - w:      change curve 2 type
-  - m:      persist current effect
-  - mouse:  change curve 2 position  
-  - F11:    screenshot
+See [how to add new effects or how to control the plugin with the keyboard](minidocs/controlkeys.md).
 
 Known Bugs
 ----------
 
-In Ubuntu systems over AMD64 architectures, try running configure with
---prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu
+In Ubuntu systems over AMD64 architectures, try configure with
+``--prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu``
 
 If you found a bug please report it at
 <https://github.com/dprotti/infinity-plugin/issues>.

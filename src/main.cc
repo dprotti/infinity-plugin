@@ -28,7 +28,7 @@ extern "C" {
 static const char about_text[] =
 	"Infinity " PACKAGE_VERSION "\n\n"
 	"Julien Carme, Duilio Protti\n\n"
-	"https://github.com/dprotti/infinity-plugin";
+	"https://dprotti.github.io/infinity-plugin";
 
 static const PreferencesWidget prefs_fps[] = {
 	WidgetLabel ("<b>Frames per second</b>"),

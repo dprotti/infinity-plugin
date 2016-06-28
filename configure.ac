@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([Infinity plugin],[0.9.0alpha],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin-4-audacious],[https://github.com/dprotti/infinity-plugin])
+AC_INIT([Infinity plugin],[0.9.0alpha],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin-4-audacious],[https://dprotti.github.io/infinity-plugin])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
@@ -183,6 +183,7 @@ AC_SUBST(libdir)
 AC_SUBST(pkglibdir)
 
 AC_CONFIG_FILES([Makefile
+  minidocs/Makefile
   src/Makefile])
 AC_OUTPUT
 
