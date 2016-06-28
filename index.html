@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Infinity-plugin by dprotti</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Infinity-plugin</h1>
+        <p>music visualization plugin</p>
+
+        <p class="view"><a href="https://github.com/dprotti/infinity-plugin">View the Project on GitHub <small>dprotti/infinity-plugin</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/dprotti/infinity-plugin/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/dprotti/infinity-plugin/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/dprotti/infinity-plugin">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="infinity" class="anchor" href="#infinity" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Infinity</h1>
+
+<p>Visualization plugin for <a href="http://audacious-media-player.org/">Audacious</a> music player.</p>
+
+<p>It generates beautiful light effects. Supports full-screen mode, mouse resizing and preferences
+saving.</p>
+
+<p><img src="https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png" alt="Screenshot of Infinity"></p>
+
+<h2>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>Audacious &gt;= 3.5, Audclient &gt;= 3.5, 1.0.6 &lt;= SDL &lt; 2, Glib &gt;= 2.8, Gtk+ &gt;= 2.8</p>
+
+<p><strong>Install deps in Ubuntu</strong></p>
+
+<pre><code>sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
+</code></pre>
+
+<h2>
+<a id="install-from-tarball" class="anchor" href="#install-from-tarball" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install from tarball</h2>
+
+<ul>
+<li><strong><a href="https://github.com/dprotti/infinity-plugin/releases/latest/">Download</a></strong></li>
+<li>./configure</li>
+<li>make</li>
+<li>sudo make install</li>
+</ul>
+
+<h2>
+<a id="install-from-repo" class="anchor" href="#install-from-repo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install from repo</h2>
+
+<ul>
+<li>git clone <a href="https://github.com/dprotti/infinity-plugin">https://github.com/dprotti/infinity-plugin</a>
+</li>
+<li>./autogen.sh --prefix=/usr (or whatever your prefix is)</li>
+<li>make</li>
+<li>sudo make install</li>
+</ul>
+
+<h2>
+<a id="run" class="anchor" href="#run" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Run</h2>
+
+<p>Audacious -&gt; View -&gt; Visualizations -&gt; Infinity</p>
+
+<p>Enter / leave full-screen by pressing <code>Tab</code>.</p>
+
+<p><img src="../screenshots/screenshot-settings.png?raw=true" alt="Screenshot of Infinity Settings" title="Infinity Settings"></p>
+
+<h2>
+<a id="playing-around" class="anchor" href="#playing-around" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Playing Around</h2>
+
+<p>See <a href="minidocs/controlkeys.md">how to add new effects or how to control the plugin with the keyboard</a>.</p>
+
+<h2>
+<a id="known-bugs" class="anchor" href="#known-bugs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Known Bugs</h2>
+
+<p>In Ubuntu systems over AMD64 architectures, try configure with
+<code>--prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu</code></p>
+
+<p>If you found a bug please report it at
+<a href="https://github.com/dprotti/infinity-plugin/issues">https://github.com/dprotti/infinity-plugin/issues</a>.</p>
+
+<h2>
+<a id="authors" class="anchor" href="#authors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors</h2>
+
+<ul>
+<li>Julien Carme (c) 2000 Original author</li>
+<li>Duilio Protti (C) 2004 - Present : Current maintainer</li>
+<li>CBke (C) 2016 <a href="https://github.com/CBke">https://github.com/CBke</a> Nice patches</li>
+<li>John Lightsey (C) 2004 <a href="mailto:john@nixnuts.net">john@nixnuts.net</a> Portability fixes and GPL License compliance</li>
+<li>Jean Delvare (C) 2004 <a href="mailto:khali@linux-fr.org">khali@linux-fr.org</a> Some nice patches</li>
+<li>Will Tatam (C) 2004 <a href="mailto:wtatam@premierit.com">wtatam@premierit.com</a> Online source RPMs <a href="http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/">http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/</a>
+</li>
+<li>Haavard Kvaalen (C) 2000 <a href="mailto:havardk@xmms.org">havardk@xmms.org</a> Converted original hand made Makefile to automake/autoconf/libtool</li>
+<li>Chris Lea (C) 2000 <a href="mailto:chrislea@luciddesign.com">chrislea@luciddesign.com</a> Made RPMs</li>
+<li>Mitja Horvat (C) 2000 <a href="mailto:Mitja.Horvat@hermes.si">Mitja.Horvat@hermes.si</a> Misc optimisations</li>
+</ul>
+
+<h2>
+<a id="old-versions" class="anchor" href="#old-versions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Old Versions</h2>
+
+<p>Releases older than 0.8.0beta1 can be found at Sourceforge: <a href="https://sourceforge.net/projects/infinity-plugin/">https://sourceforge.net/projects/infinity-plugin/</a></p>
+
+<h2>
+<a id="contributions" class="anchor" href="#contributions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributions</h2>
+
+<p>Your help is welcome either coding, testing or building distro packages.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/dprotti">dprotti</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
