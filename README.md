@@ -2,6 +2,7 @@ Infinity
 ========
 
 Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
+
 It generates beautiful light effects. Supports full-screen mode, mouse resizing and preferences
 saving.
 
