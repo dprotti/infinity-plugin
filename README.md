@@ -42,7 +42,7 @@ Audacious -> View -> Visualizations -> Infinity
 
 Enter / leave full-screen by pressing `Tab`.
 
-![Screenshot of Infinity Settings](../screenshots/screenshot-settings.png?raw=true "Infinity Settings")
+![Screenshot of Infinity Settings](https://cloud.githubusercontent.com/assets/2084073/16421084/2d45d54a-3d2a-11e6-9919-3d6aa5733743.png "Infinity Settings")
 
 Playing Around
 --------------
