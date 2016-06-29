@@ -13,7 +13,7 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.28, Gtk+ >= 2.8
+Audacious >= 3.5, 1.2 <= SDL < 2, Glib >= 2.28, Gtk+ >= 2.8
 
 **Install deps in Ubuntu**
 

@@ -33,7 +33,7 @@ else
   AC_MSG_ERROR([*** pkg-config too old; version 0.14 or better required.])
 fi
 
-# Check some dependencies
+# Check dependencies
 PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28,,)
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
@@ -46,16 +46,9 @@ PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.5,,)
 AC_SUBST(AUDACIOUS_LIBS)
 AC_SUBST(AUDACIOUS_CFLAGS)
 
-AC_PATH_PROG(SDL_CONFIG, [sdl-config], [no])
-if test x$SDL_CONFIG = xno ; then
-  AC_MSG_ERROR([
-*** sdl-config not found.
-*** If you have installed from binaries, probably you have not 
-*** installed SDL development package.
-*** See http://www.libsdl.org
-])
-fi
-AM_PATH_SDL(1.0.6,,AC_MSG_ERROR([*** SDL >= 1.0.6 not installed - please install first]))
+PKG_CHECK_MODULES(SDL, sdl >= 1.2,,)
+AC_SUBST(SDL_LIBS)
+AC_SUBST(SDL_CFLAGS)
 
 # Check for header files.
 AC_HEADER_STDC
