@@ -69,25 +69,39 @@ else
 *** using the GNU C compiler.
 	])
 fi
-	    
+
+AC_CHECK_SIZEOF([size_t])
+AC_MSG_CHECKING([whether compiler is 32 or 64 bit])
+if test x$ac_cv_sizeof_size_t = x8; then
+  AC_MSG_RESULT([64])
+  compiler_width=64
+else
+  AC_MSG_RESULT([32])
+  compiler_width=32
+fi
+
 # Check for library functions.
 AC_CHECK_FUNCS([floor sqrt])
 
 # Arguments to specify certain features.
 AC_ARG_ENABLE([mmx],
-            AS_HELP_STRING([--enable-mmx],[Turn on MMX detection support @<:@default=enabled@:>@]),
+            AS_HELP_STRING([--enable-mmx],[use MMX if available and if building with a 32 bit compiler @<:@default=enabled@:>@]),
 	    [mmx=$enableval],
-	    [mmx=no])
-AC_MSG_CHECKING([whether to enable MMX detection support])
+	    [mmx=yes])
+AC_MSG_CHECKING([whether to enable MMX])
 if test x$mmx = xyes; then
-  AC_MSG_RESULT([yes])
-  AC_DEFINE([MMX_DETECTION], [1], [Activate MMX Extensions support])
+  if test x$compiler_width = x32; then
+    AC_MSG_RESULT([yes])
+    AC_DEFINE([MMX_DETECTION], [1], [Activate MMX Extensions support])
+  else
+    AC_MSG_RESULT([no, was requested but feature is not supported with a 64bit compiler])
+  fi
 else
   AC_MSG_RESULT([no])
 fi
 
 AC_ARG_ENABLE([debug],
-            AS_HELP_STRING([--enable-debug],[Turn on debug mode @<:@default=disabled@:>@]),
+            AS_HELP_STRING([--enable-debug],[turn on debug mode @<:@default=disabled@:>@]),
 	    [debug=$enableval],
 	    [debug=no])
 
@@ -107,7 +121,7 @@ if test x"$GCC" = xyes; then
 fi
 
 AC_ARG_ENABLE([vectorization],
-            AS_HELP_STRING([--enable-vectorization],[Turn on vectorization optimizations (gcc >= 4 only) @<:@default=enabled@:>@]),
+            AS_HELP_STRING([--enable-vectorization],[turn on vectorization optimizations (gcc >= 4 only) @<:@default=enabled@:>@]),
 	    [vectorization=$enableval],
 	    [vectorization=yes])
 
@@ -129,17 +143,6 @@ if test x"$vectorization" = xyes; then
         ;;
       *)
         INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -ftree-vectorize"
-	case "$target_cpu" in
-	  i*86|ia64*)
-            # TODO check for sse2 availability
-	    INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -msse"
-	    ;;
-       	  powerpc|ppc)
-	    INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -maltivec"
-	    ;;
-	  *)
-	    ;;
-	esac
         ;;
     esac
   fi

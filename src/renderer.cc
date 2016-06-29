@@ -70,9 +70,6 @@ static SDL_Thread *thread;
 static gint32 event_filter(const SDL_Event *event);
 static void check_events();
 static int renderer(void *);
-#if MMX_DETECTION
-static int renderer_mmx(void *);
-#endif
 static void set_title(void);
 
 void renderer_init(void)
@@ -121,11 +118,6 @@ void renderer_init(void)
 
 	SDL_SetEventFilter(event_filter);
 
-#if MMX_DETECTION
-	if (mm_support_check_and_show() != 0)
-		thread = SDL_CreateThread(renderer_mmx, NULL);
-	else
-#endif
 	thread = SDL_CreateThread(renderer, NULL);
 }
 
@@ -410,11 +402,15 @@ static int renderer(void *arg)
 	gint32 frame_length;
 	gint32 fps, new_fps;
 	gint32 t_between_effects, t_between_colors;
+	gint32 has_mmx = 0;
 
 	fps = aud_get_int(CFGID, "max_fps");
 	frame_length = calculate_frame_length_usecs(fps, __LINE__);
 	t_between_effects = aud_get_int(CFGID, "effect_time");
 	t_between_colors = aud_get_int(CFGID, "palette_time");
+#if MMX_DETECTION
+	has_mmx = mm_support_check_and_show();
+#endif
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -437,7 +433,10 @@ static int renderer(void *arg)
 			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
 		}
 		auto t_begin = g_get_monotonic_time();
-		display_blur(scr_par.width * scr_par.height * current_effect.num_effect);
+		if (has_mmx)
+			display_blur_mmx(scr_par.width * scr_par.height * current_effect.num_effect);
+		else
+			display_blur(scr_par.width * scr_par.height * current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
 		if (t_last_color <= 32)
@@ -488,94 +487,6 @@ static int renderer(void *arg)
 
 	return 0;
 }
-
-#if MMX_DETECTION
-static int renderer_mmx(void *arg)
-{
-	gint32 render_time, now;
-	gint32 frame_length;
-	gint32 idle_time;
-	gint32 fps, new_fps;
-	gint32 t_between_effects, t_between_colors;
-
-	fps = aud_get_int(CFGID, "max_fps");
-	frame_length = calculate_frame_length(fps, __LINE__);
-	t_between_effects = aud_get_int(CFGID, "effect_time");
-	t_between_colors = aud_get_int(CFGID, "palette_time");
-	initializing = FALSE;
-	for (;; ) { /* ever... */
-		if (!visible) {
-			check_events();
-			if (finished)
-				break;
-			g_usleep(3000 * frame_length);
-			continue;
-		}
-		check_events();
-		if (finished)
-			break;
-		if (must_resize) {
-			display_resize(scr_par.width, scr_par.height);
-			aud_set_int(CFGID, "width", scr_par.width);
-			aud_set_int(CFGID, "heigth", scr_par.height);
-			must_resize = FALSE;
-			g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, -1);
-			resizing = FALSE;
-			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
-		}
-		auto t_begin = g_get_monotonic_time();
-		display_blur_mmx(scr_par.width * scr_par.height * current_effect.num_effect);
-		spectral(&current_effect);
-		curve(&current_effect);
-		if (t_last_color <= 32)
-			change_color(old_color, color, t_last_color * 8);
-		next_color();
-		next_effect();
-		if (t_last_effect % t_between_effects == 0) {
-#ifdef INFINITY_DEBUG
-			if (!mode_interactif) {
-				display_load_random_effect(&current_effect);
-				t_last_effect = 0;
-				t_between_effects = aud_get_int(CFGID, "effect_time");
-			}
-#else
-			display_load_random_effect(&current_effect);
-			t_last_effect = 0;
-			t_between_effects = aud_get_int(CFGID, "effect_time");
-#endif
-		}
-		if (t_last_color % t_between_colors == 0) {
-#ifdef INFINITY_DEBUG
-			if (!mode_interactif) {
-				old_color = color;
-				color = rand() % NB_PALETTES;
-				t_last_color = 0;
-				t_between_colors = aud_get_int(CFGID, "palette_time");
-			}
-#else
-			old_color = color;
-			color = rand() % NB_PALETTES;
-			t_last_color = 0;
-			t_between_colors = aud_get_int(CFGID, "palette_time");
-#endif
-		}
-
-		new_fps = aud_get_int(CFGID, "max_fps");
-		if (new_fps != fps) {
-			fps = new_fps;
-			frame_length = calculate_frame_length(fps, __LINE__);
-		}
-
-		auto now = g_get_monotonic_time();
-		auto render_time = now - t_begin;
-		if (render_time < frame_length) {
-			g_usleep(frame_length - render_time);
-		}
-	}
-
-	return 0;
-}
-#endif /* MMX_DETECTION */
 
 static void set_title(void)
 {

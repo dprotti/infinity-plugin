@@ -2,6 +2,7 @@
 #include "cputest.h"
 #include "glib.h"
 
+// This code is 32-bit only
 
 /* ebx saving is necessary for PIC. gcc seems unable to see it alone */
 #if MMX_DETECTION
