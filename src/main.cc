@@ -32,7 +32,7 @@ static const char about_text[] =
 
 static const PreferencesWidget prefs_fps[] = {
 	WidgetLabel ("<b>Frames per second</b>"),
-	WidgetSpin ("Max. :", WidgetInt (CFGID, "max_fps"), {10, 120, 1, "fps"}),
+	WidgetSpin ("Max. :", WidgetInt (CFGID, "max_fps"), {15, 60, 1, "fps"}),
 	WidgetLabel ("<b>How often change effect</b>"),
 	WidgetSpin ("Every", WidgetInt (CFGID, "effect_time"), {50, 500, 5, "frames   "}),
 	WidgetLabel ("<b>How often change colors</b>"),
@@ -116,7 +116,7 @@ static const char * const defaults[] = {
 	"effect_time", "100",
 	"palette_time", "100",
 	"scale_factor", "1",
-	"max_fps", "15",
+	"max_fps", "30",
 	"show_title", "true"
 };
 

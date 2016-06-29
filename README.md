@@ -3,8 +3,8 @@ Infinity
 
 Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
 
-It generates beautiful light effects. Supports full-screen mode, mouse resizing and preferences
-saving.
+It generates beautiful light effects. Supports full-screen mode, mouse resizing, preferences
+saving and player control through keyboard.
 
 **[Go to Downloads](https://github.com/dprotti/infinity-plugin/releases/latest/)**
 
@@ -13,11 +13,11 @@ saving.
 Requirements
 ------------
 
-Audacious >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.8, Gtk+ >= 2.8
+Audacious >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.28, Gtk+ >= 2.8
 
 **Install deps in Ubuntu**
 
-`sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev`
+`sudo apt -y install audacious-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev`
 
 Install from tarball
 -------

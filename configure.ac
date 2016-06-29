@@ -34,7 +34,7 @@ else
 fi
 
 # Check some dependencies
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.8,,)
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28,,)
 AC_SUBST(GLIB_LIBS)
 AC_SUBST(GLIB_CFLAGS)
 

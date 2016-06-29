@@ -399,22 +399,20 @@ static void check_events()
 }
 
 // log calling line to improve bug reports
-static gint32 calculate_frame_length(gint32 fps, int line) {
-	gint32 frame_length = (gint32)(((1.0 / fps) * 1000));
+static gint64 calculate_frame_length_usecs(gint32 fps, int line) {
+	gint64 frame_length = (gint64)(((1.0 / fps) * 1000000));
 	g_message("Infinity[%d]: setting maximum rate at ~%d frames/second", line, fps);
 	return frame_length;
 }
 
 static int renderer(void *arg)
 {
-	gint32 render_time, now;
 	gint32 frame_length;
-	gint32 idle_time;
 	gint32 fps, new_fps;
 	gint32 t_between_effects, t_between_colors;
 
 	fps = aud_get_int(CFGID, "max_fps");
-	frame_length = calculate_frame_length(fps, __LINE__);
+	frame_length = calculate_frame_length_usecs(fps, __LINE__);
 	t_between_effects = aud_get_int(CFGID, "effect_time");
 	t_between_colors = aud_get_int(CFGID, "palette_time");
 	initializing = FALSE;
@@ -438,7 +436,7 @@ static int renderer(void *arg)
 			resizing = FALSE;
 			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
 		}
-		render_time = (gint32)SDL_GetTicks();
+		auto t_begin = g_get_monotonic_time();
 		display_blur(scr_par.width * scr_par.height * current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
@@ -478,12 +476,14 @@ static int renderer(void *arg)
 		new_fps = aud_get_int(CFGID, "max_fps");
 		if (new_fps != fps) {
 			fps = new_fps;
-			frame_length = calculate_frame_length(fps, __LINE__);
+			frame_length = calculate_frame_length_usecs(fps, __LINE__);
 		}
 
-		now = (gint32)SDL_GetTicks();
-		if ((idle_time = (now - render_time)) < frame_length)
-			g_usleep(idle_time * 900);
+		auto now = g_get_monotonic_time();
+		auto render_time = now - t_begin;
+		if (render_time < frame_length) {
+			g_usleep(frame_length - render_time);
+		}
 	}
 
 	return 0;
@@ -523,7 +523,7 @@ static int renderer_mmx(void *arg)
 			resizing = FALSE;
 			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
 		}
-		render_time = SDL_GetTicks();
+		auto t_begin = g_get_monotonic_time();
 		display_blur_mmx(scr_par.width * scr_par.height * current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
@@ -566,9 +566,11 @@ static int renderer_mmx(void *arg)
 			frame_length = calculate_frame_length(fps, __LINE__);
 		}
 
-		now = SDL_GetTicks();
-		if ((idle_time = (now - render_time)) < frame_length)
-			g_usleep(idle_time * 900);
+		auto now = g_get_monotonic_time();
+		auto render_time = now - t_begin;
+		if (render_time < frame_length) {
+			g_usleep(frame_length - render_time);
+		}
 	}
 
 	return 0;
