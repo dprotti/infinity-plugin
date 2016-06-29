@@ -5,7 +5,7 @@ data_DATA = infinite_states
 
 datadir = $(prefix)/share/audacious
 
-COMMON_FLAGS = @AUDACIOUS_CFLAGS@ @AUDCLIENT_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
+COMMON_FLAGS = @AUDACIOUS_CFLAGS@ @SDL_CFLAGS@ @GTK_CFLAGS@\
 	@GLIB_CFLAGS@ $(INF_CFLAGS_EXTRA) -DDATADIR='"$(datadir)"'
 
 AM_CFLAGS = @CFLAGS@ $(COMMON_FLAGS)
@@ -13,7 +13,7 @@ AM_CXXFLAGS = @CXXFLAGS@ $(COMMON_FLAGS)
 AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)
 
 libinfinite_la_LDFLAGS = ${CXX}
-libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @AUDCLIENT_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@
+libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@
 libinfinite_la_SOURCES = \
 	main.cc \
 	renderer.cc renderer.h\

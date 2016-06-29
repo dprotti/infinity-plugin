@@ -6,23 +6,24 @@ Visualization plugin for [Audacious](http://audacious-media-player.org/) music p
 It generates beautiful light effects. Supports full-screen mode, mouse resizing and preferences
 saving.
 
+**[Go to Downloads](https://github.com/dprotti/infinity-plugin/releases/latest/)**
+
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
 ------------
 
-Audacious >= 3.5, Audclient >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.8, Gtk+ >= 2.8
+Audacious >= 3.5, 1.0.6 <= SDL < 2, Glib >= 2.8, Gtk+ >= 2.8
 
 **Install deps in Ubuntu**
 
-```
-sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev
-```
+`sudo apt -y install audacious-dev libaudclient-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev`
 
 Install from tarball
 -------
 
-- **[Download](https://github.com/dprotti/infinity-plugin/releases/latest/)**
+- [Download](https://github.com/dprotti/infinity-plugin/releases/latest/)
+- tar xf infinity-plugin-4-audacious-{version}.tar.xz
 - ./configure
 - make
 - sudo make install
@@ -31,7 +32,7 @@ Install from repo
 -------
 
 - git clone https://github.com/dprotti/infinity-plugin
-- ./autogen.sh --prefix=/usr (or whatever your prefix is)
+- ./autogen.sh
 - make
 - sudo make install
 
@@ -47,7 +48,7 @@ Enter / leave full-screen by pressing `Tab`.
 Playing Around
 --------------
 
-See [how to add new effects or how to control the plugin with the keyboard](minidocs/controlkeys.md).
+See [how to add new effects or how to control the plugin with the keyboard](https://github.com/dprotti/infinity-plugin/blob/master/minidocs/controlkeys.md).
 
 Known Bugs
 ----------
