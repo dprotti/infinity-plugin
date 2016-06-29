@@ -16,9 +16,9 @@
 #include <math.h>
 #include <glib.h>
 
-#include "config.h"
 #include "compute.h"
-#include "prefs.h"
+#include "config.h"
+#include "types.h"
 #ifdef MMX_DETECTION
 #include "mmx.h"
 #endif
@@ -184,14 +184,11 @@ static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, gui
 	}
 }
 
-/*
- * Public functions
- */
-void compute_init(void)
+void compute_init(gint32 width, gint32 height, gint32 scale)
 {
-	scr_par.width = config_get_xres();
-	scr_par.height = config_get_yres();
-	scr_par.scale = config_get_sres();
+	scr_par.width = width;
+	scr_par.height = height;
+	scr_par.scale = scale;
 
 	surface1 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));
 	surface2 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));

@@ -30,10 +30,10 @@
 
 extern "C" {
 #include "config.h"
-#include "renderer.h"
-#include "prefs.h"
-#include "effects.h"
 #include "display.h"
+#include "effects.h"
+#include "renderer.h"
+#include "types.h"
 
 #if MMX_DETECTION
 #include "cputest.h"
@@ -90,9 +90,9 @@ void renderer_init(void)
 		}
 	}
 	initializing = TRUE;
-	scr_par.width = config_get_xres();
-	scr_par.height = config_get_yres();
-	scr_par.scale = config_get_sres();
+	scr_par.width = aud_get_int(CFGID, "width");
+	scr_par.height = aud_get_int(CFGID, "height");
+	scr_par.scale = aud_get_int(CFGID, "scale_factor");
 
 	old_color = 0;
 	color = 0;
@@ -106,7 +106,7 @@ void renderer_init(void)
 	quiting = FALSE;
 	first_xevent = TRUE;
 
-	display_init();
+	display_init(scr_par.width, scr_par.height, scr_par.scale);
 	current_title = g_strdup("Infinity");
 	set_title();
 	title_timer = g_timer_new();
@@ -237,7 +237,7 @@ static void check_events()
 	 * XWindowAttributes attr;
 	 * XSetWindowAttributes s_attr;*/
 
-	if (config_get_show_title()) {
+	if (aud_get_int(CFGID, "show_title")) {
 		if (g_timer_elapsed(title_timer, NULL) > 1.0) {
 			if (aud_drct_get_playing() && aud_drct_get_ready()) {
 				if (current_title)
@@ -429,8 +429,8 @@ static int renderer(void *arg)
 			break;
 		if (must_resize) {
 			display_resize(scr_par.width, scr_par.height);
-			config_set_xres(scr_par.width);
-			config_set_yres(scr_par.height);
+			aud_set_int(CFGID, "width", scr_par.width);
+			aud_set_int(CFGID, "heigth", scr_par.height);
 			must_resize = FALSE;
 			g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, -1);
 			resizing = FALSE;
@@ -516,8 +516,8 @@ static int renderer_mmx(void *arg)
 			break;
 		if (must_resize) {
 			display_resize(scr_par.width, scr_par.height);
-			config_set_xres(scr_par.width);
-			config_set_yres(scr_par.height);
+			aud_set_int(CFGID, "width", scr_par.width);
+			aud_set_int(CFGID, "heigth", scr_par.height);
 			must_resize = FALSE;
 			g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, -1);
 			resizing = FALSE;

@@ -60,15 +60,7 @@ void compute_vector_field_destroy(vector_field_t *vector_field);
  */
 void compute_quit(void);
 
-/*
- * Initialize this module.
- *
- * For to do this the user configuration options are readed and
- * internals structures setting accordingly. If this options
- * change, the module must be reinitialized in order to the
- * changes take effect.
- */
-void compute_init(void);
+void compute_init(gint32 width, gint32 height, gint32 scale);
 
 /*
  * Tell the module that the screen has been resized.

@@ -20,7 +20,7 @@
 
 #include "config.h"
 #include "display.h"
-#include "prefs.h"
+#include "types.h"
 
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
@@ -208,18 +208,18 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-void display_init(void)
+void display_init(gint32 width, gint32 height, gint32 scale)
 {
-	scr_par.width = config_get_xres();
-	scr_par.height = config_get_yres();
-	scr_par.scale = config_get_sres();
+	scr_par.width = width;
+	scr_par.height = height;
+	scr_par.scale = scale;
 
 	pcm_data_mutex = SDL_CreateMutex();
-	compute_init();
-	init_sdl(scr_par.width, scr_par.height, scr_par.scale);
+	compute_init(width, height, scale);
+	init_sdl(width, height, scale);
 	generate_colors();
 	effects_load_effects();
-	vector_field = compute_vector_field_new(scr_par.width, scr_par.height);
+	vector_field = compute_vector_field_new(width, height);
 	compute_generate_vector_field(vector_field);
 }
 

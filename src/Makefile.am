@@ -19,7 +19,6 @@ libinfinite_la_SOURCES = \
 	renderer.cc renderer.h\
 	compute.c compute.h \
 	display.c display.h \
-	prefs.c prefs.h\
 	effects.c effects.h\
 	cputest.c cputest.h\
 	mmx.h types.h

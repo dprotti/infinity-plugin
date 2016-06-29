@@ -27,15 +27,13 @@
 /*
  * Initializes the display related structures.
  *
- * This function reads the user configuration options
- * and set his internal data structures accordingly.
- * It also initializes the SDL library.
+ * It initializes the module and the SDL library.
  *
  * Warning: because this function initializes the SDL
  * library, must be called before any SDL operation and
  * must not be called when SDL was already started.
  */
-void display_init(void);
+void display_init(gint32 width, gint32 height, gint32 scale);
 
 /*
  * Closes the display module.
@@ -55,10 +53,6 @@ void display_quit(void);
 /*
  * Change the size of the display to the new dimension
  * width x height.
- *
- * It is supposed that this must be called when the display
- * screen is resized (i.e. when is resized the window where
- * the screen is embedded in).
  */
 void display_resize(gint32 width, gint32 height);
 

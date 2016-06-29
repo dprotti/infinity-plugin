@@ -21,8 +21,8 @@
 
 extern "C" {
 #include "config.h"
-#include "prefs.h"
 #include "renderer.h"
+#include "types.h"
 }
 
 static const char about_text[] =
@@ -69,7 +69,6 @@ public:
 
 private:
 	void load_settings ();
-	void save_settings();
 };
 
 EXPORT InfinityPlugin aud_plugin_instance;
@@ -102,7 +101,6 @@ void InfinityPlugin::clear ()
 void InfinityPlugin::cleanup(void)
 {
 	g_message("Infinity: cleanup()");
-	save_settings();
 	renderer_finish();
 }
 
@@ -123,20 +121,4 @@ static const char * const defaults[] = {
 void InfinityPlugin::load_settings(void)
 {
 	aud_config_set_defaults (CFGID, defaults);
-
-	config_set_x(20);
-	config_set_y(10);
-	config_set_xres(aud_get_int(CFGID, "width"));
-	config_set_yres(aud_get_int(CFGID, "height"));
-	config_set_teff(aud_get_int(CFGID, "effect_time"));
-	config_set_tcol(aud_get_int(CFGID, "palette_time"));
-	config_set_sres(aud_get_int(CFGID, "scale_factor"));
-	config_set_fps(aud_get_int(CFGID, "max_fps"));
-	config_set_show_title(aud_get_bool(CFGID, "show_title"));
-}
-
-void InfinityPlugin::save_settings(void)
-{
-	aud_set_int(CFGID, "width", config_get_xres());
-	aud_set_int(CFGID, "height", config_get_yres());
 }
