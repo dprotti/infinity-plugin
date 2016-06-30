@@ -17,6 +17,7 @@
 #define __INFINITY_INFINITY__
 
 #include <glib.h>
+#include "music-player.h"
 
 typedef struct _InfParameters {
     gint32  (*get_x_origin)     (void);
@@ -32,23 +33,6 @@ typedef struct _InfParameters {
     gint32  (*must_show_title)  (void);
     gint32  (*get_max_fps)      (void);
 } InfParameters;
-
-typedef struct _Player {
-
-    gboolean (*is_playing)      (void);
-    gchar*  (*get_title)        (void);
-
-    void    (*play)             (void);
-    void    (*pause)            (void);
-    void    (*stop)             (void);
-    void    (*previous)         (void);
-    void    (*next)             (void);
-    void    (*seek)             (gint32 usecs);
-    void    (*adjust_volume)    (gint delta);
-
-    void    (*disable_plugin)   (void);  /* tell the player that this plugin has stopped */
-
-} Player;
 
 /*
  * Initializes rendering process.

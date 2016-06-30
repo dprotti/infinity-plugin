@@ -16,6 +16,7 @@
 #ifndef __INFINITY_COMPUTE__
 #define __INFINITY_COMPUTE__
 
+#include <glib.h>
 #include "types.h"
 
 #define NB_FCT 7
@@ -73,6 +74,5 @@ void compute_generate_vector_field(vector_field_t *vector_field);
 
 byte *compute_surface(t_interpol *vector, gint32 width, gint32 height);
 byte *compute_surface_mmx(t_interpol *vector, gint32 width, gint32 height);
-
 
 #endif /* __INFINITY_COMPUTE__ */

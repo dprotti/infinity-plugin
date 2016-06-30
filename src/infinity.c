@@ -72,7 +72,7 @@ void infinity_init(InfParameters * _params, Player * _player)
 	gint32 _try;
 
 	if (initializing) {
-		g_warning("We are already initializing");
+		g_warning("Infinity: is already initializing...");
 		_try = 0;
 		while (initializing) {
 			g_usleep(1000000);
@@ -88,6 +88,14 @@ void infinity_init(InfParameters * _params, Player * _player)
 	height = params->get_height();
 	scale = params->get_scale();
 
+	if (! display_init(width, height, scale, player)) {
+		g_critical("Infinity: cannot initialize display");
+		initializing = FALSE;
+		finished = TRUE;
+		player->disable_plugin();
+		return;
+	}
+
 	old_color = 0;
 	color = 0;
 
@@ -100,7 +108,6 @@ void infinity_init(InfParameters * _params, Player * _player)
 	quiting = FALSE;
 	first_xevent = TRUE;
 
-	display_init(width, height, scale);
 	current_title = g_strdup("Infinity");
 	set_title();
 	title_timer = g_timer_new();
@@ -214,6 +221,12 @@ static gint disable_func(gpointer data)
 	return FALSE;
 }
 
+static void schedule_exit() {
+	GDK_THREADS_ENTER();
+	(void)gtk_idle_add(disable_func, NULL);
+	GDK_THREADS_LEAVE();
+}
+
 static void check_events()
 {
 	SDL_Event event;
@@ -268,9 +281,7 @@ static void check_events()
 		 * }
 		 * break;*/
 		case SDL_QUIT:
-			GDK_THREADS_ENTER();
-			(void)gtk_idle_add(disable_func, NULL);
-			GDK_THREADS_LEAVE();
+			schedule_exit();
 			break;
 		case SDL_VIDEORESIZE:
 			g_return_if_fail(SDL_LockMutex(resizing_mutex) >= 0);
@@ -413,7 +424,10 @@ static int renderer(void *arg)
 		if (finished)
 			break;
 		if (must_resize) {
-			display_resize(width, height);
+			if (! display_resize(width, height)) {
+				schedule_exit();
+				break;
+			}
 			params->set_width(width);
 			params->set_height(height);
 			must_resize = FALSE;

@@ -21,19 +21,19 @@
 
 #include "compute.h"
 #include "effects.h"
+#include "music-player.h"
 
 #define NB_PALETTES 5
 
 /*
- * Initializes the display related structures.
+ * Initializes the display related structures, including the SDL library.
  *
- * It initializes the module and the SDL library.
+ * Warning: must be called before any SDL operation and must not be
+ * called when SDL was already started.
  *
- * Warning: because this function initializes the SDL
- * library, must be called before any SDL operation and
- * must not be called when SDL was already started.
+ * Returns true on success; and false otherwise.
  */
-void display_init(gint32 width, gint32 height, gint32 scale);
+gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *player);
 
 /*
  * Closes the display module.
@@ -53,8 +53,10 @@ void display_quit(void);
 /*
  * Change the size of the display to the new dimension
  * width x height.
+ *
+ * Returns true on success; and false otherwise.
  */
-void display_resize(gint32 width, gint32 height);
+gboolean display_resize(gint32 width, gint32 height);
 
 /*
  * Set data as the data PCM data of this module.

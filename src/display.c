@@ -49,17 +49,26 @@ static SDL_Color color_table[NB_PALETTES][256];
 static gint16 current_colors[256];
 
 static byte *surface1;
+static Player *player;
 
-static void init_sdl(gint32 _width, gint32 _height, gint32 _scale)
+static gchar error_msg[256];
+
+static gboolean sdl_init(gint32 _width, gint32 _height, gint32 _scale)
 {
-	if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0)
-		g_error("Infinity: Couldn't initialize SDL: %s\n", SDL_GetError());
+	if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0) {
+		g_snprintf(error_msg, 256, "Infinity cannot initialize SDL: %s", SDL_GetError());
+		player->notify_critical_error(error_msg);
+		return FALSE;
+	}
 	screen = SDL_SetVideoMode(_width * _scale, _height * _scale, 16, VIDEO_FLAGS);
-	if (screen == NULL)
-		g_error("Infinity: could not init video mode: %s\n", SDL_GetError());
-	g_message("Infinity: SDL SetVideoMode() Ok");
+	if (screen == NULL) {
+		g_snprintf(error_msg, 256, "Infinity cannot create display: %s", SDL_GetError());
+		player->notify_critical_error(error_msg);
+		return FALSE;
+	}
 	(void)SDL_ShowCursor(0);
 	(void)SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	return TRUE;
 }
 
 static void generate_colors()
@@ -208,19 +217,26 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-void display_init(gint32 _width, gint32 _height, gint32 _scale)
+gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_player)
 {
+	gboolean sdl_ok;
+
 	width = _width;
 	height = _height;
 	scale = _scale;
+	player = _player;
 
 	pcm_data_mutex = SDL_CreateMutex();
 	compute_init(width, height, scale);
-	init_sdl(width, height, scale);
+	sdl_ok = sdl_init(width, height, scale);
 	generate_colors();
 	effects_load_effects();
 	vector_field = compute_vector_field_new(width, height);
 	compute_generate_vector_field(vector_field);
+	if (!sdl_ok) {
+		display_quit();
+	}
+	return sdl_ok;
 }
 
 void display_quit(void)
@@ -234,21 +250,22 @@ void display_quit(void)
 	SDL_Quit();
 }
 
-void display_resize(gint32 _width, gint32 _height)
+gboolean display_resize(gint32 _width, gint32 _height)
 {
 	width = _width;
 	height = _height;
-	screen = SDL_SetVideoMode(width * scale,
-				  height * scale,
-				  16, VIDEO_FLAGS);
-	if (screen == NULL)
-		g_error("Infinity: Couldn't set %dx%d video mode: %s\n",
-			width * scale, height * scale,
-			SDL_GetError());
+	screen = SDL_SetVideoMode(width * scale, height * scale, 16, VIDEO_FLAGS);
+	if (screen == NULL) {
+		g_snprintf(error_msg, 256, "Infinity cannot resize display to %dx%d pixels: %s",
+			width * scale, height * scale, SDL_GetError());
+		player->notify_critical_error(error_msg);
+		return FALSE;
+	}
 	compute_vector_field_destroy(vector_field);
 	vector_field = compute_vector_field_new(width, height);
 	compute_resize(width, height);
 	compute_generate_vector_field(vector_field);
+	return TRUE;
 }
 
 inline void display_set_pcm_data(const float *data, int channels)

@@ -15,6 +15,7 @@
  */
 #include <string.h>
 #include <libaudcore/drct.h>
+#include <libaudcore/interface.h>
 #include <libaudcore/playlist.h>
 #include <libaudcore/plugin.h>
 #include <libaudcore/plugins.h>
@@ -166,6 +167,10 @@ static void adjust_volume(gint delta) {
 	aud_drct_set_volume_main(volume + delta);
 }
 
+static void notify_critical_error (const gchar *message) {
+	aud_ui_show_error(message);
+}
+
 static void disable_plugin() {
 	PluginHandle * plugin = aud_plugin_lookup_basename("libinfinite");
 	aud_plugin_enable(plugin, false);
@@ -181,6 +186,7 @@ static Player player = {
 	.next = next,
 	.seek = seek,
 	.adjust_volume = adjust_volume,
+	.notify_critical_error = notify_critical_error,
 	.disable_plugin = disable_plugin
 };
 

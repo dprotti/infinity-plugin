@@ -21,6 +21,6 @@ libinfinite_la_SOURCES = \
 	display.c display.h \
 	effects.c effects.h\
 	cputest.c cputest.h\
-	mmx.h types.h
+	mmx.h music-player.h types.h
 
 EXTRA_DIST = infinite_states

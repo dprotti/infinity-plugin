@@ -16,9 +16,8 @@
 #ifndef __INFINITY_EFFECTS__
 #define __INFINITY_EFFECTS__
 
-
-#include <types.h>
-
+#include <glib.h>
+#include "types.h"
 
 /*
  * Represents effect related information.
@@ -51,6 +50,5 @@ void effects_save_effect(t_effect *effect);
 
 void effects_load_effects(void);
 void effects_load_random_effect(t_effect *effect);
-
 
 #endif /* __INFINITY_EFFECTS__ */
