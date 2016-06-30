@@ -15,8 +15,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)
 libinfinite_la_LDFLAGS = ${CXX}
 libinfinite_la_LIBADD = @AUDACIOUS_LIBS@ @SDL_LIBS@ @GTK_LIBS@ @GLIB_LIBS@
 libinfinite_la_SOURCES = \
-	main.cc \
-	renderer.cc renderer.h\
+	audacious.cc \
+	infinity.c infinity.h\
 	compute.c compute.h \
 	display.c display.h \
 	effects.c effects.h\

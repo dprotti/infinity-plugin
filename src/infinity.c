@@ -19,26 +19,19 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
-#include <libaudcore/drct.h>
-#include <libaudcore/playlist.h>
-#include <libaudcore/plugins.h>
-#include <libaudcore/runtime.h>
-
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
 /*#include <SDL/SDL_syswm.h>*/
 
-extern "C" {
 #include "config.h"
 #include "display.h"
 #include "effects.h"
-#include "renderer.h"
+#include "infinity.h"
 #include "types.h"
 
 #if MMX_DETECTION
 #include "cputest.h"
 #endif
-}
 
 #define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define next_effect()   (t_last_effect++)
@@ -47,8 +40,10 @@ extern "C" {
 typedef gint32 t_color;
 typedef gint32 t_num_effect;
 
-static t_screen_parameters scr_par;
+static InfParameters * params;
+static Player * player;
 
+static gint32 width, height, scale;
 static t_effect current_effect;
 static t_color color, old_color, t_last_color;
 static t_num_effect t_last_effect;
@@ -72,7 +67,7 @@ static void check_events();
 static int renderer(void *);
 static void set_title(void);
 
-void renderer_init(void)
+void infinity_init(InfParameters * _params, Player * _player)
 {
 	gint32 _try;
 
@@ -87,9 +82,11 @@ void renderer_init(void)
 		}
 	}
 	initializing = TRUE;
-	scr_par.width = aud_get_int(CFGID, "width");
-	scr_par.height = aud_get_int(CFGID, "height");
-	scr_par.scale = aud_get_int(CFGID, "scale_factor");
+	params = _params;
+	player = _player;
+	width = params->get_width();
+	height = params->get_height();
+	scale = params->get_scale();
 
 	old_color = 0;
 	color = 0;
@@ -103,7 +100,7 @@ void renderer_init(void)
 	quiting = FALSE;
 	first_xevent = TRUE;
 
-	display_init(scr_par.width, scr_par.height, scr_par.scale);
+	display_init(width, height, scale);
 	current_title = g_strdup("Infinity");
 	set_title();
 	title_timer = g_timer_new();
@@ -121,10 +118,9 @@ void renderer_init(void)
 	thread = SDL_CreateThread(renderer, NULL);
 }
 
-void renderer_finish(void)
+void infinity_finish(void)
 {
 	gint32 _try;
-	PluginHandle * plugin;
 
 	if (finished)
 		return;
@@ -142,7 +138,7 @@ void renderer_finish(void)
 	SDL_WaitThread(thread, NULL);
 	SDL_DestroyMutex(resizing_mutex);
 	/*
-	 * Take some time to let it know renderer_render_multi_pcm()
+	 * Take some time to let it know infinity_render_multi_pcm()
 	 * that must not call display_set_pcm_data().
 	 * If it do that while calling display_quit(),
 	 * we could make Audacious crash, because display_quit
@@ -155,13 +151,12 @@ void renderer_finish(void)
 	display_quit();
 	g_timer_destroy(title_timer);
 
-	plugin = aud_plugin_lookup_basename("libinfinite");
-	aud_plugin_enable(plugin, false);
+	player->disable_plugin();
 
 	g_message("Infinity: Closing...");
 }
 
-void renderer_render_multi_pcm(const float *data, int channels)
+void infinity_render_multi_pcm(const float *data, int channels)
 {
 	if (!initializing && !quiting)
 		display_set_pcm_data(data, channels);
@@ -215,27 +210,25 @@ static gint32 event_filter(const SDL_Event *event)
 
 static gint disable_func(gpointer data)
 {
-	renderer_finish();
+	infinity_finish();
 	return FALSE;
 }
 
 static void check_events()
 {
 	SDL_Event event;
-	gint volume;
 
 	/*XEvent *xevent;
 	 * XWindowChanges changes;
 	 * XWindowAttributes attr;
 	 * XSetWindowAttributes s_attr;*/
 
-	if (aud_get_int(CFGID, "show_title")) {
+	if (params->must_show_title()) {
 		if (g_timer_elapsed(title_timer, NULL) > 1.0) {
-			if (aud_drct_get_playing() && aud_drct_get_ready()) {
+			if (player->is_playing()) {
 				if (current_title)
 					g_free(current_title);
-				String title = aud_playlist_get_title(aud_playlist_get_playing());
-				current_title = g_strdup(title.to_raw());
+				current_title = g_strdup(player->get_title());
 			} else {
 				if (current_title)
 					g_free(current_title);
@@ -283,49 +276,44 @@ static void check_events()
 			g_return_if_fail(SDL_LockMutex(resizing_mutex) >= 0);
 			resizing = TRUE;
 			g_return_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0);
-			scr_par.width = event.resize.w;
-			scr_par.height = event.resize.h;
-			g_message("Infinity: Screen resized to %dx%d pixels^2",
-				  scr_par.width, scr_par.height);
+			width = event.resize.w;
+			height = event.resize.h;
+			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
 			must_resize = TRUE;
 			break;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
-				if (aud_drct_get_playing() && aud_drct_get_ready())
-					aud_drct_seek(aud_drct_get_time() + 5000);
+				if (player->is_playing())
+					player->seek(5000);
 				break;
 			case SDLK_LEFT:
-				if (aud_drct_get_playing() && aud_drct_get_ready())
-					aud_drct_seek(aud_drct_get_time() - 5000);
+				if (player->is_playing())
+					player->seek(-5000);
 				break;
 			case SDLK_UP:
-				volume = aud_drct_get_volume_main();
-				g_message("Increasing volume to %d", volume + 5);
-				aud_drct_set_volume_main(volume + 5);
+				player->adjust_volume(5);
 				break;
 			case SDLK_DOWN:
-				volume = aud_drct_get_volume_main();
-				g_message("Decreasing volume to %d", volume - 5);
-				aud_drct_set_volume_main(volume - 5);
+				player->adjust_volume(-5);
 				break;
 			case SDLK_TAB:
 				display_toggle_fullscreen();
 				break;
 			case SDLK_z:
-				aud_drct_pl_prev();
+				player->previous();
 				break;
 			case SDLK_x:
-				aud_drct_play();
+				player->play();
 				break;
 			case SDLK_c:
-				aud_drct_pause();
+				player->pause();
 				break;
 			case SDLK_v:
-				aud_drct_stop();
+				player->stop();
 				break;
 			case SDLK_b:
-				aud_drct_pl_next();
+				player->next();
 				break;
 			case SDLK_F11:
 				display_save_screen();
@@ -399,15 +387,16 @@ static gint64 calculate_frame_length_usecs(gint32 fps, int line) {
 
 static int renderer(void *arg)
 {
+	gint64 now, render_time, t_begin;
 	gint32 frame_length;
 	gint32 fps, new_fps;
 	gint32 t_between_effects, t_between_colors;
 	gint32 has_mmx = 0;
 
-	fps = aud_get_int(CFGID, "max_fps");
+	fps = params->get_max_fps();
 	frame_length = calculate_frame_length_usecs(fps, __LINE__);
-	t_between_effects = aud_get_int(CFGID, "effect_time");
-	t_between_colors = aud_get_int(CFGID, "palette_time");
+	t_between_effects = params->get_effect_interval();
+	t_between_colors = params->get_color_interval();
 #if MMX_DETECTION
 	has_mmx = mm_support_check_and_show();
 #endif
@@ -424,19 +413,19 @@ static int renderer(void *arg)
 		if (finished)
 			break;
 		if (must_resize) {
-			display_resize(scr_par.width, scr_par.height);
-			aud_set_int(CFGID, "width", scr_par.width);
-			aud_set_int(CFGID, "heigth", scr_par.height);
+			display_resize(width, height);
+			params->set_width(width);
+			params->set_height(height);
 			must_resize = FALSE;
 			g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, -1);
 			resizing = FALSE;
 			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
 		}
-		auto t_begin = g_get_monotonic_time();
+		t_begin = g_get_monotonic_time();
 		if (has_mmx)
-			display_blur_mmx(scr_par.width * scr_par.height * current_effect.num_effect);
+			display_blur_mmx(width * height * current_effect.num_effect);
 		else
-			display_blur(scr_par.width * scr_par.height * current_effect.num_effect);
+			display_blur(width * height * current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
 		if (t_last_color <= 32)
@@ -448,12 +437,12 @@ static int renderer(void *arg)
 			if (!mode_interactif) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
-				t_between_effects = aud_get_int(CFGID, "effect_time");
+				t_between_effects = params->get_effect_interval();
 			}
 #else
 			display_load_random_effect(&current_effect);
 			t_last_effect = 0;
-			t_between_effects = aud_get_int(CFGID, "effect_time");
+			t_between_effects = params->get_effect_interval();
 #endif
 		}
 		if (t_last_color % t_between_colors == 0) {
@@ -462,24 +451,24 @@ static int renderer(void *arg)
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;
-				t_between_colors = aud_get_int(CFGID, "palette_time");
+				t_between_colors = params->get_color_interval();
 			}
 #else
 			old_color = color;
 			color = rand() % NB_PALETTES;
 			t_last_color = 0;
-			t_between_colors = aud_get_int(CFGID, "palette_time");
+			t_between_colors = params->get_color_interval();
 #endif
 		}
 
-		new_fps = aud_get_int(CFGID, "max_fps");
+		new_fps = params->get_max_fps();
 		if (new_fps != fps) {
 			fps = new_fps;
 			frame_length = calculate_frame_length_usecs(fps, __LINE__);
 		}
 
-		auto now = g_get_monotonic_time();
-		auto render_time = now - t_begin;
+		now = g_get_monotonic_time();
+		render_time = now - t_begin;
 		if (render_time < frame_length) {
 			g_usleep(frame_length - render_time);
 		}

@@ -31,7 +31,7 @@ typedef struct t_complex {
 	gfloat x, y;
 } t_complex;
 
-static t_screen_parameters scr_par;
+static gint32 width, height, scale;
 
 static byte *surface1;
 static byte *surface2;
@@ -45,15 +45,15 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 	gfloat speed;
 	gfloat co, si;
 
-	a.x -= scr_par.width / 2;
-	a.y -= scr_par.height / 2;
+	a.x -= width / 2;
+	a.y -= height / 2;
 
 	switch (n) {
 	case 0:
 		an = 0.025 * (p1 - 2) + 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.25;
+		circle_size = height * 0.25;
 		speed = (gfloat)2000 + p2 * 500;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -65,7 +65,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = 0.015 * (p1 - 2) + 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.45;
+		circle_size = height * 0.45;
 		speed = (gfloat)4000 + p2 * 1000;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -77,7 +77,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.25;
+		circle_size = height * 0.25;
 		speed = (gfloat)400 + p2 * 100;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -89,7 +89,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = (sin(sqrt(a.x * a.x + a.y * a.y) / 20) / 20) + 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.25;
+		circle_size = height * 0.25;
 		speed = (gfloat)4000;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -101,7 +101,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.25;
+		circle_size = height * 0.25;
 		speed = sin(sqrt(a.x * a.x + a.y * a.y) / 5) * 3000 + 4000;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -117,7 +117,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = scr_par.height * 0.25;
+		circle_size = height * 0.25;
 		fact = 1 + cos(atan(a.x / (a.y + 0.00001)) * 6) * 0.02;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -128,16 +128,16 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		b.x = (gfloat)0.0;
 		b.y = (gfloat)0.0;
 	}
-	b.x += scr_par.width / 2;
-	b.y += scr_par.height / 2;
+	b.x += width / 2;
+	b.y += height / 2;
 	if (b.x < 0.0)
 		b.x = 0.0;
 	if (b.y < 0.0)
 		b.y = 0.0;
-	if (b.x > (gfloat)scr_par.width - 1)
-		b.x = (gfloat)scr_par.width - 1;
-	if (b.y > (gfloat)scr_par.height - 1)
-		b.y = (gfloat)scr_par.height - 1;
+	if (b.x > (gfloat)width - 1)
+		b.x = (gfloat)width - 1;
+	if (b.y > (gfloat)height - 1)
+		b.y = (gfloat)height - 1;
 	return b;
 }
 
@@ -184,24 +184,24 @@ static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, gui
 	}
 }
 
-void compute_init(gint32 width, gint32 height, gint32 scale)
+void compute_init(gint32 _width, gint32 _height, gint32 _scale)
 {
-	scr_par.width = width;
-	scr_par.height = height;
-	scr_par.scale = scale;
+	width = _width;
+	height = _height;
+	scale = _scale;
 
-	surface1 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));
-	surface2 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));
+	surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+	surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
 }
 
-void compute_resize(gint32 width, gint32 height)
+void compute_resize(gint32 _width, gint32 _height)
 {
-	scr_par.width = width;
-	scr_par.height = height;
+	width = _width;
+	height = _height;
 	g_free(surface1);
 	g_free(surface2);
-	surface1 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));
-	surface2 = (byte *)g_malloc((gulong)(scr_par.width + 1) * (scr_par.height + 1));
+	surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+	surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
 }
 
 vector_field_t *compute_vector_field_new(gint32 width, gint32 height)
@@ -232,15 +232,15 @@ void compute_quit()
 
 void compute_generate_vector_field(vector_field_t *vector_field)
 {
-	guint32 f, i, height;
+	guint32 f, i, _height;
 
 	g_return_if_fail(vector_field != NULL);
 	g_return_if_fail(vector_field->height >= 0);
 
-	height = (guint32)vector_field->height;
+	_height = (guint32)vector_field->height;
 
 	for (f = 0; f < NB_FCT; f++)
-		for (i = 0; i < height; i += 10)
+		for (i = 0; i < _height; i += 10)
 			compute_generate_sector(f, f, 2, 2, i, 10, vector_field);
 }
 

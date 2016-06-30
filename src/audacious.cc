@@ -14,16 +14,20 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 #include <string.h>
+#include <libaudcore/drct.h>
+#include <libaudcore/playlist.h>
 #include <libaudcore/plugin.h>
+#include <libaudcore/plugins.h>
 #include <libaudcore/preferences.h>
 #include <libaudcore/runtime.h>
-#include <glib/gi18n.h>
 
 extern "C" {
 #include "config.h"
-#include "renderer.h"
+#include "infinity.h"
 #include "types.h"
 }
+
+#define CFGID "infinity"
 
 static const char about_text[] =
 	"Infinity " PACKAGE_VERSION "\n\n"
@@ -73,6 +77,113 @@ private:
 
 EXPORT InfinityPlugin aud_plugin_instance;
 
+static gint32 get_width() {
+	return aud_get_int(CFGID, "width");
+}
+
+static void set_width(gint32 width) {
+	aud_set_int(CFGID, "width", width);
+}
+
+static gint32 get_height() {
+	return aud_get_int(CFGID, "height");
+}
+
+static void set_height(gint32 height) {
+	aud_set_int(CFGID, "height", height);
+}
+
+static gint32 get_scale() {
+	return aud_get_int(CFGID, "scale_factor");
+}
+
+static gint32 get_effect_interval() {
+	return aud_get_int(CFGID, "effect_time");
+}
+
+static gint32 get_color_interval() {
+	return aud_get_int(CFGID, "palette_time");
+}
+
+static gboolean must_show_title() {
+	return aud_get_bool(CFGID, "show_title");
+}
+
+static gint32 get_max_fps() {
+	return aud_get_int(CFGID, "max_fps");
+}
+
+static InfParameters params;
+
+static void init_params() {
+	params.get_width = get_width;
+	params.set_width = set_width;
+	params.get_height = get_height;
+	params.set_height = set_height;
+	params.get_scale = get_scale;
+	params.get_effect_interval = get_effect_interval;
+	params.get_color_interval = get_color_interval;
+	params.must_show_title = must_show_title;
+	params.get_max_fps = get_max_fps;
+};
+
+static gboolean is_playing() {
+	return aud_drct_get_playing() && aud_drct_get_ready();
+}
+
+static gchar* get_title() {
+	String title = aud_playlist_get_title(aud_playlist_get_playing());
+	return (gchar*) title.to_raw();
+}
+
+static void play() {
+	aud_drct_play();
+}
+
+static void pause() {
+	aud_drct_pause();
+}
+
+static void stop() {
+	aud_drct_stop();
+}
+
+static void previous() {
+	aud_drct_pl_prev();
+}
+
+static void next() {
+	aud_drct_pl_next();
+}
+
+static void seek(gint32 usecs) {
+	aud_drct_seek(aud_drct_get_time() + usecs);
+}
+
+static void adjust_volume(gint delta) {
+	gint volume = aud_drct_get_volume_main();
+	g_message("Increasing volume to %d", volume + 5);
+	aud_drct_set_volume_main(volume + delta);
+}
+
+static void disable_plugin() {
+	PluginHandle * plugin = aud_plugin_lookup_basename("libinfinite");
+	aud_plugin_enable(plugin, false);
+}
+
+static Player player = {
+	.is_playing = is_playing,
+	.get_title = get_title,
+	.play = play,
+	.pause = pause,
+	.stop = stop,
+	.previous = previous,
+	.next = next,
+	.seek = seek,
+	.adjust_volume = adjust_volume,
+	.disable_plugin = disable_plugin
+};
+
 bool InfinityPlugin::init(void)
 {
 	g_message("Infinity commands:\n"
@@ -89,7 +200,9 @@ bool InfinityPlugin::init(void)
 			"- F11:\t\tscreenshot.\n"
 			"- F12:\t\tchange palette.");
 	load_settings();
-	renderer_init();
+	init_params();
+	infinity_init(&params, &player);
+
 	return TRUE;
 }
 
@@ -101,11 +214,11 @@ void InfinityPlugin::clear ()
 void InfinityPlugin::cleanup(void)
 {
 	g_message("Infinity: cleanup()");
-	renderer_finish();
+	infinity_finish();
 }
 
 void InfinityPlugin::render_multi_pcm (const float * pcm, int channels) {
-	renderer_render_multi_pcm(pcm, channels);
+	infinity_render_multi_pcm(pcm, channels);
 }
 
 static const char * const defaults[] = {

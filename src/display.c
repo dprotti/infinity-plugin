@@ -35,7 +35,7 @@ typedef struct sincos {
 static gint16 pcm_data[2][512];
 static SDL_mutex *pcm_data_mutex;
 
-static t_screen_parameters scr_par;
+static gint32 width, height, scale;
 
 /* Little optimization for cos/sin functions */
 static sincos_t cosw = { 0, NULL };
@@ -50,11 +50,11 @@ static gint16 current_colors[256];
 
 static byte *surface1;
 
-static void init_sdl(gint32 width, gint32 height, gint32 scale)
+static void init_sdl(gint32 _width, gint32 _height, gint32 _scale)
 {
 	if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0)
 		g_error("Infinity: Couldn't initialize SDL: %s\n", SDL_GetError());
-	screen = SDL_SetVideoMode(width * scale, height * scale, 16, VIDEO_FLAGS);
+	screen = SDL_SetVideoMode(_width * _scale, _height * _scale, 16, VIDEO_FLAGS);
 	if (screen == NULL)
 		g_error("Infinity: could not init video mode: %s\n", SDL_GetError());
 	g_message("Infinity: SDL SetVideoMode() Ok");
@@ -99,12 +99,12 @@ static void display_surface()
 	} else {
 		screen_locked = FALSE;
 	}
-	if (scr_par.scale > 1) {
-		for (i = 0; i < scr_par.height; i++) {
-			pdest = (gint16 *)(screen->pixels + i * screen->pitch * scr_par.scale);
-			psrc = surface1 + i * scr_par.width;
-			if (scr_par.scale == 2) {
-				for (j = 1; j < scr_par.width; j++) {
+	if (scale > 1) {
+		for (i = 0; i < height; i++) {
+			pdest = (gint16 *)(screen->pixels + i * screen->pitch * scale);
+			psrc = surface1 + i * width;
+			if (scale == 2) {
+				for (j = 1; j < width; j++) {
 					*(pdest++) = current_colors[*psrc++];
 					*(pdest) = *(pdest - 1);
 					pdest++;
@@ -112,7 +112,7 @@ static void display_surface()
 				memcpy(screen->pixels + i * screen->pitch * 2 + screen->pitch,
 				       screen->pixels + i * screen->pitch * 2, screen->pitch);
 			}       /* else {
-			         * for (j=1;j<scr_par.width;j++) {
+			         * for (j=1;j<width;j++) {
 			         *(pdest++)=current_colors[*psrc++];
 			         *(pdest++)=*(pdest-1);
 			         *(pdest++)=*(pdest-1);
@@ -125,9 +125,9 @@ static void display_surface()
 		}               /* for */
 	} else {
 		psrc = surface1;
-		for (i = 0; i < scr_par.height; i++) {
+		for (i = 0; i < height; i++) {
 			pdest = (gint16 *)(screen->pixels + i * screen->pitch);
-			for (j = 0; j < scr_par.width; j++)
+			for (j = 0; j < width; j++)
 				*pdest++ = current_colors[*psrc++];
 		}
 	}
@@ -139,19 +139,19 @@ static void display_surface()
 
 #define plot1(x, y, c) \
 \
-	if ((x) > 0 && (x) < scr_par.width - 3 && (y) > 0 && (y) < scr_par.height - 3) \
-		assign_max(&(surface1)[(x) + (y) * scr_par.width], (c)) \
+	if ((x) > 0 && (x) < width - 3 && (y) > 0 && (y) < height - 3) \
+		assign_max(&(surface1)[(x) + (y) * width], (c)) \
 \
 
 #define plot2(x, y, c) \
 	{ \
 		gint32 ty; \
-		if ((x) > 0 && (gint32)(x) < scr_par.width - 3 && (y) > 0 && (gint32)(y) < scr_par.height - 3) { \
-			ty = (gint32)(y) * scr_par.width; \
+		if ((x) > 0 && (gint32)(x) < width - 3 && (y) > 0 && (gint32)(y) < height - 3) { \
+			ty = (gint32)(y) * width; \
 			assign_max((&(surface1)[(gint32)(x) + ty]), (c)); \
 			assign_max((&(surface1)[(gint32)(x) + 1 + ty]), (c)); \
-			assign_max((&(surface1)[(gint32)(x) + ty + scr_par.width]), (c)); \
-			assign_max((&(surface1)[(gint32)(x) + 1 + ty + scr_par.width]), (c)); \
+			assign_max((&(surface1)[(gint32)(x) + ty + width]), (c)); \
+			assign_max((&(surface1)[(gint32)(x) + 1 + ty + width]), (c)); \
 		} \
 	} \
 
@@ -208,11 +208,11 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-void display_init(gint32 width, gint32 height, gint32 scale)
+void display_init(gint32 _width, gint32 _height, gint32 _scale)
 {
-	scr_par.width = width;
-	scr_par.height = height;
-	scr_par.scale = scale;
+	width = _width;
+	height = _height;
+	scale = _scale;
 
 	pcm_data_mutex = SDL_CreateMutex();
 	compute_init(width, height, scale);
@@ -234,16 +234,16 @@ void display_quit(void)
 	SDL_Quit();
 }
 
-void display_resize(gint32 width, gint32 height)
+void display_resize(gint32 _width, gint32 _height)
 {
-	scr_par.width = width;
-	scr_par.height = height;
-	screen = SDL_SetVideoMode(scr_par.width * scr_par.scale,
-				  scr_par.height * scr_par.scale,
+	width = _width;
+	height = _height;
+	screen = SDL_SetVideoMode(width * scale,
+				  height * scale,
 				  16, VIDEO_FLAGS);
 	if (screen == NULL)
 		g_error("Infinity: Couldn't set %dx%d video mode: %s\n",
-			scr_par.width * scr_par.scale, scr_par.height * scr_par.scale,
+			width * scale, height * scale,
 			SDL_GetError());
 	compute_vector_field_destroy(vector_field);
 	vector_field = compute_vector_field_new(width, height);
@@ -301,13 +301,13 @@ void spectral(t_effect *current_effect)
 	gfloat y1, y2;
 	const gint32 density_lines = 5;
 	const gint32 step = 4;
-	const gint32 shift = (current_effect->spectral_shift * scr_par.height) >> 8;
+	const gint32 shift = (current_effect->spectral_shift * height) >> 8;
 
 	/* begin CS */
 	g_return_if_fail(SDL_mutexP(pcm_data_mutex) >= 0);
-	y1 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * scr_par.height) >> 12);
-	y2 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * scr_par.height) >> 12);
-	if (cosw.i != scr_par.width || sinw.i != scr_par.width) {
+	y1 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * height) >> 12);
+	y2 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * height) >> 12);
+	if (cosw.i != width || sinw.i != width) {
 		g_free(cosw.f);
 		g_free(sinw.f);
 		sinw.f = cosw.f = NULL;
@@ -315,21 +315,21 @@ void spectral(t_effect *current_effect)
 	}
 	if (cosw.i == 0 || cosw.f == NULL) {
 		gfloat halfPI = (gfloat)PI / 2;
-		cosw.i = scr_par.width;
+		cosw.i = width;
 		if (cosw.f != NULL)
 			g_free(cosw.f);
-		cosw.f = g_malloc(sizeof(gfloat) * scr_par.width);
-		for (i = 0; i < scr_par.width; i += step)
-			cosw.f[i] = cos((gfloat)i / scr_par.width * PI + halfPI);
+		cosw.f = g_malloc(sizeof(gfloat) * width);
+		for (i = 0; i < width; i += step)
+			cosw.f[i] = cos((gfloat)i / width * PI + halfPI);
 	}
 	if (sinw.i == 0 || sinw.f == NULL) {
 		gfloat halfPI = (gfloat)PI / 2;
-		sinw.i = scr_par.width;
+		sinw.i = width;
 		if (sinw.f != NULL)
 			g_free(sinw.f);
-		sinw.f = g_malloc(sizeof(gfloat) * scr_par.width);
-		for (i = 0; i < scr_par.width; i += step)
-			sinw.f[i] = sin((gfloat)i / scr_par.width * PI + halfPI);
+		sinw.f = g_malloc(sizeof(gfloat) * width);
+		for (i = 0; i < width; i += step)
+			sinw.f[i] = sin((gfloat)i / width * PI + halfPI);
 	}
 	if (current_effect->mode_spectre == 3) {
 		if (y1 < 0.0)
@@ -337,15 +337,15 @@ void spectral(t_effect *current_effect)
 		if (y2 < 0.0)
 			y2 = 0.0;
 	}
-	halfheight = scr_par.height >> 1;
-	halfwidth = scr_par.width >> 1;
-	for (i = step; i < scr_par.width; i += step) {
+	halfheight = height >> 1;
+	halfwidth = width >> 1;
+	for (i = step; i < width; i += step) {
 		old_y1 = y1;
 		old_y2 = y2;
-		y1 = (gfloat)(((pcm_data[1][(i << 9) / scr_par.width / density_lines] >> 8) *
-			       current_effect->spectral_amplitude * scr_par.height) >> 12);
-		y2 = (gfloat)(((pcm_data[0][(i << 9) / scr_par.width / density_lines] >> 8) *
-			       current_effect->spectral_amplitude * scr_par.height) >> 12);
+		y1 = (gfloat)(((pcm_data[1][(i << 9) / width / density_lines] >> 8) *
+			       current_effect->spectral_amplitude * height) >> 12);
+		y2 = (gfloat)(((pcm_data[0][(i << 9) / width / density_lines] >> 8) *
+			       current_effect->spectral_amplitude * height) >> 12);
 		/* end CS */
 		switch (current_effect->mode_spectre) {
 		case 0:
@@ -396,10 +396,10 @@ void spectral(t_effect *current_effect)
 	}
 	g_return_if_fail(SDL_mutexV(pcm_data_mutex) >= 0);
 	if (current_effect->mode_spectre == 3 || current_effect->mode_spectre == 4) {
-		line(halfwidth + cosw.f[scr_par.width - step] * (shift + y1),
-		     halfheight + sinw.f[scr_par.width - step] * (shift + y1),
-		     halfwidth - cosw.f[scr_par.width - step] * (shift + y2),
-		     halfheight + sinw.f[scr_par.width - step] * (shift + y2),
+		line(halfwidth + cosw.f[width - step] * (shift + y1),
+		     halfheight + sinw.f[width - step] * (shift + y1),
+		     halfwidth - cosw.f[width - step] * (shift + y2),
+		     halfheight + sinw.f[width - step] * (shift + y2),
 		     current_effect->spectral_color);
 	}
 }
@@ -420,10 +420,10 @@ void curve(t_effect *current_effect)
 		vr = 0.001;
 		k = current_effect->x_curve;
 		for (i = 0; i < 64; i++) {
-			x = cos((gfloat)(k) / (v + v * j * 1.34)) * scr_par.height * amplitude;
-			y = sin((gfloat)(k) / (1.756 * (v + v * j * 0.93))) * scr_par.height * amplitude;
-			plot2(x * cos((gfloat)k * vr) + y * sin((gfloat)k * vr) + scr_par.width / 2,
-			      x * sin((gfloat)k * vr) - y * cos((gfloat)k * vr) + scr_par.height / 2,
+			x = cos((gfloat)(k) / (v + v * j * 1.34)) * height * amplitude;
+			y = sin((gfloat)(k) / (1.756 * (v + v * j * 0.93))) * height * amplitude;
+			plot2(x * cos((gfloat)k * vr) + y * sin((gfloat)k * vr) + width / 2,
+			      x * sin((gfloat)k * vr) - y * cos((gfloat)k * vr) + height / 2,
 			      (byte)current_effect->curve_color);
 			k++;
 		}

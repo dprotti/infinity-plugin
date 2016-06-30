@@ -18,17 +18,6 @@
 
 #include <SDL/SDL.h>
 
-#define CFGID "infinity"
- 
-// existence of this header smells as bad design...
-typedef struct _t_screen_parameters {
-	gint32	x, y;
-	gint32	width;
-	gint32	height;
-	gint32	scale;
-	gint32	bpp; /* bytes per pixels. */
-} t_screen_parameters;
-
 typedef Uint8 byte;
 
 #endif /* __INFINITY_TYPES__ */
