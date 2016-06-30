@@ -266,8 +266,6 @@ forbid_m4macro gnome-cxx-check.m4
 
 want_libtool=false
 want_pkg_config=false
-want_gtk_doc=false
-want_gnome_doc_utils=false
 want_maintainer_mode=false
 
 configure_files="`find $srcdir -name '{arch}' -prune -o -name '_darcs' -prune -o -name '.??*' -prune -o -name configure.ac -print -o -name configure.in -print`"

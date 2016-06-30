@@ -13,17 +13,17 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious >= 3.5, 1.2 <= SDL < 2, Glib >= 2.28, Gtk+ >= 2.8
+Audacious >= 3.5, 1.2 <= SDL < 2, Glib >= 2.28
 
 **Install deps in Ubuntu**
 
-`sudo apt -y install audacious-dev libsdl1.2-dev libglib2.0-dev libgtk2.0-dev`
+`sudo apt -y install audacious-dev libsdl1.2-dev libglib2.0-dev`
 
 Install from tarball
 -------
 
 - [Download](https://github.com/dprotti/infinity-plugin/releases/latest/)
-- tar xf infinity-plugin-4-audacious-{version}.tar.xz
+- tar xf infinity-plugin-{version}.tar.xz
 - ./configure
 - make
 - sudo make install

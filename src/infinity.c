@@ -17,7 +17,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <glib.h>
-#include <gtk/gtk.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
@@ -215,18 +214,6 @@ static gint32 event_filter(const SDL_Event *event)
 	return 1;
 }
 
-static gint disable_func(gpointer data)
-{
-	infinity_finish();
-	return FALSE;
-}
-
-static void schedule_exit() {
-	GDK_THREADS_ENTER();
-	(void)gtk_idle_add(disable_func, NULL);
-	GDK_THREADS_LEAVE();
-}
-
 static void check_events()
 {
 	SDL_Event event;
@@ -281,7 +268,7 @@ static void check_events()
 		 * }
 		 * break;*/
 		case SDL_QUIT:
-			schedule_exit();
+			player->disable_plugin();
 			break;
 		case SDL_VIDEORESIZE:
 			g_return_if_fail(SDL_LockMutex(resizing_mutex) >= 0);
@@ -425,7 +412,7 @@ static int renderer(void *arg)
 			break;
 		if (must_resize) {
 			if (! display_resize(width, height)) {
-				schedule_exit();
+				player->disable_plugin();
 				break;
 			}
 			params->set_width(width);
