@@ -234,7 +234,8 @@ static const char * const defaults[] = {
 	"palette_time", "100",
 	"scale_factor", "1",
 	"max_fps", "30",
-	"show_title", "true"
+	"show_title", "true",
+	nullptr
 };
 
 void InfinityPlugin::load_settings(void)
