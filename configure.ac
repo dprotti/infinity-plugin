@@ -1,7 +1,7 @@
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.65)
-AC_INIT([Infinity plugin],[0.9.0-dev],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin],[https://dprotti.github.io/infinity-plugin])
+AC_INIT([Infinity plugin],[0.9.0alpha2],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin],[https://dprotti.github.io/infinity-plugin])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
@@ -186,4 +186,3 @@ CFLAGS                 : ${INF_CFLAGS_EXTRA} ${CFLAGS}
 CXXFLAGS               : ${CXXFLAGS}
 Debug enabled          : ${debug}
 "
-

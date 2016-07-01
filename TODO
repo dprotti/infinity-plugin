@@ -2,11 +2,5 @@ TODO
 ====
 
 * Provide Ubuntu package
-* Save window position on close
-* Remove config.h.in from repo?
-* Remove prefs.c
-* Update to SDL 2?
 * Compile on Windows
-* Fix MMX
 * Add icon
-* Add an option to disable the screensaver
