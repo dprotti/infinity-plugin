@@ -16,7 +16,7 @@
 #ifndef __INFINITY_TYPES__
 #define __INFINITY_TYPES__
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 typedef Uint8 byte;
 

@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
+#include <SDL.h>
 
 #include "config.h"
 #include "display.h"
@@ -25,7 +26,7 @@
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
 
-#define VIDEO_FLAGS ((Uint32)(SDL_HWSURFACE | SDL_HWPALETTE | SDL_DOUBLEBUF | SDL_RESIZABLE))
+#define VIDEO_FLAGS ((Uint32)(SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE))
 
 typedef struct sincos {
 	gint32	i;
@@ -33,7 +34,7 @@ typedef struct sincos {
 } sincos_t;
 
 static gint16 pcm_data[2][512];
-static SDL_mutex *pcm_data_mutex;
+G_LOCK_DEFINE_STATIC(pcm_data);
 
 static gint32 width, height, scale;
 
@@ -43,7 +44,10 @@ static sincos_t sinw = { 0, NULL };
 
 static vector_field_t *vector_field;
 
-static SDL_Surface *screen = NULL;
+static SDL_Window *window;
+static SDL_Renderer *sdl_renderer;
+static SDL_Surface *screen;
+static SDL_Texture *texture;
 
 static SDL_Color color_table[NB_PALETTES][256];
 static gint16 current_colors[256];
@@ -52,23 +56,46 @@ static byte *surface1;
 static Player *player;
 
 static gchar error_msg[256];
+static gboolean initialized;
 
-static gboolean sdl_init(gint32 _width, gint32 _height, gint32 _scale)
-{
-	if (SDL_Init((Uint32)(SDL_INIT_VIDEO | SDL_INIT_TIMER)) < 0) {
-		g_snprintf(error_msg, 256, "Infinity cannot initialize SDL: %s", SDL_GetError());
-		player->notify_critical_error(error_msg);
-		return FALSE;
+static gboolean allocate_screen_and_texture() {
+	if (screen != NULL) {
+		SDL_FreeSurface(screen);
 	}
-	screen = SDL_SetVideoMode(_width * _scale, _height * _scale, 16, VIDEO_FLAGS);
+	screen = SDL_CreateRGBSurface(0, width, height, 16, 0, 0, 0, 0);
 	if (screen == NULL) {
 		g_snprintf(error_msg, 256, "Infinity cannot create display: %s", SDL_GetError());
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
-	(void)SDL_ShowCursor(0);
-	(void)SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	SDL_SetSurfaceBlendMode(screen, SDL_BLENDMODE_NONE);
+	if (texture != NULL) {
+		SDL_DestroyTexture(texture);
+	}
+	texture = SDL_CreateTexture(sdl_renderer,
+		                       SDL_PIXELFORMAT_RGB565,
+                               SDL_TEXTUREACCESS_STREAMING,
+                               width, height);
+	if (texture == NULL) {
+		g_snprintf(error_msg, 256, "Infinity cannot create SDL texture: %s", SDL_GetError());
+		player->notify_critical_error(error_msg);
+		return FALSE;
+	}
 	return TRUE;
+}
+
+static gboolean sdl_init()
+{
+	SDL_InitSubSystem(SDL_INIT_EVENTS);
+	int res = SDL_CreateWindowAndRenderer(width, height, VIDEO_FLAGS, &window, &sdl_renderer);
+	if (res < 0) {
+		g_snprintf(error_msg, 256, "Infinity cannot initialize SDL: %s", SDL_GetError());
+		player->notify_critical_error(error_msg);
+		return FALSE;
+	}
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
+	SDL_RenderSetLogicalSize(sdl_renderer, width, height);
+	return allocate_screen_and_texture();
 }
 
 static void generate_colors()
@@ -97,53 +124,31 @@ static void display_surface()
 	gint32 i, j;
 	gint16 *pdest;
 	byte *psrc;
-	gboolean screen_locked;
+	gboolean screen_locked = FALSE;
 
 	if (SDL_MUSTLOCK(screen)) {
 		if (SDL_LockSurface(screen) < 0) {
-			g_error("Infinity: Cannot lock screen: %s", SDL_GetError());
+			g_critical("Infinity cannot lock SDL surface: %s", SDL_GetError());
 			return;
 		}
 		screen_locked = TRUE;
-	} else {
-		screen_locked = FALSE;
 	}
-	if (scale > 1) {
-		for (i = 0; i < height; i++) {
-			pdest = (gint16 *)(screen->pixels + i * screen->pitch * scale);
-			psrc = surface1 + i * width;
-			if (scale == 2) {
-				for (j = 1; j < width; j++) {
-					*(pdest++) = current_colors[*psrc++];
-					*(pdest) = *(pdest - 1);
-					pdest++;
-				}
-				memcpy(screen->pixels + i * screen->pitch * 2 + screen->pitch,
-				       screen->pixels + i * screen->pitch * 2, screen->pitch);
-			}       /* else {
-			         * for (j=1;j<width;j++) {
-			         *(pdest++)=current_colors[*psrc++];
-			         *(pdest++)=*(pdest-1);
-			         *(pdest++)=*(pdest-1);
-			         * }
-			         * memcpy(screen->pixels+i*screen->pitch*3+screen->pitch,
-			         * screen->pixels+i*screen->pitch*3,screen->pitch);
-			         * memcpy(screen->pixels+i*screen->pitch*3+screen->pitch*2,
-			         * screen->pixels+i*screen->pitch*3,screen->pitch);
-			         * } */
-		}               /* for */
-	} else {
-		psrc = surface1;
-		for (i = 0; i < height; i++) {
-			pdest = (gint16 *)(screen->pixels + i * screen->pitch);
-			for (j = 0; j < width; j++)
-				*pdest++ = current_colors[*psrc++];
-		}
+
+	psrc = surface1;
+	for (i = 0; i < height; i++) {
+		pdest = (gint16 *)(screen->pixels + i * screen->pitch);
+		for (j = 0; j < width; j++)
+			*pdest++ = current_colors[*psrc++];
 	}
+	SDL_UpdateTexture(texture, NULL, screen->pixels, screen->pitch);
+
 	if (screen_locked)
 		SDL_UnlockSurface(screen);
-	else
-		(void)SDL_Flip(screen);
+	else {
+		SDL_RenderClear(sdl_renderer);
+		SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
+		SDL_RenderPresent(sdl_renderer);
+	}
 }
 
 #define plot1(x, y, c) \
@@ -226,9 +231,8 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
 	scale = _scale;
 	player = _player;
 
-	pcm_data_mutex = SDL_CreateMutex();
 	compute_init(width, height, scale);
-	sdl_ok = sdl_init(width, height, scale);
+	sdl_ok = sdl_init();
 	generate_colors();
 	effects_load_effects();
 	vector_field = compute_vector_field_new(width, height);
@@ -236,36 +240,39 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
 	if (!sdl_ok) {
 		display_quit();
 	}
+	initialized = TRUE;
 	return sdl_ok;
 }
 
 void display_quit(void)
 {
+	if (! initialized)
+		return;
 	compute_vector_field_destroy(vector_field);
 	compute_quit();
-	SDL_DestroyMutex(pcm_data_mutex);
 	if (screen != NULL)
 		SDL_FreeSurface(screen);
 	screen = NULL;
-	SDL_Quit();
+	if (window != NULL)
+		SDL_DestroyWindow(window);
+	window = NULL;
+	// do not call SDL_Quit() since there is another plugin that use
+	// SDL inside Audacious
+	SDL_QuitSubSystem(SDL_INIT_EVENTS);
+	initialized = FALSE;
 }
 
 gboolean display_resize(gint32 _width, gint32 _height)
 {
 	width = _width;
 	height = _height;
-	screen = SDL_SetVideoMode(width * scale, height * scale, 16, VIDEO_FLAGS);
-	if (screen == NULL) {
-		g_snprintf(error_msg, 256, "Infinity cannot resize display to %dx%d pixels: %s",
-			width * scale, height * scale, SDL_GetError());
-		player->notify_critical_error(error_msg);
-		return FALSE;
-	}
+
+	gboolean screen_ok = allocate_screen_and_texture();
 	compute_vector_field_destroy(vector_field);
 	vector_field = compute_vector_field_new(width, height);
 	compute_resize(width, height);
 	compute_generate_vector_field(vector_field);
-	return TRUE;
+	return screen_ok;
 }
 
 inline void display_set_pcm_data(const float *data, int channels)
@@ -274,12 +281,10 @@ inline void display_set_pcm_data(const float *data, int channels)
 		g_critical("Unsupported number of channels (%d)\n", channels);
 		return;
 	}
-	/* begin CS */
-	g_return_if_fail(SDL_mutexP(pcm_data_mutex) >= 0);
+	G_LOCK(pcm_data);
 	// TODO check this out, different types here...
 	memcpy(pcm_data, data, 2 * 512 * sizeof(gint16));
-	g_return_if_fail(SDL_mutexV(pcm_data_mutex) >= 0);
-	/* end CS */
+	G_UNLOCK(pcm_data);
 }
 
 void change_color(gint32 t2, gint32 t1, gint32 w)
@@ -320,8 +325,7 @@ void spectral(t_effect *current_effect)
 	const gint32 step = 4;
 	const gint32 shift = (current_effect->spectral_shift * height) >> 8;
 
-	/* begin CS */
-	g_return_if_fail(SDL_mutexP(pcm_data_mutex) >= 0);
+	G_LOCK(pcm_data);
 	y1 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * height) >> 12);
 	y2 = (gfloat)((((pcm_data[0][0] + pcm_data[1][0]) >> 9) * current_effect->spectral_amplitude * height) >> 12);
 	if (cosw.i != width || sinw.i != width) {
@@ -411,7 +415,7 @@ void spectral(t_effect *current_effect)
 			break;
 		}
 	}
-	g_return_if_fail(SDL_mutexV(pcm_data_mutex) >= 0);
+	G_UNLOCK(pcm_data);
 	if (current_effect->mode_spectre == 3 || current_effect->mode_spectre == 4) {
 		line(halfwidth + cosw.f[width - step] * (shift + y1),
 		     halfheight + sinw.f[width - step] * (shift + y1),
@@ -450,8 +454,15 @@ void curve(t_effect *current_effect)
 
 void display_toggle_fullscreen(void)
 {
-	if (SDL_WM_ToggleFullScreen(screen) < 0)
-		g_warning("Cannot toggle to fullscreen mode: %s", SDL_GetError());
+	Uint32 is_fullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
+	if (SDL_SetWindowFullscreen(window, is_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN) < 0)
+		g_warning("Infinity cannot change fullscreen mode: %s", SDL_GetError());
+	SDL_ShowCursor(is_fullscreen);
+}
+
+void display_set_title(const gchar *title) {
+	g_return_if_fail(window != NULL);
+	SDL_SetWindowTitle(window, title);
 }
 
 void display_save_screen(void)

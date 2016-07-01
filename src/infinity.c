@@ -18,9 +18,8 @@
 #include <unistd.h>
 #include <glib.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
-/*#include <SDL/SDL_syswm.h>*/
+#include <SDL.h>
+#include <SDL_thread.h>
 
 #include "config.h"
 #include "display.h"
@@ -50,7 +49,7 @@ static t_num_effect t_last_effect;
 static gboolean must_resize;
 static gboolean finished;
 static gboolean resizing;
-static SDL_mutex *resizing_mutex;
+G_LOCK_DEFINE_STATIC(resizing);
 static gboolean initializing = FALSE;
 static gboolean visible;
 static gboolean quiting;
@@ -61,7 +60,7 @@ static GTimer *title_timer;
 
 static SDL_Thread *thread;
 
-static gint32 event_filter(const SDL_Event *event);
+static int event_filter(void*, SDL_Event *event);
 static void check_events();
 static int renderer(void *);
 static void set_title(void);
@@ -101,7 +100,6 @@ void infinity_init(InfParameters * _params, Player * _player)
 	finished = FALSE;
 	must_resize = FALSE;
 	resizing = FALSE;
-	resizing_mutex = SDL_CreateMutex();
 	mode_interactif = FALSE;
 	visible = TRUE;
 	quiting = FALSE;
@@ -113,15 +111,9 @@ void infinity_init(InfParameters * _params, Player * _player)
 	g_timer_start(title_timer);
 	display_load_random_effect(&current_effect);
 
-	(void)SDL_EventState((Uint8)SDL_ALLEVENTS, SDL_IGNORE);
-	(void)SDL_EventState((Uint8)SDL_VIDEORESIZE, SDL_ENABLE);
-	(void)SDL_EventState((Uint8)SDL_ACTIVEEVENT, SDL_ENABLE);
-	(void)SDL_EventState((Uint8)SDL_KEYDOWN, SDL_ENABLE);
-	(void)SDL_EventState((Uint8)SDL_QUIT, SDL_ENABLE);
+	SDL_SetEventFilter(event_filter, NULL);
 
-	SDL_SetEventFilter(event_filter);
-
-	thread = SDL_CreateThread(renderer, NULL);
+	thread = SDL_CreateThread(renderer, "infinity_renderer", NULL);
 }
 
 void infinity_finish(void)
@@ -142,7 +134,6 @@ void infinity_finish(void)
 	quiting = TRUE;
 	finished = TRUE;
 	SDL_WaitThread(thread, NULL);
-	SDL_DestroyMutex(resizing_mutex);
 	/*
 	 * Take some time to let it know infinity_render_multi_pcm()
 	 * that must not call display_set_pcm_data().
@@ -153,13 +144,13 @@ void infinity_finish(void)
 	 *
 	 * See display.h::display_set_pcm_data()
 	 */
-	g_usleep(10000 * SDL_TIMESLICE);
+	g_usleep(1000000);
 	display_quit();
 	g_timer_destroy(title_timer);
 
 	player->disable_plugin();
 
-	g_message("Infinity: Closing...");
+	g_message("Infinity is shut down");
 }
 
 void infinity_render_multi_pcm(const float *data, int channels)
@@ -168,27 +159,85 @@ void infinity_render_multi_pcm(const float *data, int channels)
 		display_set_pcm_data(data, channels);
 }
 
-/*
- * Private functions
- */
-static gint32 event_filter(const SDL_Event *event)
+// TODO really needed?
+static int event_filter(void *user_data, SDL_Event *event)
 {
 	if (!event) {
 		g_warning("Infinity: SDL_Event is NULL");
 		return 0;
 	}
 
-	switch (event->type) {
+	if (event->type == SDL_WINDOWEVENT) {
+		switch (event->window.event) {
+		case SDL_WINDOWEVENT_SHOWN:
+            SDL_Log("Window %d shown", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            SDL_Log("Window %d hidden", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            SDL_Log("Window %d exposed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            SDL_Log("Window %d moved to %d,%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            SDL_Log("Window %d resized to %dx%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            SDL_Log("Window %d size changed to %dx%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            SDL_Log("Window %d minimized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            SDL_Log("Window %d maximized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            SDL_Log("Window %d restored", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            SDL_Log("Mouse entered window %d",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            SDL_Log("Mouse left window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            SDL_Log("Window %d gained keyboard focus",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            SDL_Log("Window %d lost keyboard focus",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            SDL_Log("event_filter Window %d closed", event->window.windowID);
+            break;
+        default:
+            SDL_Log("Window %d got unknown event %d",
+                    event->window.windowID, event->window.event);
+            break;
+        }
+	}
+
+	/*switch (event->type) {
 	case SDL_VIDEORESIZE:
-		g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, 0);
+		G_LOCK(resizing);
 		if (resizing) {
-			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, 0);
+			G_UNLOCK(resizing);
 			/*
 			 * VIDEORESIZE event dropped from event queue
-			 */
+			 *
 			return 0;
 		} else {
-			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, 0);
+			G_UNLOCK(resizing);
 			return 1;
 		}
 		g_assert_not_reached();
@@ -209,19 +258,83 @@ static gint32 event_filter(const SDL_Event *event)
 		break;
 	default:
 		break;
-	}
+	}*/
 
 	return 1;
+}
+
+static void handle_window_event(SDL_Event *event) {
+	switch (event->window.event) {
+		case SDL_WINDOWEVENT_SHOWN:
+            SDL_Log("Window %d shown", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            SDL_Log("Window %d hidden", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_EXPOSED:
+            SDL_Log("Window %d exposed", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MOVED:
+            SDL_Log("Window %d moved to %d,%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_RESIZED:
+            SDL_Log("Window %d resized to %dx%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+   			G_LOCK(resizing);
+			resizing = TRUE;
+			G_UNLOCK(resizing);
+			width = event->window.data1;
+			height = event->window.data2;
+			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
+			must_resize = TRUE;
+            break;
+        case SDL_WINDOWEVENT_SIZE_CHANGED:
+            SDL_Log("Window %d size changed to %dx%d",
+                    event->window.windowID, event->window.data1,
+                    event->window.data2);
+            break;
+        case SDL_WINDOWEVENT_MINIMIZED:
+            SDL_Log("Window %d minimized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_MAXIMIZED:
+            SDL_Log("Window %d maximized", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_RESTORED:
+            SDL_Log("Window %d restored", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_ENTER:
+            SDL_Log("Mouse entered window %d",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_LEAVE:
+            SDL_Log("Mouse left window %d", event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_GAINED:
+            SDL_Log("Window %d gained keyboard focus",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_FOCUS_LOST:
+            SDL_Log("Window %d lost keyboard focus",
+                    event->window.windowID);
+            break;
+        case SDL_WINDOWEVENT_CLOSE:
+            SDL_Log("Window %d closed", event->window.windowID);
+            //infinity_finish();
+            player->disable_plugin();
+            break;
+        default:
+            SDL_Log("Window %d got unknown event %d",
+                    event->window.windowID, event->window.event);
+            break;
+        }
 }
 
 static void check_events()
 {
 	SDL_Event event;
-
-	/*XEvent *xevent;
-	 * XWindowChanges changes;
-	 * XWindowAttributes attr;
-	 * XSetWindowAttributes s_attr;*/
 
 	if (params->must_show_title()) {
 		if (g_timer_elapsed(title_timer, NULL) > 1.0) {
@@ -241,43 +354,11 @@ static void check_events()
 
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
-		/*case SDL_SYSWMEVENT:
-		 * g_message ("Infinity: SDL_SYSWMEVENT");
-		 * if (event.syswm.msg != NULL) {
-		 * if (event.syswm.msg->subsystem == SDL_SYSWM_X11) {
-		 * xevent = &(event.syswm.msg->event.xevent);
-		 * if (xevent == NULL)
-		 * continue;
-		 * if (first_xevent) {
-		 * changes.x = config_get_x();
-		 * changes.y = config_get_y();
-		 * XConfigureWindow (xevent->xany.display,
-		 * xevent->xany.window,
-		 * CWX | CWY, &changes);
-		 * first_xevent = FALSE;
-		 * g_message ("Infinity: window moved to (%d,%d)",
-		 * changes.x, changes.y);
-		 * } else {
-		 * XGetWindowAttributes (xevent->xany.display,
-		 * xevent->xany.window,
-		 * &attr);
-		 * g_message ("Infinity: GetWindowAttributes (%d,%d)",
-		 * attr.x, attr.y);
-		 * }
-		 * }
-		 * }
-		 * break;*/
 		case SDL_QUIT:
 			player->disable_plugin();
 			break;
-		case SDL_VIDEORESIZE:
-			g_return_if_fail(SDL_LockMutex(resizing_mutex) >= 0);
-			resizing = TRUE;
-			g_return_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0);
-			width = event.resize.w;
-			height = event.resize.h;
-			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
-			must_resize = TRUE;
+		case SDL_WINDOWEVENT:
+			handle_window_event(&event);
 			break;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
@@ -418,9 +499,9 @@ static int renderer(void *arg)
 			params->set_width(width);
 			params->set_height(height);
 			must_resize = FALSE;
-			g_return_val_if_fail(SDL_LockMutex(resizing_mutex) >= 0, -1);
+			G_LOCK(resizing);
 			resizing = FALSE;
-			g_return_val_if_fail(SDL_UnlockMutex(resizing_mutex) >= 0, -1);
+			G_UNLOCK(resizing);
 		}
 		t_begin = g_get_monotonic_time();
 		if (has_mmx)
@@ -480,5 +561,5 @@ static int renderer(void *arg)
 
 static void set_title(void)
 {
-	SDL_WM_SetCaption(current_title, "Infinity");
+	display_set_title(current_title);
 }

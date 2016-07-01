@@ -16,7 +16,6 @@
 #ifndef __INFINITY_DISPLAY__
 #define __INFINITY_DISPLAY__
 
-#include <SDL/SDL.h>
 #include <glib.h>
 
 #include "compute.h"
@@ -84,6 +83,7 @@ void curve(t_effect *current_effect);
  */
 void display_toggle_fullscreen(void);
 
+void display_set_title(const gchar *title);
 void display_save_screen(void);
 void display_save_effect(t_effect *effect);
 void display_load_random_effect(t_effect *effect);
