@@ -117,7 +117,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2)   /* p
 		an = 0.002;
 		co = cos(an);
 		si = sin(an);
-		circle_size = height * 0.25;
+		//circle_size = height * 0.25;
 		fact = 1 + cos(atan(a.x / (a.y + 0.00001)) * 6) * 0.02;
 		b.x = (co * a.x - si * a.y);
 		b.y = (si * a.x + co * a.y);
@@ -221,7 +221,6 @@ void compute_vector_field_destroy(vector_field_t *vector_field)
 
 	g_free(vector_field->vector);
 	g_free(vector_field);
-	vector_field = NULL;
 }
 
 void compute_quit()

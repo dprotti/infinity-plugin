@@ -234,7 +234,7 @@ static void handle_window_event(SDL_Event *event) {
 			SDL_Log("Window %d restored", event->window.windowID);
 			break;*/
 		case SDL_WINDOWEVENT_CLOSE:
-			SDL_Log("Window %d closed", event->window.windowID);
+			//SDL_Log("Window %d closed", event->window.windowID);
 			player->disable_plugin();
 			break;
 		default:

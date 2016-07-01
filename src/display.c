@@ -192,7 +192,7 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 			dxy = -1;
 		else
 			dxy = 1;
-		for (y1 = y1; y1 < y2; y1++) {
+		for (; y1 < y2; y1++) {
 			cxy += dx;
 			if (cxy >= dy) {
 				x1 += dxy;
@@ -211,7 +211,7 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 		else
 			dxy = 1;
 
-		for (x1 = x1; x1 < x2; x1++) {
+		for (; x1 < x2; x1++) {
 			cxy += dy;
 			if (cxy >= dx) {
 				y1 += dxy;
