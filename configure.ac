@@ -117,23 +117,15 @@ if test x"$GCC" = xyes; then
 fi
 
 AC_ARG_ENABLE([vectorization],
-            AS_HELP_STRING([--enable-vectorization],[turn on vectorization optimizations (gcc >= 4 only) @<:@default=enabled@:>@]),
+            AS_HELP_STRING([--enable-vectorization],[turn on vectorization optimizations for gcc >= 4 @<:@default=enabled@:>@]),
 	    [vectorization=$enableval],
 	    [vectorization=yes])
 
-AC_MSG_CHECKING([whether to activate vectorization under gcc >= 4])
+AC_MSG_CHECKING([whether to activate auto vectorization with gcc >= 4])
 if test x"$vectorization" = xyes; then
-  AC_MSG_RESULT([yes])
-  if test x"$GCC" = xno; then
-    AC_MSG_ERROR([You are not using a gcc compiler])
-  else
-    # Some distros call gcc 4.x as gcc4
-    if test -z "$ac_cv_prog_CC" || test x"$CC" = xgcc4; then
-      our_gcc="$CC"
-    else
-      our_gcc="$ac_cv_prog_CC"
-    fi
-    case `$our_gcc --version | sed -e 's,\..*,.,' -e q` in
+  if test x"$ac_cv_prog_CC" = xgcc; then
+    AC_MSG_RESULT([yes])
+    case `$ac_cv_prog_CC --version | sed -e 's,\..*,.,' -e q` in
       *2. | *3.)
         AC_MSG_ERROR([You need gcc version 4 or newer to build with vectorization optimizations])
         ;;
@@ -141,6 +133,8 @@ if test x"$vectorization" = xyes; then
         INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -ftree-vectorize"
         ;;
     esac
+  else
+    AC_MSG_RESULT([no, was requested but compiler is not gcc])
   fi
 else
   AC_MSG_RESULT([no])
