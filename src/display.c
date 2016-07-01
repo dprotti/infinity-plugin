@@ -81,6 +81,8 @@ static gboolean allocate_screen_and_texture() {
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
+	SDL_RenderSetLogicalSize(sdl_renderer, width, height);
 	return TRUE;
 }
 
@@ -93,8 +95,6 @@ static gboolean sdl_init()
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
-	SDL_RenderSetLogicalSize(sdl_renderer, width, height);
 	return allocate_screen_and_texture();
 }
 

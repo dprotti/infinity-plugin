@@ -60,7 +60,6 @@ static GTimer *title_timer;
 
 static SDL_Thread *thread;
 
-static int event_filter(void*, SDL_Event *event);
 static void check_events();
 static int renderer(void *);
 static void set_title(void);
@@ -111,8 +110,6 @@ void infinity_init(InfParameters * _params, Player * _player)
 	g_timer_start(title_timer);
 	display_load_random_effect(&current_effect);
 
-	SDL_SetEventFilter(event_filter, NULL);
-
 	thread = SDL_CreateThread(renderer, "infinity_renderer", NULL);
 }
 
@@ -159,120 +156,19 @@ void infinity_render_multi_pcm(const float *data, int channels)
 		display_set_pcm_data(data, channels);
 }
 
-// TODO really needed?
-static int event_filter(void *user_data, SDL_Event *event)
-{
-	if (!event) {
-		g_warning("Infinity: SDL_Event is NULL");
-		return 0;
-	}
-
-	if (event->type == SDL_WINDOWEVENT) {
-		switch (event->window.event) {
-		case SDL_WINDOWEVENT_SHOWN:
-            SDL_Log("Window %d shown", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_HIDDEN:
-            SDL_Log("Window %d hidden", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_EXPOSED:
-            SDL_Log("Window %d exposed", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_MOVED:
-            SDL_Log("Window %d moved to %d,%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_RESIZED:
-            SDL_Log("Window %d resized to %dx%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
-            SDL_Log("Window %d size changed to %dx%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
-            break;
-        case SDL_WINDOWEVENT_MINIMIZED:
-            SDL_Log("Window %d minimized", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_MAXIMIZED:
-            SDL_Log("Window %d maximized", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_RESTORED:
-            SDL_Log("Window %d restored", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_ENTER:
-            SDL_Log("Mouse entered window %d",
-                    event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_LEAVE:
-            SDL_Log("Mouse left window %d", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            SDL_Log("Window %d gained keyboard focus",
-                    event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            SDL_Log("Window %d lost keyboard focus",
-                    event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_CLOSE:
-            SDL_Log("event_filter Window %d closed", event->window.windowID);
-            break;
-        default:
-            SDL_Log("Window %d got unknown event %d",
-                    event->window.windowID, event->window.event);
-            break;
-        }
-	}
-
-	/*switch (event->type) {
-	case SDL_VIDEORESIZE:
-		G_LOCK(resizing);
-		if (resizing) {
-			G_UNLOCK(resizing);
-			/*
-			 * VIDEORESIZE event dropped from event queue
-			 *
-			return 0;
-		} else {
-			G_UNLOCK(resizing);
-			return 1;
-		}
-		g_assert_not_reached();
-		break;
-	case SDL_ACTIVEEVENT:
-		if (event->active.state & SDL_APPACTIVE) {
-			if (event->active.gain) {
-				visible = TRUE;
-				return 0;
-			} else {
-				visible = FALSE;
-				return 0;
-			}
-		}
-		break;
-	case SDL_QUIT:
-		// ignore it. let handle it in check_events()
-		break;
-	default:
-		break;
-	}*/
-
-	return 1;
-}
-
 static void handle_window_event(SDL_Event *event) {
 	switch (event->window.event) {
 		case SDL_WINDOWEVENT_SHOWN:
             SDL_Log("Window %d shown", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_HIDDEN:
-            SDL_Log("Window %d hidden", event->window.windowID);
+            visible = TRUE;
             break;
         case SDL_WINDOWEVENT_EXPOSED:
             SDL_Log("Window %d exposed", event->window.windowID);
+            visible = TRUE;
+            break;
+        case SDL_WINDOWEVENT_HIDDEN:
+            SDL_Log("Window %d hidden", event->window.windowID);
+            visible = FALSE;
             break;
         case SDL_WINDOWEVENT_MOVED:
             SDL_Log("Window %d moved to %d,%d",
@@ -298,6 +194,7 @@ static void handle_window_event(SDL_Event *event) {
             break;
         case SDL_WINDOWEVENT_MINIMIZED:
             SDL_Log("Window %d minimized", event->window.windowID);
+            visible = FALSE;
             break;
         case SDL_WINDOWEVENT_MAXIMIZED:
             SDL_Log("Window %d maximized", event->window.windowID);
@@ -305,29 +202,11 @@ static void handle_window_event(SDL_Event *event) {
         case SDL_WINDOWEVENT_RESTORED:
             SDL_Log("Window %d restored", event->window.windowID);
             break;
-        case SDL_WINDOWEVENT_ENTER:
-            SDL_Log("Mouse entered window %d",
-                    event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_LEAVE:
-            SDL_Log("Mouse left window %d", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_GAINED:
-            SDL_Log("Window %d gained keyboard focus",
-                    event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_FOCUS_LOST:
-            SDL_Log("Window %d lost keyboard focus",
-                    event->window.windowID);
-            break;
         case SDL_WINDOWEVENT_CLOSE:
             SDL_Log("Window %d closed", event->window.windowID);
-            //infinity_finish();
             player->disable_plugin();
             break;
         default:
-            SDL_Log("Window %d got unknown event %d",
-                    event->window.windowID, event->window.event);
             break;
         }
 }
@@ -485,7 +364,7 @@ static int renderer(void *arg)
 			check_events();
 			if (finished)
 				break;
-			g_usleep(3000 * frame_length);
+			g_usleep(3 * frame_length);
 			continue;
 		}
 		check_events();
