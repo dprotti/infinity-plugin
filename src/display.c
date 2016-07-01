@@ -257,8 +257,9 @@ void display_quit(void)
 		SDL_DestroyWindow(window);
 	window = NULL;
 	// do not call SDL_Quit() since there is another plugin that use
-	// SDL inside Audacious
-	SDL_QuitSubSystem(SDL_INIT_EVENTS);
+	// SDL inside Audacious.
+	// Do not call neither SDL_QuitSubsystem() just in case
+	//SDL_QuitSubSystem(SDL_INIT_EVENTS);
 	initialized = FALSE;
 }
 

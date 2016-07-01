@@ -159,26 +159,23 @@ void infinity_render_multi_pcm(const float *data, int channels)
 static void handle_window_event(SDL_Event *event) {
 	switch (event->window.event) {
 		case SDL_WINDOWEVENT_SHOWN:
-            SDL_Log("Window %d shown", event->window.windowID);
+            //SDL_Log("Window %d shown", event->window.windowID);
             visible = TRUE;
             break;
         case SDL_WINDOWEVENT_EXPOSED:
-            SDL_Log("Window %d exposed", event->window.windowID);
+            //SDL_Log("Window %d exposed", event->window.windowID);
             visible = TRUE;
             break;
         case SDL_WINDOWEVENT_HIDDEN:
-            SDL_Log("Window %d hidden", event->window.windowID);
+            //SDL_Log("Window %d hidden", event->window.windowID);
             visible = FALSE;
             break;
-        case SDL_WINDOWEVENT_MOVED:
+        /*case SDL_WINDOWEVENT_MOVED:
             SDL_Log("Window %d moved to %d,%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
-            break;
+            break;*/
         case SDL_WINDOWEVENT_RESIZED:
-            SDL_Log("Window %d resized to %dx%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
    			G_LOCK(resizing);
 			resizing = TRUE;
 			G_UNLOCK(resizing);
@@ -187,21 +184,21 @@ static void handle_window_event(SDL_Event *event) {
 			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
 			must_resize = TRUE;
             break;
-        case SDL_WINDOWEVENT_SIZE_CHANGED:
+        /*case SDL_WINDOWEVENT_SIZE_CHANGED:
             SDL_Log("Window %d size changed to %dx%d",
                     event->window.windowID, event->window.data1,
                     event->window.data2);
-            break;
+            break;*/
         case SDL_WINDOWEVENT_MINIMIZED:
-            SDL_Log("Window %d minimized", event->window.windowID);
+            //SDL_Log("Window %d minimized", event->window.windowID);
             visible = FALSE;
             break;
-        case SDL_WINDOWEVENT_MAXIMIZED:
+        /*case SDL_WINDOWEVENT_MAXIMIZED:
             SDL_Log("Window %d maximized", event->window.windowID);
             break;
         case SDL_WINDOWEVENT_RESTORED:
             SDL_Log("Window %d restored", event->window.windowID);
-            break;
+            break;*/
         case SDL_WINDOWEVENT_CLOSE:
             SDL_Log("Window %d closed", event->window.windowID);
             player->disable_plugin();
