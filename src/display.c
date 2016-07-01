@@ -222,26 +222,35 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
+static void sdl_quit() {
+	if (screen != NULL)
+		SDL_FreeSurface(screen);
+	screen = NULL;
+	if (window != NULL)
+		SDL_DestroyWindow(window);
+	window = NULL;
+}
+
 gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_player)
 {
-	gboolean sdl_ok;
-
 	width = _width;
 	height = _height;
 	scale = _scale;
 	player = _player;
 
+	if (! effects_load_effects(player)) {
+		return FALSE;
+	}
+	if (! sdl_init()) {
+		sdl_quit();
+		return FALSE;
+	}
 	compute_init(width, height, scale);
-	sdl_ok = sdl_init();
 	generate_colors();
-	effects_load_effects();
 	vector_field = compute_vector_field_new(width, height);
 	compute_generate_vector_field(vector_field);
-	if (!sdl_ok) {
-		display_quit();
-	}
 	initialized = TRUE;
-	return sdl_ok;
+	return TRUE;
 }
 
 void display_quit(void)
@@ -250,12 +259,7 @@ void display_quit(void)
 		return;
 	compute_vector_field_destroy(vector_field);
 	compute_quit();
-	if (screen != NULL)
-		SDL_FreeSurface(screen);
-	screen = NULL;
-	if (window != NULL)
-		SDL_DestroyWindow(window);
-	window = NULL;
+	sdl_quit();
 	// do not call SDL_Quit() since there is another plugin that use
 	// SDL inside Audacious.
 	// Do not call neither SDL_QuitSubsystem() just in case
@@ -480,7 +484,7 @@ void display_save_screen(void)
 
 inline void display_save_effect(t_effect *effect)
 {
-	effects_save_effect(effect);
+	effects_append_effect(effect);
 }
 
 

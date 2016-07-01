@@ -17,6 +17,7 @@
 #define __INFINITY_EFFECTS__
 
 #include <glib.h>
+#include "music-player.h"
 #include "types.h"
 
 /*
@@ -26,29 +27,31 @@
  * would be enough for some of them.
  */
 typedef struct {
-	gint32	num_effect; /* The number of the effect */
-	gint32	x_curve;
-	gint32	curve_color;
-	gint32	curve_amplitude;
-	gint32	spectral_amplitude;
-	gint32	spectral_color;
-	gint32	mode_spectre;
-	gint32	spectral_shift;
+	gint32  num_effect; /* The number of the effect */
+	gint32  x_curve;
+	gint32  curve_color;
+	gint32  curve_amplitude;
+	gint32  spectral_amplitude;
+	gint32  spectral_color;
+	gint32  mode_spectre;
+	gint32  spectral_shift;
 } t_effect;
 
 /*
- * Saves the given effect pointed by \a effect to disk.
- *
- * The effect are saved to the file
- * {prefix}/share/xmms/infinity_states, where {prefix} is
- * usually /usr or /usr/local.
+ * Appends effect to file ~/infinite_states
  *
  * @param effect Must be a non NULL reference to a ::t_effect
  * object.
  */
-void effects_save_effect(t_effect *effect);
+void    effects_append_effect (t_effect *effect);
 
-void effects_load_effects(void);
-void effects_load_random_effect(t_effect *effect);
+/*
+ * Loads effects from file {DATADIR}/infinite_states
+ *
+ * Returns TRUE on success or FALSE otherwise.
+ */
+gboolean effects_load_effects (Player *player);
+
+void    effects_load_random_effect (t_effect *effect);
 
 #endif /* __INFINITY_EFFECTS__ */

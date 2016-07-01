@@ -53,7 +53,7 @@ G_LOCK_DEFINE_STATIC(resizing);
 static gboolean initializing = FALSE;
 static gboolean visible;
 static gboolean quiting;
-static gboolean mode_interactif;
+static gboolean interactive_mode;
 static gboolean first_xevent;
 static gchar *current_title;
 static GTimer *title_timer;
@@ -99,7 +99,7 @@ void infinity_init(InfParameters * _params, Player * _player)
 	finished = FALSE;
 	must_resize = FALSE;
 	resizing = FALSE;
-	mode_interactif = FALSE;
+	interactive_mode = FALSE;
 	visible = TRUE;
 	quiting = FALSE;
 	first_xevent = TRUE;
@@ -156,56 +156,90 @@ void infinity_render_multi_pcm(const float *data, int channels)
 		display_set_pcm_data(data, channels);
 }
 
+#ifdef INFINITY_DEBUG
+static void handle_interactive_mode() {
+	gint32 i;
+	gint32 sx, sy;
+	const byte *keystate = SDL_GetKeyboardState(NULL);
+
+	SDL_GetMouseState(&sx, &sy);
+	current_effect.spectral_shift = sx;
+	if (keystate[SDL_SCANCODE_A])
+		current_effect.curve_color = wrap(current_effect.curve_color - 32);
+	if (keystate[SDL_SCANCODE_Z])
+		current_effect.curve_color = wrap(current_effect.curve_color + 32);
+	if (keystate[SDL_SCANCODE_Q])
+		current_effect.spectral_color = wrap(current_effect.spectral_color - 32);
+	if (keystate[SDL_SCANCODE_S])
+		current_effect.spectral_color = wrap(current_effect.spectral_color + 32);
+	for (i = 0; i < 10; i++)
+		if (keystate[SDL_SCANCODE_F1 + i])
+			current_effect.num_effect = i % NB_FCT;
+	if (keystate[SDL_SCANCODE_D])
+		current_effect.spectral_amplitude = (current_effect.spectral_amplitude - 1);
+	if (keystate[SDL_SCANCODE_F])
+		current_effect.spectral_amplitude = (current_effect.spectral_amplitude + 1);
+	if (keystate[SDL_SCANCODE_E])
+		current_effect.curve_amplitude = (current_effect.curve_amplitude - 1);
+	if (keystate[SDL_SCANCODE_R])
+		current_effect.curve_amplitude = (current_effect.curve_amplitude + 1);
+	if (keystate[SDL_SCANCODE_M])
+		display_save_effect(&current_effect);
+	if (keystate[SDL_SCANCODE_W])
+		current_effect.mode_spectre = (current_effect.mode_spectre + 1) % 5;
+}
+#endif /* INFINITY_DEBUG */
+
 static void handle_window_event(SDL_Event *event) {
 	switch (event->window.event) {
 		case SDL_WINDOWEVENT_SHOWN:
-            //SDL_Log("Window %d shown", event->window.windowID);
-            visible = TRUE;
-            break;
-        case SDL_WINDOWEVENT_EXPOSED:
-            //SDL_Log("Window %d exposed", event->window.windowID);
-            visible = TRUE;
-            break;
-        case SDL_WINDOWEVENT_HIDDEN:
-            //SDL_Log("Window %d hidden", event->window.windowID);
-            visible = FALSE;
-            break;
-        /*case SDL_WINDOWEVENT_MOVED:
-            SDL_Log("Window %d moved to %d,%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
-            break;*/
-        case SDL_WINDOWEVENT_RESIZED:
-   			G_LOCK(resizing);
+			//SDL_Log("Window %d shown", event->window.windowID);
+			visible = TRUE;
+			break;
+		case SDL_WINDOWEVENT_EXPOSED:
+			//SDL_Log("Window %d exposed", event->window.windowID);
+			visible = TRUE;
+			break;
+		case SDL_WINDOWEVENT_HIDDEN:
+			//SDL_Log("Window %d hidden", event->window.windowID);
+			visible = FALSE;
+			break;
+		/*case SDL_WINDOWEVENT_MOVED:
+			SDL_Log("Window %d moved to %d,%d",
+					event->window.windowID, event->window.data1,
+					event->window.data2);
+			break;*/
+		case SDL_WINDOWEVENT_RESIZED:
+			G_LOCK(resizing);
 			resizing = TRUE;
 			G_UNLOCK(resizing);
 			width = event->window.data1;
 			height = event->window.data2;
 			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
 			must_resize = TRUE;
-            break;
-        /*case SDL_WINDOWEVENT_SIZE_CHANGED:
-            SDL_Log("Window %d size changed to %dx%d",
-                    event->window.windowID, event->window.data1,
-                    event->window.data2);
-            break;*/
-        case SDL_WINDOWEVENT_MINIMIZED:
-            //SDL_Log("Window %d minimized", event->window.windowID);
-            visible = FALSE;
-            break;
-        /*case SDL_WINDOWEVENT_MAXIMIZED:
-            SDL_Log("Window %d maximized", event->window.windowID);
-            break;
-        case SDL_WINDOWEVENT_RESTORED:
-            SDL_Log("Window %d restored", event->window.windowID);
-            break;*/
-        case SDL_WINDOWEVENT_CLOSE:
-            SDL_Log("Window %d closed", event->window.windowID);
-            player->disable_plugin();
-            break;
-        default:
-            break;
-        }
+			break;
+		/*case SDL_WINDOWEVENT_SIZE_CHANGED:
+			SDL_Log("Window %d size changed to %dx%d",
+					event->window.windowID, event->window.data1,
+					event->window.data2);
+			break;*/
+		case SDL_WINDOWEVENT_MINIMIZED:
+			//SDL_Log("Window %d minimized", event->window.windowID);
+			visible = FALSE;
+			break;
+		/*case SDL_WINDOWEVENT_MAXIMIZED:
+			SDL_Log("Window %d maximized", event->window.windowID);
+			break;
+		case SDL_WINDOWEVENT_RESTORED:
+			SDL_Log("Window %d restored", event->window.windowID);
+			break;*/
+		case SDL_WINDOWEVENT_CLOSE:
+			SDL_Log("Window %d closed", event->window.windowID);
+			player->disable_plugin();
+			break;
+		default:
+			break;
+		}
 }
 
 static void check_events()
@@ -231,11 +265,9 @@ static void check_events()
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-			player->disable_plugin();
-			break;
+			player->disable_plugin(); break;
 		case SDL_WINDOWEVENT:
-			handle_window_event(&event);
-			break;
+			handle_window_event(&event); break;
 		case SDL_KEYDOWN:
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
@@ -247,32 +279,23 @@ static void check_events()
 					player->seek(-5000);
 				break;
 			case SDLK_UP:
-				player->adjust_volume(5);
-				break;
+				player->adjust_volume(5); break;
 			case SDLK_DOWN:
-				player->adjust_volume(-5);
-				break;
+				player->adjust_volume(-5); break;
 			case SDLK_TAB:
-				display_toggle_fullscreen();
-				break;
+				display_toggle_fullscreen(); break;
 			case SDLK_z:
-				player->previous();
-				break;
+				player->previous(); break;
 			case SDLK_x:
-				player->play();
-				break;
+				player->play(); break;
 			case SDLK_c:
-				player->pause();
-				break;
+				player->pause(); break;
 			case SDLK_v:
-				player->stop();
-				break;
+				player->stop(); break;
 			case SDLK_b:
-				player->next();
-				break;
+				player->next(); break;
 			case SDLK_F11:
-				display_save_screen();
-				break;
+				display_save_screen(); break;
 			case SDLK_F12:
 				if (t_last_color > 32) {
 					t_last_color = 0;
@@ -286,7 +309,8 @@ static void check_events()
 				break;
 #ifdef INFINITY_DEBUG
 			case SDLK_RETURN:
-				mode_interactif = !mode_interactif;
+				interactive_mode = !interactive_mode;
+				g_message("Infinity %s interactive mode", interactive_mode ? "entered" : "leaved");
 				break;
 #endif
 			default:
@@ -298,38 +322,8 @@ static void check_events()
 		}
 	}
 #ifdef INFINITY_DEBUG
-	if (mode_interactif) {
-		gint32 i;
-		gint32 sx, sy;
-		byte *keystate;
-
-		keystate = SDL_GetKeyState(NULL);
-		SDL_GetMouseState(&sx, &sy);
-		current_effect.spectral_shift = sx;
-		if (keystate[SDLK_a])
-			current_effect.curve_color = wrap(current_effect.curve_color - 32);
-		if (keystate[SDLK_z])
-			current_effect.curve_color = wrap(current_effect.curve_color + 32);
-		if (keystate[SDLK_q])
-			current_effect.spectral_color = wrap(current_effect.spectral_color - 32);
-		if (keystate[SDLK_s])
-			current_effect.spectral_color = wrap(current_effect.spectral_color + 32);
-		for (i = 0; i < 10; i++)
-			if (keystate[SDLK_F1 + i])
-				current_effect.num_effect = i % NB_FCT;
-		if (keystate[SDLK_d])
-			current_effect.spectral_amplitude = (current_effect.spectral_amplitude - 1);
-		if (keystate[SDLK_f])
-			current_effect.spectral_amplitude = (current_effect.spectral_amplitude + 1);
-		if (keystate[SDLK_e])
-			current_effect.curve_amplitude = (current_effect.curve_amplitude - 1);
-		if (keystate[SDLK_r])
-			current_effect.curve_amplitude = (current_effect.curve_amplitude + 1);
-		if (keystate[SDLK_m])
-			display_save_effect(&current_effect);
-		if (keystate[SDLK_w])
-			current_effect.mode_spectre = (current_effect.mode_spectre + 1) % 5;
-	}
+	if (interactive_mode)
+		handle_interactive_mode();
 #endif  /* INFINITY_DEBUG */
 }
 
@@ -392,7 +386,7 @@ static int renderer(void *arg)
 		next_effect();
 		if (t_last_effect % t_between_effects == 0) {
 #ifdef INFINITY_DEBUG
-			if (!mode_interactif) {
+			if (!interactive_mode) {
 				display_load_random_effect(&current_effect);
 				t_last_effect = 0;
 				t_between_effects = params->get_effect_interval();
@@ -405,7 +399,7 @@ static int renderer(void *arg)
 		}
 		if (t_last_color % t_between_colors == 0) {
 #ifdef INFINITY_DEBUG
-			if (!mode_interactif) {
+			if (!interactive_mode) {
 				old_color = color;
 				color = rand() % NB_PALETTES;
 				t_last_color = 0;

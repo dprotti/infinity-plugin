@@ -10,35 +10,43 @@
 static t_effect effects[100];
 static gint32 nb_effects = 0;
 static gboolean initialized = FALSE;
+static gchar error_msg[256];
 
-void effects_save_effect(t_effect *effect)
+void effects_append_effect(t_effect *effect)
 {
 	FILE *f;
 	gint32 i;
+	gchar *personal_states = g_strconcat(g_get_home_dir(), "/infinite_states", NULL);
 
-	g_assert(effect);
-	f = fopen (EFFECTS_FILE,"a");
+	g_return_if_fail(effect != NULL);
+
+	f = fopen (personal_states, "a");
 	if (f == NULL) {
-		g_warning ("Cannot open file %s for saving effects\n",
-			   EFFECTS_FILE);
+		g_critical("Cannot open file '%s' for saving effects", personal_states);
+		g_free(personal_states);
 		return;
 	}
+	g_message("Infinity appended effect to '%s'", personal_states);
+	g_free(personal_states);
 	for (i = 0; i < sizeof(t_effect); i++)
 		fputc(*((byte *)effect + i), f);
 	fclose(f);
 }
 
-void effects_load_effects(void)
+gboolean effects_load_effects(Player *player)
 {
 	FILE *f;
 	gint32 finished = 0;
 	gint32 i, b, c, d, e;
 
-	f = fopen (EFFECTS_FILE,"r");
+	g_return_val_if_fail(player != NULL, FALSE);
+
+	f = fopen (EFFECTS_FILE, "r");
 	if (f == NULL) {
-		g_warning ("Cannot open file %s for loading effects\n",
+		g_snprintf(error_msg, 256, "Cannot open file '%s' for loading effects",
 			   EFFECTS_FILE);
-		return;
+		player->notify_critical_error(error_msg);
+		return FALSE;
 	}
 	while (!finished) {
 		byte *ptr_effect = (byte *)&effects[nb_effects];
@@ -70,6 +78,7 @@ void effects_load_effects(void)
 	}
 	nb_effects--;
 	fclose(f);
+	return TRUE;
 }
 
 void effects_load_random_effect(t_effect *effect)
