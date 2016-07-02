@@ -154,8 +154,8 @@ else
 fi
 AC_DEFINE_UNQUOTED([EXPORT], [$EXPORT], [Compiler syntax for export of public symbols])
 
-AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libSDL.so",
-# Ubuntu on AMD64 puts libraries into x86_64-linux-gnu/
+# Hack for Ubuntu on AMD64
+AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libSDL2.so",
   libdir="${libdir}/x86_64-linux-gnu/audacious/Visualization",
   libdir="${libdir}/audacious/Visualization"
 )
