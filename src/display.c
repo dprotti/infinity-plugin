@@ -95,6 +95,7 @@ static gboolean sdl_init()
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
+	SDL_SetWindowTitle(window, "Infinity");
 	return allocate_screen_and_texture();
 }
 
@@ -463,11 +464,6 @@ void display_toggle_fullscreen(void)
 	if (SDL_SetWindowFullscreen(window, is_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN) < 0)
 		g_warning("Infinity cannot change fullscreen mode: %s", SDL_GetError());
 	SDL_ShowCursor(is_fullscreen);
-}
-
-void display_set_title(const gchar *title) {
-	g_return_if_fail(window != NULL);
-	SDL_SetWindowTitle(window, title);
 }
 
 void display_save_screen(void)

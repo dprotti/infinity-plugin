@@ -55,14 +55,11 @@ static gboolean visible;
 static gboolean quiting;
 static gboolean interactive_mode;
 static gboolean first_xevent;
-static gchar *current_title;
-static GTimer *title_timer;
 
 static SDL_Thread *thread;
 
 static void check_events();
 static int renderer(void *);
-static void set_title(void);
 
 void infinity_init(InfParameters * _params, Player * _player)
 {
@@ -104,10 +101,6 @@ void infinity_init(InfParameters * _params, Player * _player)
 	quiting = FALSE;
 	first_xevent = TRUE;
 
-	current_title = g_strdup("Infinity");
-	set_title();
-	title_timer = g_timer_new();
-	g_timer_start(title_timer);
 	display_load_random_effect(&current_effect);
 
 	thread = SDL_CreateThread(renderer, "infinity_renderer", NULL);
@@ -143,7 +136,6 @@ void infinity_finish(void)
 	 */
 	g_usleep(1000000);
 	display_quit();
-	g_timer_destroy(title_timer);
 
 	player->disable_plugin();
 
@@ -245,22 +237,6 @@ static void handle_window_event(SDL_Event *event) {
 static void check_events()
 {
 	SDL_Event event;
-
-	if (params->must_show_title()) {
-		if (g_timer_elapsed(title_timer, NULL) > 1.0) {
-			if (player->is_playing()) {
-				if (current_title)
-					g_free(current_title);
-				current_title = g_strdup(player->get_title());
-			} else {
-				if (current_title)
-					g_free(current_title);
-				current_title = g_strdup("Infinity");
-			}
-			set_title();
-			g_timer_reset(title_timer);
-		}
-	}
 
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -427,9 +403,4 @@ static int renderer(void *arg)
 	}
 
 	return 0;
-}
-
-static void set_title(void)
-{
-	display_set_title(current_title);
 }

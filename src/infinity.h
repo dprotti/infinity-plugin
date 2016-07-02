@@ -30,7 +30,6 @@ typedef struct _InfParameters {
     gint32  (*get_bpp)          (void);  /* bytes per pixels. */
     gint32  (*get_effect_interval) (void);
     gint32  (*get_color_interval) (void);
-    gint32  (*must_show_title)  (void);
     gint32  (*get_max_fps)      (void);
 } InfParameters;
 

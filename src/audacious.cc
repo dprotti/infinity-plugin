@@ -106,10 +106,6 @@ static gint32 get_color_interval() {
 	return aud_get_int(CFGID, "palette_time");
 }
 
-static gboolean must_show_title() {
-	return aud_get_bool(CFGID, "show_title");
-}
-
 static gint32 get_max_fps() {
 	return aud_get_int(CFGID, "max_fps");
 }
@@ -124,7 +120,6 @@ static void init_params() {
 	params.get_scale = get_scale;
 	params.get_effect_interval = get_effect_interval;
 	params.get_color_interval = get_color_interval;
-	params.must_show_title = must_show_title;
 	params.get_max_fps = get_max_fps;
 };
 
@@ -234,7 +229,6 @@ static const char * const defaults[] = {
 	"palette_time", "100",
 	"scale_factor", "1",
 	"max_fps", "30",
-	"show_title", "true",
 	nullptr
 };
 
