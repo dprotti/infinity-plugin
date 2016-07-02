@@ -34,13 +34,9 @@ else
 fi
 
 # Check dependencies
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28,,)
-AC_SUBST(GLIB_LIBS)
-AC_SUBST(GLIB_CFLAGS)
-
-PKG_CHECK_MODULES(SDL, sdl2 >= 2,,)
-AC_SUBST(SDL_LIBS)
-AC_SUBST(SDL_CFLAGS)
+PKG_CHECK_MODULES(INFINITY, glib-2.0 >= 2.28 sdl2 >= 2,,)
+AC_SUBST(INFINITY_LIBS)
+AC_SUBST(INFINITY_CFLAGS)
 
 PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.5,,)
 AC_SUBST(AUDACIOUS_LIBS)
@@ -172,10 +168,9 @@ AC_OUTPUT
 echo "
 ==============================================================
 Infinity Plugin for the Audacious Player -- version $VERSION
-==============================================================
 
-Install path           : ${libdir}
 Compiler               : ${CC}
+Install path           : ${libdir}
 CFLAGS                 : ${INF_CFLAGS_EXTRA} ${CFLAGS}
 CXXFLAGS               : ${CXXFLAGS}
 Debug enabled          : ${debug}
