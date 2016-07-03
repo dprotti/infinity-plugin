@@ -54,7 +54,7 @@ static gboolean initializing = FALSE;
 static gboolean visible;
 static gboolean quiting;
 static gboolean interactive_mode;
-static gboolean first_xevent;
+static gboolean windowevent_close_received;
 
 static SDL_Thread *thread;
 
@@ -97,9 +97,9 @@ void infinity_init(InfParameters * _params, Player * _player)
 	must_resize = FALSE;
 	resizing = FALSE;
 	interactive_mode = FALSE;
+	windowevent_close_received = FALSE;
 	visible = TRUE;
 	quiting = FALSE;
-	first_xevent = TRUE;
 
 	display_load_random_effect(&current_effect);
 
@@ -136,8 +136,6 @@ void infinity_finish(void)
 	 */
 	g_usleep(1000000);
 	display_quit();
-
-	player->disable_plugin();
 
 	g_message("Infinity is shut down");
 }
@@ -185,15 +183,12 @@ static void handle_interactive_mode() {
 static void handle_window_event(SDL_Event *event) {
 	switch (event->window.event) {
 		case SDL_WINDOWEVENT_SHOWN:
-			//SDL_Log("Window %d shown", event->window.windowID);
 			visible = TRUE;
 			break;
 		case SDL_WINDOWEVENT_EXPOSED:
-			//SDL_Log("Window %d exposed", event->window.windowID);
 			visible = TRUE;
 			break;
 		case SDL_WINDOWEVENT_HIDDEN:
-			//SDL_Log("Window %d hidden", event->window.windowID);
 			visible = FALSE;
 			break;
 		/*case SDL_WINDOWEVENT_MOVED:
@@ -216,7 +211,6 @@ static void handle_window_event(SDL_Event *event) {
 					event->window.data2);
 			break;*/
 		case SDL_WINDOWEVENT_MINIMIZED:
-			//SDL_Log("Window %d minimized", event->window.windowID);
 			visible = FALSE;
 			break;
 		/*case SDL_WINDOWEVENT_MAXIMIZED:
@@ -226,7 +220,7 @@ static void handle_window_event(SDL_Event *event) {
 			SDL_Log("Window %d restored", event->window.windowID);
 			break;*/
 		case SDL_WINDOWEVENT_CLOSE:
-			//SDL_Log("Window %d closed", event->window.windowID);
+			windowevent_close_received = TRUE;
 			player->disable_plugin();
 			break;
 		default:
@@ -241,7 +235,9 @@ static void check_events()
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-			player->disable_plugin(); break;
+			if (! windowevent_close_received)
+				player->disable_plugin();
+			break;
 		case SDL_WINDOWEVENT:
 			handle_window_event(&event); break;
 		case SDL_KEYDOWN:
