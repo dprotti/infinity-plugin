@@ -6,7 +6,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install autotools-dev audacious-dev libglib2.0-dev
 install:
-  - cd ~
+  - pushd ~
   - mkdir sdl2install
   - export SDL2DIR="`pwd`/sdl2install"
   - wget https://www.libsdl.org/release/SDL2-2.0.3.tar.gz
@@ -15,12 +15,11 @@ install:
   - ./configure --prefix=$SDL2DIR
   - make
   - make install
-script: 
-  - ./autogen.sh
+  - popd
+  - ./autogen.sh --prefix=$SDL2DIR
   - make
-compiler:
-  - clang
-  - gcc
+  - make install
+compiler: gcc
 notifications:
   email:
   - dprotti@gmail.com
