@@ -20,14 +20,11 @@
 #include "music-player.h"
 
 typedef struct _InfParameters {
-    gint32  (*get_x_origin)     (void);
-    gint32  (*get_y_origin)     (void);
     gint32  (*get_width)        (void);
     void    (*set_width)        (gint32 width);
     gint32  (*get_height)       (void);
     void    (*set_height)       (gint32 height);
     gint32  (*get_scale)        (void);
-    gint32  (*get_bpp)          (void);  /* bytes per pixels. */
     gint32  (*get_effect_interval) (void);
     gint32  (*get_color_interval) (void);
     gint32  (*get_max_fps)      (void);

@@ -49,15 +49,27 @@ static const PreferencesWidget prefs_fps[] = {
 	WidgetLabel ("<b>Frames per second</b>"),
 	WidgetSpin ("Max. :", WidgetInt (CFGID, "max_fps"), {15, 60, 1, "fps"}),
 	WidgetLabel ("<b>How often change effect</b>"),
-	WidgetSpin ("Every", WidgetInt (CFGID, "effect_time"), {50, 500, 5, "frames   "}),
+	WidgetSpin ("Every", WidgetInt (CFGID, "effect_time"), {50, 500, 5, "frames"}),
 	WidgetLabel ("<b>How often change colors</b>"),
-	WidgetSpin ("Every", WidgetInt (CFGID, "palette_time"), {50, 500, 5, "frames   "})
+	WidgetSpin ("Every", WidgetInt (CFGID, "palette_time"), {50, 500, 5, "frames"}),
+
+	WidgetLabel ("<b>Controls</b>"),
+	WidgetLabel ("Tab:\t\ttoggle full-screen"),
+	WidgetLabel ("Up/Down:\tup/down main volume"),
+	WidgetLabel ("Left/Right:\treward/forward current song"),
+	WidgetLabel ("z:\t\t\tprevious song"),
+	WidgetLabel ("x:\t\t\tplay"),
+	WidgetLabel ("c:\t\t\tpause"),
+	WidgetLabel ("v:\t\t\tstop"),
+	WidgetLabel ("b:\t\t\tnext song"),
+	WidgetLabel ("F11:\t\tscreenshot"),
+	WidgetLabel ("F12:\t\tchange palette"),
+	WidgetLabel ("Space:\t\tchange effect"),
+	WidgetLabel ("Enter:\t\tswitch to interactive mode\n\t\t\t(only if compiled with --enable-debug)   ")
 };
 
 static const PreferencesWidget prefs_widgets[] = {
-	WidgetBox ({{prefs_fps}}),
-	//WidgetSeparator (),
-	//WidgetBox ({{...}})
+	WidgetBox ({{prefs_fps}})
 };
 
 static const PluginPreferences preferences = {{prefs_widgets}};
@@ -197,19 +209,6 @@ static Player player = {
 
 bool InfinityPlugin::init(void)
 {
-	g_message("Infinity commands:\n"
-			"- Space:\tchange effect.\n"
-			"- Tab:\t\ttoggle full-screen.\n"
-			"- Up/Down:\tup/down main volume.\n"
-			"- Left/Right:\treward/forward actual played song, if any.\n"
-			"- z:\t\tprevious song.\n"
-			"- x:\t\tplay.\n"
-			"- c:\t\tpause.\n"
-			"- v:\t\tstop.\n"
-			"- b:\t\tnext song.\n"
-			"- Enter:\tswitch to interactive mode.\n\t\t(works only if infinity was configured with --enable-debug option)\n"
-			"- F11:\t\tscreenshot.\n"
-			"- F12:\t\tchange palette.");
 	load_settings();
 	init_params();
 	infinity_init(&params, &player);
