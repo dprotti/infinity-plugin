@@ -266,7 +266,9 @@ static void check_events()
 			case SDLK_b:
 				player->next(); break;
 			case SDLK_F11:
-				display_toggle_fullscreen(); break;				
+				display_toggle_fullscreen(); break;
+			case SDLK_ESCAPE:
+				display_exit_fullscreen_if_needed(); break;
 			case SDLK_F12:
 				if (t_last_color > 32) {
 					t_last_color = 0;

@@ -458,12 +458,20 @@ void curve(t_effect *current_effect)
 	current_effect->x_curve = k;
 }
 
+static gboolean is_in_fullscreen(void) {
+	return (gboolean) SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
+}
+
 void display_toggle_fullscreen(void)
 {
-	Uint32 is_fullscreen = SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
-	if (SDL_SetWindowFullscreen(window, is_fullscreen ? 0 : SDL_WINDOW_FULLSCREEN) < 0)
+	if (SDL_SetWindowFullscreen(window, is_in_fullscreen() ? 0 : SDL_WINDOW_FULLSCREEN) < 0)
 		g_warning("Infinity cannot change fullscreen mode: %s", SDL_GetError());
-	SDL_ShowCursor(is_fullscreen);
+	SDL_ShowCursor(is_in_fullscreen());
+}
+
+void display_exit_fullscreen_if_needed(void) {
+	if (is_in_fullscreen())
+		display_toggle_fullscreen();
 }
 
 inline void display_save_effect(t_effect *effect)

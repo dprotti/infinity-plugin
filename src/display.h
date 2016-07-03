@@ -83,6 +83,8 @@ void curve(t_effect *current_effect);
  */
 void display_toggle_fullscreen(void);
 
+void display_exit_fullscreen_if_needed(void);
+
 void display_save_effect(t_effect *effect);
 void display_load_random_effect(t_effect *effect);
 
