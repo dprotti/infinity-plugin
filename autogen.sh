@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-REQUIRED_AUTOMAKE_VERSION=1.14
+REQUIRED_AUTOMAKE_VERSION=1.11
 
 PKG_NAME="Infinity Visualization Plugin"
 

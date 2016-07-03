@@ -5,7 +5,7 @@ AC_INIT([Infinity plugin],[0.9.0-dev],[https://github.com/dprotti/infinity-plugi
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE([1.15 -Wno-portability no-dist-gzip dist-xz tar-ustar])
+AM_INIT_AUTOMAKE([1.11 -Wno-portability no-dist-gzip dist-xz tar-ustar])
 
 # Support silent build rules. Disable by either passing --disable-silent-rules
 # to configure or passing V=1 to make
