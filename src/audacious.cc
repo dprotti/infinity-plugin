@@ -32,8 +32,18 @@ extern "C" {
 
 static const char about_text[] =
 	"Infinity " PACKAGE_VERSION "\n\n"
-	"Julien Carme, Duilio Protti\n\n"
-	"https://dprotti.github.io/infinity-plugin";
+	"https://dprotti.github.io/infinity-plugin\n\n"
+	"Copyright 2016 Duilio Protti\n\n"
+	"Based on the XMMS plugin:\n"
+	"Copyright 2000 Julien Carme\n\n"
+	"Contributions from:\n"
+	"CBke (C) 2016 <https://github.com/CBke>\n"
+	"John Lightsey (C) 2004 <john@nixnuts.net>\n"
+	"Jean Delvare (C) 2004 <khali@linux-fr.org>\n"
+	"Will Tatam (C) 2004 <wtatam@premierit.com>\n"
+	"Haavard Kvaalen (C) 2000 <havardk@xmms.org>\n"
+	"Chris Lea (C) 2000 <chrislea@luciddesign.com>\n"
+	"Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si>\n";
 
 static const PreferencesWidget prefs_fps[] = {
 	WidgetLabel ("<b>Frames per second</b>"),
