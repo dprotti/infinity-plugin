@@ -41,7 +41,7 @@ Run
 
 Audacious -> View -> Visualizations -> Infinity
 
-Enter / leave full-screen by pressing `Tab`.
+Enter / leave full-screen by pressing `F11`.
 
 ![Screenshot of Infinity Settings](https://cloud.githubusercontent.com/assets/2084073/16421084/2d45d54a-3d2a-11e6-9919-3d6aa5733743.png "Infinity Settings")
 
@@ -80,4 +80,4 @@ Releases older than 0.8.0beta1 can be found at Sourceforge: <https://sourceforge
 Contributions
 -------------
 
-Your help is welcome either coding, testing or building distro packages.
+Your feedback or help would be really appreciated.

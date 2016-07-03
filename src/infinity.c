@@ -202,7 +202,7 @@ static void handle_window_event(SDL_Event *event) {
 			G_UNLOCK(resizing);
 			width = event->window.data1;
 			height = event->window.data2;
-			g_message("Infinity: Screen resized to %dx%d pixels^2", width, height);
+			g_message("Infinity: screen resize to %dx%d pixels", width, height);
 			must_resize = TRUE;
 			break;
 		/*case SDL_WINDOWEVENT_SIZE_CHANGED:
@@ -241,6 +241,7 @@ static void check_events()
 		case SDL_WINDOWEVENT:
 			handle_window_event(&event); break;
 		case SDL_KEYDOWN:
+			// TODO check how this may work in a Mac keyboard
 			switch (event.key.keysym.sym) {
 			case SDLK_RIGHT:
 				if (player->is_playing())
@@ -254,8 +255,6 @@ static void check_events()
 				player->adjust_volume(5); break;
 			case SDLK_DOWN:
 				player->adjust_volume(-5); break;
-			case SDLK_TAB:
-				display_toggle_fullscreen(); break;
 			case SDLK_z:
 				player->previous(); break;
 			case SDLK_x:
@@ -267,7 +266,7 @@ static void check_events()
 			case SDLK_b:
 				player->next(); break;
 			case SDLK_F11:
-				display_save_screen(); break;
+				display_toggle_fullscreen(); break;				
 			case SDLK_F12:
 				if (t_last_color > 32) {
 					t_last_color = 0;

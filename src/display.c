@@ -466,23 +466,10 @@ void display_toggle_fullscreen(void)
 	SDL_ShowCursor(is_fullscreen);
 }
 
-void display_save_screen(void)
-{
-	gchar name[256];
-
-	(void)snprintf(name, 255, "screenshot%i%s", rand() % 1000000, ".bmp");
-	name[255] = '\0';
-	if (SDL_SaveBMP(screen, name) < 0)
-		g_warning("Error while saving file %s: %s", name, SDL_GetError());
-	else
-		g_message("saved");
-}
-
 inline void display_save_effect(t_effect *effect)
 {
 	effects_append_effect(effect);
 }
-
 
 inline void display_load_random_effect(t_effect *effect)
 {
