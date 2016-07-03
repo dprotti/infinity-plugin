@@ -1,0 +1,15 @@
+language: c
+os: linux
+sudo: required
+dist: xenial
+before_install:
+  - sudo apt -y install audacious-dev libsdl2-dev libglib2.0-dev
+script: 
+  - ./autogen.sh
+  - make
+compiler:
+  - clang
+  - gcc
+notifications:
+  email:
+  - dprotti@gmail.com
