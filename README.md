@@ -1,8 +1,6 @@
 Infinity
 ========
 
-[![Build Status](https://api.travis-ci.org/dprotti/infinity-plugin.svg?branch=master)](https://travis-ci.org/dprotti/infinity-plugin)
-
 Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
 
 It generates beautiful light effects. Supports full-screen mode, mouse resizing, preferences
