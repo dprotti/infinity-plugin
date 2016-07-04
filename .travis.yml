@@ -3,7 +3,6 @@ os: linux
 sudo: required
 dist: xenial
 before_install:
-  - sudo apt-get update
   - sudo apt-get -y install autotools-dev audacious-dev libglib2.0-dev
 install:
   - pushd ~
@@ -15,10 +14,11 @@ install:
   - ./configure --prefix=$SDL2DIR
   - make
   - make install
+  - ls -lh $SDL2DIR/lib/pkgconfig
   - pwd
   - popd
   - pwd
-  - ./autogen.sh --prefix=$SDL2DIR
+  - PKG_CONFIG_PATH=$SDL2DIR/lib/pkgconfig ./autogen.sh --prefix=$SDL2DIR
   - make
   - make install
 compiler: gcc
