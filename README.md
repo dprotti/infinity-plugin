@@ -13,11 +13,11 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious >= 3.5, Glib >= 2.28, SDL >= 2
+Audacious >= 3.6, Glib >= 2.28, SDL >= 2
 
 **Install deps in Ubuntu**
 
-`sudo apt -y install audacious-dev libsdl2-dev libglib2.0-dev`
+`sudo apt -y install pkg-config audacious-dev libsdl2-dev libglib2.0-dev`
 
 Install from tarball
 -------
