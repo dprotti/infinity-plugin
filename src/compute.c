@@ -253,8 +253,8 @@ inline byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
 	guint32 color;
 	byte *ptr_swap;
 
-	for (j = 0; j < height; j++)
-		for (i = 0; i < width; i++) {
+	for (j = 0; j < height; ++j)
+		for (i = 0; i < width; ++i) {
 			interpol = &vector[add_dest];
 			add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
 			ptr_pix = &((byte *)surface1)[add_src];
@@ -266,7 +266,7 @@ inline byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
 				surface2[add_dest] = (byte)255;
 			else
 				surface2[add_dest] = (byte)color;
-			add_dest++;
+			++add_dest;
 		}
 	ptr_swap = surface2;
 	surface2 = surface1;
@@ -288,8 +288,8 @@ inline byte *compute_surface_mmx(t_interpol *vector, gint32 width, gint32 height
 	register byte *ptr_pix;
 	byte *ptr_swap;
 
-	for (j = 0; j < height; j++)
-		for (i = 0; i < width; i++) {
+	for (j = 0; j < height; ++j)
+		for (i = 0; i < width; ++i) {
 			interpol = &vector[add_dest];
 			add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
 			ptr_pix = &((byte *)surface1)[add_src];
@@ -311,7 +311,7 @@ inline byte *compute_surface_mmx(t_interpol *vector, gint32 width, gint32 height
 				surface2[add_dest] = 255;
 			else
 				surface2[add_dest] = (byte)color;
-			add_dest++;
+			++add_dest;
 		}
 	ptr_swap = surface1;
 	surface1 = surface2;
