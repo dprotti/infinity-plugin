@@ -1,7 +1,7 @@
 Infinity
 ========
 
-Visualization plugin for [Audacious](http://audacious-media-player.org/) music player.
+Music visualization plugin for [Audacious](http://audacious-media-player.org/).
 
 It generates beautiful light effects. Supports full-screen mode, mouse resizing, preferences
 saving and player control through keyboard.
@@ -13,11 +13,11 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious >= 3.6, Glib >= 2.28, SDL >= 2
+Audacious 3.6, Glib 2.28, SDL 2
 
 **Install deps in Ubuntu**
 
-`sudo apt -y install pkg-config audacious-dev libsdl2-dev libglib2.0-dev`
+`sudo apt-get -y install pkg-config audacious-dev libsdl2-dev libglib2.0-dev`
 
 Install from tarball
 -------
@@ -53,7 +53,7 @@ See [how to add new effects or how to control the plugin with the keyboard](http
 Known Bugs
 ----------
 
-In Ubuntu systems over AMD64 architectures, try configure with
+In Ubuntu over AMD64, try configure with
 ``--prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu``
 
 If you found a bug please report it at
@@ -63,7 +63,7 @@ Authors
 -------
 
 - Julien Carme (c) 2000 Original author
-- Duilio Protti (C) 2004 - Present : Current maintainer
+- Duilio Protti (C) 2016 Current maintainer
 - CBke (C) 2016 <https://github.com/CBke> Nice patches
 - John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
 - Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
