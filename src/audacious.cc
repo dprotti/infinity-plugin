@@ -54,7 +54,6 @@ static const PreferencesWidget prefs_fps[] = {
 	WidgetSpin ("Every", WidgetInt (CFGID, "palette_time"), {50, 500, 5, "frames"}),
 
 	WidgetLabel ("<b>Controls</b>"),
-	WidgetLabel ("Tab:\t\ttoggle full-screen"),
 	WidgetLabel ("Up/Down:\tup/down main volume"),
 	WidgetLabel ("Left/Right:\treward/forward current song"),
 	WidgetLabel ("z:\t\t\tprevious song"),
@@ -62,7 +61,7 @@ static const PreferencesWidget prefs_fps[] = {
 	WidgetLabel ("c:\t\t\tpause"),
 	WidgetLabel ("v:\t\t\tstop"),
 	WidgetLabel ("b:\t\t\tnext song"),
-	WidgetLabel ("F11:\t\tscreenshot"),
+	WidgetLabel ("F11:\t\ttoggle full-screen"),
 	WidgetLabel ("F12:\t\tchange palette"),
 	WidgetLabel ("Space:\t\tchange effect"),
 	WidgetLabel ("Enter:\t\tswitch to interactive mode\n\t\t\t(only if compiled with --enable-debug)   ")
