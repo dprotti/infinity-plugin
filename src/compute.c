@@ -19,9 +19,6 @@
 #include "compute.h"
 #include "config.h"
 #include "types.h"
-#ifdef MMX_DETECTION
-#include "mmx.h"
-#endif
 
 typedef struct t_coord {
 	gint32 x, y;
@@ -274,48 +271,3 @@ inline byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
 
 	return surface1;
 }
-
-#if MMX_DETECTION
-inline byte *compute_surface_mmx(t_interpol *vector, gint32 width, gint32 height)
-{
-	/*@unused@*/
-	volatile mmx_t mm0, mm1, mm2;
-	volatile mmx_t offsets, r;
-	t_interpol *interpol;
-	gint32 i, j, color;
-	gint32 add_dest = 0;
-	guint32 add_src;
-	register byte *ptr_pix;
-	byte *ptr_swap;
-
-	for (j = 0; j < height; ++j)
-		for (i = 0; i < width; ++i) {
-			interpol = &vector[add_dest];
-			add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
-			ptr_pix = &((byte *)surface1)[add_src];
-			((guint16 *)&offsets)[0] = (guint16) * (ptr_pix + width + 1);
-			((guint16 *)&offsets)[1] = (guint16) * (ptr_pix + width);
-			((guint16 *)&offsets)[2] = (guint16) * (ptr_pix + 1);
-			((guint16 *)&offsets)[3] = (guint16) * (ptr_pix);
-			/* MMX mode entry */
-			movd_m2r(interpol->weight, mm1);
-			movq_m2r(offsets, mm2);
-			pxor_r2r(mm0, mm0);
-			punpcklbw_r2r(mm0, mm1);
-			pmaddwd_r2r(mm1, mm2);
-			movq_r2m(mm2, r);
-			emms();
-			/* MMX mode exit */
-			color = (((gint32 *)&r)[0] + ((gint32 *)&r)[1]) >> 8;
-			if (color > 255)
-				surface2[add_dest] = 255;
-			else
-				surface2[add_dest] = (byte)color;
-			++add_dest;
-		}
-	ptr_swap = surface1;
-	surface1 = surface2;
-	surface2 = ptr_swap;
-	return surface1;
-}
-#endif /* MMX_DETECTION */

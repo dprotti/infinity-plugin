@@ -72,7 +72,6 @@ void display_show(void);
 
 void change_color(gint32 old_p, gint32 p, gint32 w);
 void display_blur(guint32 vector_index);
-void display_blur_mmx(guint32 vector_index);
 void spectral(t_effect *current_effect);
 void curve(t_effect *current_effect);
 

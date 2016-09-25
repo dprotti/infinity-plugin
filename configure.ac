@@ -52,46 +52,10 @@ AC_C_CONST
 AC_C_INLINE
 AC_C_BIGENDIAN(AC_MSG_WARN([*** You have a big endian system, Infinity have not been tested on these systems]),,)
 
-AC_CHECK_SIZEOF(long long)
-if test x$ac_cv_sizeof_long_long = x8; then
-  :
-else
-  AC_MSG_ERROR([
-*** Infinity requires a 64 bit long long type. You might want to consider
-*** using the GNU C compiler.
-	])
-fi
-
-AC_CHECK_SIZEOF([size_t])
-AC_MSG_CHECKING([whether compiler is 32 or 64 bit])
-if test x$ac_cv_sizeof_size_t = x8; then
-  AC_MSG_RESULT([64])
-  compiler_width=64
-else
-  AC_MSG_RESULT([32])
-  compiler_width=32
-fi
-
 # Check for library functions.
 AC_CHECK_FUNCS([floor sqrt])
 
 # Arguments to specify certain features.
-AC_ARG_ENABLE([mmx],
-            AS_HELP_STRING([--enable-mmx],[use MMX if available and if building with a 32 bit compiler @<:@default=enabled@:>@]),
-	    [mmx=$enableval],
-	    [mmx=yes])
-AC_MSG_CHECKING([whether to enable MMX])
-if test x$mmx = xyes; then
-  if test x$compiler_width = x32; then
-    AC_MSG_RESULT([yes])
-    AC_DEFINE([MMX_DETECTION], [1], [Activate MMX Extensions support])
-  else
-    AC_MSG_RESULT([no, was requested but feature is not supported with a 64bit compiler])
-  fi
-else
-  AC_MSG_RESULT([no])
-fi
-
 AC_ARG_ENABLE([debug],
             AS_HELP_STRING([--enable-debug],[turn on debug mode @<:@default=disabled@:>@]),
 	    [debug=$enableval],

@@ -313,15 +313,6 @@ inline void display_blur(guint32 vector_index)
 	display_surface();
 }
 
-#if MMX_DETECTION
-inline void display_blur_mmx(guint32 vector_index)
-{
-	surface1 = compute_surface_mmx(&(vector_field->vector[vector_index]),
-				       vector_field->width, vector_field->height);
-	display_surface();
-}
-#endif
-
 void spectral(t_effect *current_effect)
 {
 	gint32 i, halfheight, halfwidth;

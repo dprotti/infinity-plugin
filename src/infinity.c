@@ -27,10 +27,6 @@
 #include "infinity.h"
 #include "types.h"
 
-#if MMX_DETECTION
-#include "cputest.h"
-#endif
-
 #define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define next_effect()   (t_last_effect++)
 #define next_color()    (t_last_color++)
@@ -313,15 +309,11 @@ static int renderer(void *arg)
 	gint32 frame_length;
 	gint32 fps, new_fps;
 	gint32 t_between_effects, t_between_colors;
-	gint32 has_mmx = 0;
 
 	fps = params->get_max_fps();
 	frame_length = calculate_frame_length_usecs(fps, __LINE__);
 	t_between_effects = params->get_effect_interval();
 	t_between_colors = params->get_color_interval();
-#if MMX_DETECTION
-	has_mmx = mm_support_check_and_show();
-#endif
 	initializing = FALSE;
 	for (;; ) { /* ever... */
 		if (!visible) {
@@ -347,10 +339,7 @@ static int renderer(void *arg)
 			G_UNLOCK(resizing);
 		}
 		t_begin = g_get_monotonic_time();
-		if (has_mmx)
-			display_blur_mmx(width * height * current_effect.num_effect);
-		else
-			display_blur(width * height * current_effect.num_effect);
+		display_blur(width * height * current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
 		if (t_last_color <= 32)

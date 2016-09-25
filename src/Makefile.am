@@ -20,8 +20,7 @@ libinfinity_la_SOURCES = \
 	compute.c compute.h \
 	display.c display.h \
 	effects.c effects.h \
-	cputest.c cputest.h \
-	mmx.h music-player.h types.h
+	music-player.h types.h
 
 libinfinite_la_SOURCES = audacious.cc
 libinfinite_la_LDFLAGS = ${CXX}

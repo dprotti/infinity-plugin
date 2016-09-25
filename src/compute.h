@@ -73,6 +73,5 @@ void compute_resize(gint32 width, gint32 height);
 void compute_generate_vector_field(vector_field_t *vector_field);
 
 byte *compute_surface(t_interpol *vector, gint32 width, gint32 height);
-byte *compute_surface_mmx(t_interpol *vector, gint32 width, gint32 height);
 
 #endif /* __INFINITY_COMPUTE__ */
