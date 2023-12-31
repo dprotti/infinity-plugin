@@ -22,7 +22,7 @@ srcdir=${srcdir:-.}
 
 # default version requirements ...
 REQUIRED_AUTOCONF_VERSION=${REQUIRED_AUTOCONF_VERSION:-2.65}
-REQUIRED_AUTOMAKE_VERSION=${REQUIRED_AUTOMAKE_VERSION:-1.15}
+REQUIRED_AUTOMAKE_VERSION=${REQUIRED_AUTOMAKE_VERSION:-1.16}
 REQUIRED_LIBTOOL_VERSION=${REQUIRED_LIBTOOL_VERSION:-1.4.3}
 REQUIRED_PKG_CONFIG_VERSION=${REQUIRED_PKG_CONFIG_VERSION:-0.14.0}
 
@@ -300,7 +300,7 @@ version_check autoconf AUTOCONF 'autoconf2.50 autoconf autoconf-2.53' $REQUIRED_
     "http://ftp.gnu.org/pub/gnu/autoconf/autoconf-$REQUIRED_AUTOCONF_VERSION.tar.gz"
 AUTOHEADER=`echo $AUTOCONF | sed s/autoconf/autoheader/`
 
-automake_progs="automake-1.15 automake-1.14 automake-1.13 automake-1.12 automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6 automake-1.5"
+automake_progs="automake-1.16 automake-1.15 automake-1.14 automake-1.13 automake-1.12 automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6 automake-1.5"
 version_check automake AUTOMAKE "$automake_progs" $REQUIRED_AUTOMAKE_VERSION \
     "http://ftp.gnu.org/pub/gnu/automake/automake-$REQUIRED_AUTOMAKE_VERSION.tar.gz"
 ACLOCAL=`echo $AUTOMAKE | sed s/automake/aclocal/`
