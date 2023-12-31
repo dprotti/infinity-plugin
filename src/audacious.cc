@@ -160,9 +160,9 @@ static void play() {
 	aud_drct_play();
 }
 
-static void pause() {
+/*static void pause() {
 	aud_drct_pause();
-}
+}*/
 
 static void stop() {
 	aud_drct_stop();
@@ -199,7 +199,7 @@ static Player player = {
 	.is_playing = is_playing,
 	.get_title = get_title,
 	.play = play,
-	.pause = pause,
+/*	.pause = pause,*/
 	.stop = stop,
 	.previous = previous,
 	.next = next,
