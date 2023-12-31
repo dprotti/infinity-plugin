@@ -149,8 +149,11 @@ static gboolean is_playing() {
 }
 
 static gchar* get_title() {
-	String title = aud_playlist_get_title(aud_playlist_get_playing());
-	return (gchar*) title.to_raw();
+/*      String title = aud_playlist_get_title(aud_playlist_get_playing());
+        return (gchar*) title.to_raw();*/
+        auto playlist = Playlist::playing_playlist();
+        String title = playlist.entry_filename(playlist.get_position());
+        return (gchar*) (const char *) title;
 }
 
 static void play() {

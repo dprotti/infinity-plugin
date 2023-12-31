@@ -1,6 +1,6 @@
 ## Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.65)
+AC_PREREQ([2.71])
 AC_INIT([Infinity plugin],[0.9.0-dev],[https://github.com/dprotti/infinity-plugin/issues],[infinity-plugin],[https://dprotti.github.io/infinity-plugin])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -11,7 +11,7 @@ AM_INIT_AUTOMAKE([1.11 -Wno-portability no-dist-gzip dist-xz tar-ustar])
 # to configure or passing V=1 to make
 AM_SILENT_RULES([yes])
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PREFIX_PROGRAM(audacious)
@@ -43,7 +43,15 @@ AC_SUBST(AUDACIOUS_LIBS)
 AC_SUBST(AUDACIOUS_CFLAGS)
 
 # Check for header files.
-AC_HEADER_STDC
+m4_warn([obsolete],
+[The preprocessor macro `STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  ISO C90 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
 AC_CHECK_HEADERS([stdlib.h string.h unistd.h])
 
 # Check for typedefs, structures, and compiler characteristics.
