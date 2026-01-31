@@ -13,6 +13,9 @@
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QWidget>
+#include <QEventLoop>
+
+#include <memory>
 
 namespace {
 
@@ -139,11 +142,30 @@ private:
 };
 
 InfinityWindow *window_instance = nullptr;
+std::unique_ptr<QApplication> app_instance;
+
+void ensure_app_instance() {
+	if (QApplication::instance() != nullptr) {
+		return;
+	}
+	static int argc = 1;
+	static char app_name[] = "infinity";
+	static char *argv[] = {app_name, nullptr};
+	app_instance = std::make_unique<QApplication>(argc, argv);
+}
+
+void process_events() {
+	if (QApplication::instance() == nullptr) {
+		return;
+	}
+	QApplication::processEvents(QEventLoop::AllEvents, 1);
+}
 
 } // namespace
 
 gboolean ui_init(gint32 width, gint32 height)
 {
+	ensure_app_instance();
 	if (QApplication::instance() == nullptr) {
 		return FALSE;
 	}
@@ -156,6 +178,7 @@ gboolean ui_init(gint32 width, gint32 height)
 	window_instance->resize(width, height);
 	window_instance->show();
 	window_instance->raise();
+	process_events();
 	return TRUE;
 }
 
@@ -175,6 +198,7 @@ void ui_present(const guint16 *pixels, gint32 width, gint32 height)
 		return;
 	}
 	window_instance->update_frame(pixels, width, height);
+	process_events();
 }
 
 void ui_resize(gint32 width, gint32 height)
@@ -183,6 +207,7 @@ void ui_resize(gint32 width, gint32 height)
 		return;
 	}
 	window_instance->resize(width, height);
+	process_events();
 }
 
 void ui_toggle_fullscreen(void)
@@ -191,6 +216,8 @@ void ui_toggle_fullscreen(void)
 		return;
 	}
 	window_instance->set_fullscreen(!window_instance->is_fullscreen());
+	process_events();
+	display_notify_resize(window_instance->width(), window_instance->height());
 }
 
 void ui_exit_fullscreen_if_needed(void)
@@ -200,5 +227,7 @@ void ui_exit_fullscreen_if_needed(void)
 	}
 	if (window_instance->is_fullscreen()) {
 		window_instance->set_fullscreen(false);
+		process_events();
+		display_notify_resize(window_instance->width(), window_instance->height());
 	}
 }
