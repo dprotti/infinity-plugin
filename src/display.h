@@ -25,10 +25,7 @@
 #define NB_PALETTES 5
 
 /*
- * Initializes the display related structures, including the SDL library.
- *
- * Warning: must be called before any SDL operation and must not be
- * called when SDL was already started.
+ * Initializes the display related structures and UI window.
  *
  * Returns true on success; and false otherwise.
  */
@@ -36,16 +33,6 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *play
 
 /*
  * Closes the display module.
- *
- * It also closes the SDL library.
- *
- * \warning If you call this from a multithreaded application,
- * any thread must be calling display_set_pcm_data() while
- * inside this function, because display_set_pcm_data()
- * could be bloqued on a mutex, mutex that display_quit()
- * will destroy!
- *
- * See display_init().
  */
 void display_quit(void);
 
@@ -56,6 +43,10 @@ void display_quit(void);
  * Returns true on success; and false otherwise.
  */
 gboolean display_resize(gint32 width, gint32 height);
+
+gboolean display_take_resize(gint32 *out_width, gint32 *out_height);
+gboolean display_window_closed(void);
+gboolean display_is_visible(void);
 
 /*
  * Set data as the data PCM data of this module.
@@ -86,5 +77,9 @@ void display_exit_fullscreen_if_needed(void);
 
 void display_save_effect(t_effect *effect);
 void display_load_random_effect(t_effect *effect);
+
+void display_notify_resize(gint32 width, gint32 height);
+void display_notify_close(void);
+void display_notify_visibility(gboolean is_visible);
 
 #endif /* __INFINITY_DISPLAY__ */

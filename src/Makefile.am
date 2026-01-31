@@ -22,9 +22,9 @@ libinfinity_la_SOURCES = \
 	effects.c effects.h \
 	music-player.h types.h
 
-libinfinite_la_SOURCES = audacious.cc
+libinfinite_la_SOURCES = audacious.cc ui_qt.cc
 libinfinite_la_LDFLAGS = ${CXX}
-libinfinite_la_LIBADD = libinfinity.la @AUDACIOUS_LIBS@ @INFINITY_LIBS@
-libinfinite_la_CFLAGS = @AUDACIOUS_CFLAGS@ $(COMMON_FLAGS)
+libinfinite_la_LIBADD = libinfinity.la @AUDACIOUS_LIBS@ @INFINITY_LIBS@ @INFINITY_UI_LIBS@
+libinfinite_la_CFLAGS = @AUDACIOUS_CFLAGS@ @INFINITY_UI_CFLAGS@ $(COMMON_FLAGS)
 
 EXTRA_DIST = infinite_states
