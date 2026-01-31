@@ -12,7 +12,7 @@ fs = import('fs')
 
 glib_dep = dependency('glib-2.0', version: '>=2.28')
 audacious_dep = dependency('audacious', version: '>=3.6')
-qt_dep = dependency('qt6', modules: ['Widgets'])
+gtk_dep = dependency('gtk+-3.0')
 
 cc = meson.get_compiler('c')
 
@@ -53,7 +53,7 @@ add_project_arguments(
 
 prefix = get_option('prefix')
 libdir = get_option('libdir')
-if fs.exists(join_paths(prefix, 'lib', 'x86_64-linux-gnu', 'libaudcore.so'))
+if fs.exists(join_paths(prefix, 'lib', 'libaudcore.so'))
   plugin_install_dir = join_paths(libdir, 'x86_64-linux-gnu', 'audacious', 'Visualization')
 else
   plugin_install_dir = join_paths(libdir, 'audacious', 'Visualization')

@@ -1,3 +1,5 @@
+
+
 ## Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.71])
@@ -42,7 +44,7 @@ PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.6,,)
 AC_SUBST(AUDACIOUS_LIBS)
 AC_SUBST(AUDACIOUS_CFLAGS)
 
-PKG_CHECK_MODULES(INFINITY_UI, Qt6Widgets >= 6.0,,)
+PKG_CHECK_MODULES(INFINITY_UI, gtk+-3.0,,)
 AC_SUBST(INFINITY_UI_LIBS)
 AC_SUBST(INFINITY_UI_CFLAGS)
 
