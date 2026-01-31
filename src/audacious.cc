@@ -87,7 +87,7 @@ public:
 	bool init ();
 	void cleanup ();
 
-	// No gtk window, SDL creates its own window.
+	// No embedded widget; UI toolkit creates its own window.
 	// void * get_gtk_widget ();
 
 	void clear ();
