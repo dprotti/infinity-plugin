@@ -242,7 +242,6 @@ gboolean display_resize(gint32 _width, gint32 _height)
 	vector_field = compute_vector_field_new(width, height);
 	compute_resize(width, height);
 	compute_generate_vector_field(vector_field);
-	ui_resize(width, height);
 	return screen_ok;
 }
 
