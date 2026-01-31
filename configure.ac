@@ -85,7 +85,7 @@ INF_CFLAGS_EXTRA=''
 
 if test x"$GCC" = xyes; then
   INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -Wall -Wimplicit -Wunused -Wmissing-prototypes"
-  CXXFLAGS="${CXXFLAGS} -std=c++11"
+  CXXFLAGS="${CXXFLAGS} -std=c++17"
 fi
 
 AC_ARG_ENABLE([vectorization],

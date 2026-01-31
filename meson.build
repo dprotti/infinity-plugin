@@ -3,7 +3,7 @@ project('infinity-plugin', ['c', 'cpp'],
   meson_version: '>=1.1.0',
   default_options: [
     'c_std=gnu99',
-    'cpp_std=c++11',
+    'cpp_std=c++17',
     'warning_level=2',
   ],
 )
