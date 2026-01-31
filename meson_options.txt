@@ -1,0 +1,2 @@
+option('infinity_debug', type: 'boolean', value: false, description: 'Enable Infinity debug logging')
+option('vectorization', type: 'boolean', value: true, description: 'Enable auto vectorization for GCC')

@@ -17,16 +17,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
-#include <SDL.h>
-
 #include "config.h"
 #include "display.h"
 #include "types.h"
+#include "ui.h"
 
 #define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
-
-#define VIDEO_FLAGS ((Uint32)(SDL_WINDOW_SHOWN|SDL_WINDOW_RESIZABLE))
 
 typedef struct sincos {
 	gint32	i;
@@ -44,12 +41,15 @@ static sincos_t sinw = { 0, NULL };
 
 static vector_field_t *vector_field;
 
-static SDL_Window *window;
-static SDL_Renderer *sdl_renderer;
-static SDL_Surface *screen;
-static SDL_Texture *texture;
+static guint16 *render_buffer;
 
-static SDL_Color color_table[NB_PALETTES][256];
+typedef struct {
+	guint8 r;
+	guint8 g;
+	guint8 b;
+} color_entry_t;
+
+static color_entry_t color_table[NB_PALETTES][256];
 static gint16 current_colors[256];
 
 static byte *surface1;
@@ -57,46 +57,31 @@ static Player *player;
 
 static gchar error_msg[256];
 static gboolean initialized;
+static gboolean pending_resize;
+static gint32 pending_width;
+static gint32 pending_height;
+static gboolean window_closed;
+static gboolean visible;
 
-static gboolean allocate_screen_and_texture() {
-	if (screen != NULL) {
-		SDL_FreeSurface(screen);
-	}
-	screen = SDL_CreateRGBSurface(0, width, height, 16, 0, 0, 0, 0);
-	if (screen == NULL) {
-		g_snprintf(error_msg, 256, "Infinity cannot create display: %s", SDL_GetError());
+static gboolean allocate_render_buffer() {
+	g_free(render_buffer);
+	render_buffer = g_new0(guint16, width * height);
+	if (render_buffer == NULL) {
+		g_snprintf(error_msg, 256, "Infinity cannot allocate render buffer");
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
-	SDL_SetSurfaceBlendMode(screen, SDL_BLENDMODE_NONE);
-	if (texture != NULL) {
-		SDL_DestroyTexture(texture);
-	}
-	texture = SDL_CreateTexture(sdl_renderer,
-		                       SDL_PIXELFORMAT_RGB565,
-                               SDL_TEXTUREACCESS_STREAMING,
-                               width, height);
-	if (texture == NULL) {
-		g_snprintf(error_msg, 256, "Infinity cannot create SDL texture: %s", SDL_GetError());
-		player->notify_critical_error(error_msg);
-		return FALSE;
-	}
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");  // make the scaled rendering look smoother.
-	SDL_RenderSetLogicalSize(sdl_renderer, width, height);
 	return TRUE;
 }
 
-static gboolean sdl_init()
+static gboolean ui_init_window()
 {
-	SDL_InitSubSystem(SDL_INIT_EVENTS);
-	int res = SDL_CreateWindowAndRenderer(width, height, VIDEO_FLAGS, &window, &sdl_renderer);
-	if (res < 0) {
-		g_snprintf(error_msg, 256, "Infinity cannot initialize SDL: %s", SDL_GetError());
+	if (! ui_init(width, height)) {
+		g_snprintf(error_msg, 256, "Infinity cannot initialize UI window");
 		player->notify_critical_error(error_msg);
 		return FALSE;
 	}
-	SDL_SetWindowTitle(window, "Infinity");
-	return allocate_screen_and_texture();
+	return allocate_render_buffer();
 }
 
 static void generate_colors()
@@ -110,12 +95,12 @@ static void generate_colors()
 
 	for (k = 0; k < NB_PALETTES; k++) {
 		for (i = 0; i < 128; i++) {
-			color_table[k][i].r = (Uint8)(colors[k][0][0] * i);
-			color_table[k][i].g = (Uint8)(colors[k][0][1] * i);
-			color_table[k][i].b = (Uint8)(colors[k][0][2] * i);
-			color_table[k][i + 128].r = (Uint8)(colors[k][0][0] * 127 + colors[k][1][0] * i);
-			color_table[k][i + 128].g = (Uint8)(colors[k][0][1] * 127 + colors[k][1][1] * i);
-			color_table[k][i + 128].b = (Uint8)(colors[k][0][2] * 127 + colors[k][1][2] * i);
+			color_table[k][i].r = (guint8)(colors[k][0][0] * i);
+			color_table[k][i].g = (guint8)(colors[k][0][1] * i);
+			color_table[k][i].b = (guint8)(colors[k][0][2] * i);
+			color_table[k][i + 128].r = (guint8)(colors[k][0][0] * 127 + colors[k][1][0] * i);
+			color_table[k][i + 128].g = (guint8)(colors[k][0][1] * 127 + colors[k][1][1] * i);
+			color_table[k][i + 128].b = (guint8)(colors[k][0][2] * 127 + colors[k][1][2] * i);
 		}
 	}
 }
@@ -123,33 +108,16 @@ static void generate_colors()
 static void display_surface()
 {
 	gint32 i, j;
-	gint16 *pdest;
 	byte *psrc;
-	gboolean screen_locked = FALSE;
-
-	if (SDL_MUSTLOCK(screen)) {
-		if (SDL_LockSurface(screen) < 0) {
-			g_critical("Infinity cannot lock SDL surface: %s", SDL_GetError());
-			return;
-		}
-		screen_locked = TRUE;
-	}
 
 	psrc = surface1;
 	for (i = 0; i < height; i++) {
-		pdest = (gint16 *)(screen->pixels + i * screen->pitch);
-		for (j = 0; j < width; j++)
+		guint16 *pdest = render_buffer + (i * width);
+		for (j = 0; j < width; j++) {
 			*pdest++ = current_colors[*psrc++];
+		}
 	}
-	SDL_UpdateTexture(texture, NULL, screen->pixels, screen->pitch);
-
-	if (screen_locked)
-		SDL_UnlockSurface(screen);
-	else {
-		SDL_RenderClear(sdl_renderer);
-		SDL_RenderCopy(sdl_renderer, texture, NULL, NULL);
-		SDL_RenderPresent(sdl_renderer);
-	}
+	ui_present(render_buffer, width, height);
 }
 
 #define plot1(x, y, c) \
@@ -223,13 +191,10 @@ static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
 	}
 }
 
-static void sdl_quit() {
-	if (screen != NULL)
-		SDL_FreeSurface(screen);
-	screen = NULL;
-	if (window != NULL)
-		SDL_DestroyWindow(window);
-	window = NULL;
+static void ui_quit_window() {
+	g_free(render_buffer);
+	render_buffer = NULL;
+	ui_quit();
 }
 
 gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_player)
@@ -238,12 +203,15 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
 	height = _height;
 	scale = _scale;
 	player = _player;
+	pending_resize = FALSE;
+	window_closed = FALSE;
+	visible = TRUE;
 
 	if (! effects_load_effects(player)) {
 		return FALSE;
 	}
-	if (! sdl_init()) {
-		sdl_quit();
+	if (! ui_init_window()) {
+		ui_quit_window();
 		return FALSE;
 	}
 	compute_init(width, height, scale);
@@ -260,11 +228,7 @@ void display_quit(void)
 		return;
 	compute_vector_field_destroy(vector_field);
 	compute_quit();
-	sdl_quit();
-	// do not call SDL_Quit() since there is another plugin that use
-	// SDL inside Audacious.
-	// Do not call neither SDL_QuitSubsystem() just in case
-	//SDL_QuitSubSystem(SDL_INIT_EVENTS);
+	ui_quit_window();
 	initialized = FALSE;
 }
 
@@ -273,12 +237,34 @@ gboolean display_resize(gint32 _width, gint32 _height)
 	width = _width;
 	height = _height;
 
-	gboolean screen_ok = allocate_screen_and_texture();
+	gboolean screen_ok = allocate_render_buffer();
 	compute_vector_field_destroy(vector_field);
 	vector_field = compute_vector_field_new(width, height);
 	compute_resize(width, height);
 	compute_generate_vector_field(vector_field);
+	ui_resize(width, height);
 	return screen_ok;
+}
+
+gboolean display_take_resize(gint32 *out_width, gint32 *out_height)
+{
+	if (!pending_resize) {
+		return FALSE;
+	}
+	pending_resize = FALSE;
+	*out_width = pending_width;
+	*out_height = pending_height;
+	return TRUE;
+}
+
+gboolean display_window_closed(void)
+{
+	return window_closed;
+}
+
+gboolean display_is_visible(void)
+{
+	return visible;
 }
 
 inline void display_set_pcm_data(const float *data, int channels)
@@ -449,20 +435,13 @@ void curve(t_effect *current_effect)
 	current_effect->x_curve = k;
 }
 
-static gboolean is_in_fullscreen(void) {
-	return (gboolean) SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN;
-}
-
 void display_toggle_fullscreen(void)
 {
-	if (SDL_SetWindowFullscreen(window, is_in_fullscreen() ? 0 : SDL_WINDOW_FULLSCREEN) < 0)
-		g_warning("Infinity cannot change fullscreen mode: %s", SDL_GetError());
-	SDL_ShowCursor(is_in_fullscreen());
+	ui_toggle_fullscreen();
 }
 
 void display_exit_fullscreen_if_needed(void) {
-	if (is_in_fullscreen())
-		display_toggle_fullscreen();
+	ui_exit_fullscreen_if_needed();
 }
 
 inline void display_save_effect(t_effect *effect)
@@ -473,4 +452,22 @@ inline void display_save_effect(t_effect *effect)
 inline void display_load_random_effect(t_effect *effect)
 {
 	effects_load_random_effect(effect);
+}
+
+void display_notify_resize(gint32 _width, gint32 _height)
+{
+	pending_resize = TRUE;
+	pending_width = _width;
+	pending_height = _height;
+	visible = TRUE;
+}
+
+void display_notify_close(void)
+{
+	window_closed = TRUE;
+}
+
+void display_notify_visibility(gboolean is_visible)
+{
+	visible = is_visible;
 }

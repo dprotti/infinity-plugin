@@ -13,28 +13,28 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious 3.6, Glib 2.28, SDL 2
+Audacious 3.6, Glib 2.28, Qt 6
 
 **Install deps in Ubuntu**
 
-`sudo apt-get -y install pkg-config audacious-dev libsdl2-dev libglib2.0-dev`
+`sudo apt-get -y install meson ninja-build pkg-config audacious-dev libglib2.0-dev qt6-base-dev`
 
 Install from tarball
 -------
 
 - [Download](https://github.com/dprotti/infinity-plugin/releases/latest/)
 - tar xf infinity-plugin-{version}.tar.xz
-- ./configure
-- make
-- sudo make install
+- meson setup build
+- meson compile -C build
+- sudo meson install -C build
 
 Install from repo
 -------
 
 - git clone https://github.com/dprotti/infinity-plugin
-- ./autogen.sh
-- make
-- sudo make install
+- meson setup build
+- meson compile -C build
+- sudo meson install -C build
 
 Run
 ---

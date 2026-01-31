@@ -34,13 +34,17 @@ else
 fi
 
 # Check dependencies
-PKG_CHECK_MODULES(INFINITY, glib-2.0 >= 2.28 sdl2 >= 2,,)
+PKG_CHECK_MODULES(INFINITY, glib-2.0 >= 2.28,,)
 AC_SUBST(INFINITY_LIBS)
 AC_SUBST(INFINITY_CFLAGS)
 
 PKG_CHECK_MODULES(AUDACIOUS, audacious >= 3.6,,)
 AC_SUBST(AUDACIOUS_LIBS)
 AC_SUBST(AUDACIOUS_CFLAGS)
+
+PKG_CHECK_MODULES(INFINITY_UI, Qt6Widgets >= 6.0,,)
+AC_SUBST(INFINITY_UI_LIBS)
+AC_SUBST(INFINITY_UI_CFLAGS)
 
 # Check for header files.
 m4_warn([obsolete],
@@ -81,7 +85,7 @@ INF_CFLAGS_EXTRA=''
 
 if test x"$GCC" = xyes; then
   INF_CFLAGS_EXTRA="${INF_CFLAGS_EXTRA} -Wall -Wimplicit -Wunused -Wmissing-prototypes"
-  CXXFLAGS="${CXXFLAGS} -std=c++11"
+  CXXFLAGS="${CXXFLAGS} -std=c++17"
 fi
 
 AC_ARG_ENABLE([vectorization],
@@ -123,7 +127,7 @@ fi
 AC_DEFINE_UNQUOTED([EXPORT], [$EXPORT], [Compiler syntax for export of public symbols])
 
 # Hack for Ubuntu on AMD64
-AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libSDL2.so",
+AC_CHECK_FILE("${prefix}/lib/x86_64-linux-gnu/libaudcore.so",
   libdir="${libdir}/x86_64-linux-gnu/audacious/Visualization",
   libdir="${libdir}/audacious/Visualization"
 )
