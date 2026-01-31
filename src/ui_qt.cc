@@ -13,6 +13,7 @@
 #include <QResizeEvent>
 #include <QShowEvent>
 #include <QWidget>
+#include <QtGlobal>
 #include <QEventLoop>
 
 #include <memory>
@@ -66,7 +67,10 @@ protected:
 	}
 
 	void resizeEvent(QResizeEvent *event) override {
-		display_notify_resize(event->size().width(), event->size().height());
+		const qreal ratio = devicePixelRatioF();
+		const gint32 pixel_width = qRound(event->size().width() * ratio);
+		const gint32 pixel_height = qRound(event->size().height() * ratio);
+		display_notify_resize(pixel_width, pixel_height);
 		QWidget::resizeEvent(event);
 	}
 
@@ -206,7 +210,10 @@ void ui_resize(gint32 width, gint32 height)
 	if (window_instance == nullptr) {
 		return;
 	}
-	window_instance->resize(width, height);
+	const qreal ratio = window_instance->devicePixelRatioF();
+	const gint32 logical_width = qRound(width / ratio);
+	const gint32 logical_height = qRound(height / ratio);
+	window_instance->resize(logical_width, logical_height);
 	process_events();
 }
 
@@ -217,7 +224,9 @@ void ui_toggle_fullscreen(void)
 	}
 	window_instance->set_fullscreen(!window_instance->is_fullscreen());
 	process_events();
-	display_notify_resize(window_instance->width(), window_instance->height());
+	const qreal ratio = window_instance->devicePixelRatioF();
+	display_notify_resize(qRound(window_instance->width() * ratio),
+			      qRound(window_instance->height() * ratio));
 }
 
 void ui_exit_fullscreen_if_needed(void)
@@ -228,6 +237,8 @@ void ui_exit_fullscreen_if_needed(void)
 	if (window_instance->is_fullscreen()) {
 		window_instance->set_fullscreen(false);
 		process_events();
-		display_notify_resize(window_instance->width(), window_instance->height());
+		const qreal ratio = window_instance->devicePixelRatioF();
+		display_notify_resize(qRound(window_instance->width() * ratio),
+				      qRound(window_instance->height() * ratio));
 	}
 }
