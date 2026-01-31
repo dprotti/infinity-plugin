@@ -207,6 +207,7 @@ void ui_resize(gint32 width, gint32 height)
 		return;
 	}
 	window_instance->resize(width, height);
+	process_events();
 }
 
 void ui_toggle_fullscreen(void)
@@ -215,6 +216,8 @@ void ui_toggle_fullscreen(void)
 		return;
 	}
 	window_instance->set_fullscreen(!window_instance->is_fullscreen());
+	process_events();
+	display_notify_resize(window_instance->width(), window_instance->height());
 }
 
 void ui_exit_fullscreen_if_needed(void)
@@ -224,5 +227,7 @@ void ui_exit_fullscreen_if_needed(void)
 	}
 	if (window_instance->is_fullscreen()) {
 		window_instance->set_fullscreen(false);
+		process_events();
+		display_notify_resize(window_instance->width(), window_instance->height());
 	}
 }
