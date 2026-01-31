@@ -4,7 +4,7 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-REQUIRED_AUTOMAKE_VERSION=1.11
+REQUIRED_AUTOMAKE_VERSION=1.16
 
 PKG_NAME="Infinity Visualization Plugin"
 
@@ -21,10 +21,10 @@ PKG_NAME=${PKG_NAME:-Package}
 srcdir=${srcdir:-.}
 
 # default version requirements ...
-REQUIRED_AUTOCONF_VERSION=${REQUIRED_AUTOCONF_VERSION:-2.65}
+REQUIRED_AUTOCONF_VERSION=${REQUIRED_AUTOCONF_VERSION:-2.69}
 REQUIRED_AUTOMAKE_VERSION=${REQUIRED_AUTOMAKE_VERSION:-1.16}
-REQUIRED_LIBTOOL_VERSION=${REQUIRED_LIBTOOL_VERSION:-1.4.3}
-REQUIRED_PKG_CONFIG_VERSION=${REQUIRED_PKG_CONFIG_VERSION:-0.14.0}
+REQUIRED_LIBTOOL_VERSION=${REQUIRED_LIBTOOL_VERSION:-2.4.6}
+REQUIRED_PKG_CONFIG_VERSION=${REQUIRED_PKG_CONFIG_VERSION:-0.29.1}
 
 # a list of required m4 macros.  Package can set an initial value
 REQUIRED_M4MACROS=${REQUIRED_M4MACROS:-}
@@ -69,8 +69,12 @@ compare_versions() {
     ch_actual_version=$2
     ch_status=0
     IFS="${IFS=         }"; ch_save_IFS="$IFS"; IFS="."
-    set $ch_actual_version
+    set -- $ch_actual_version
     for ch_min in $ch_min_version; do
+        if [ $# -eq 0 ]; then
+            ch_status=1
+            break
+        fi
         ch_cur=`echo $1 | sed 's/[^0-9].*$//'`; shift # remove letter suffixes
         if [ -z "$ch_min" ]; then break; fi
         if [ -z "$ch_cur" ]; then ch_status=1; break; fi
@@ -293,20 +297,19 @@ for configure_ac in $configure_files; do
     fi
 done
 
-#tell Mandrake autoconf wrapper we want autoconf 2.5x, not 2.13
-WANT_AUTOCONF_2_5=1
-export WANT_AUTOCONF_2_5
-version_check autoconf AUTOCONF 'autoconf2.50 autoconf autoconf-2.53' $REQUIRED_AUTOCONF_VERSION \
+# Prefer modern autoconf binaries commonly available on Debian.
+version_check autoconf AUTOCONF 'autoconf autoconf-2.71 autoconf-2.70 autoconf-2.69' $REQUIRED_AUTOCONF_VERSION \
     "http://ftp.gnu.org/pub/gnu/autoconf/autoconf-$REQUIRED_AUTOCONF_VERSION.tar.gz"
 AUTOHEADER=`echo $AUTOCONF | sed s/autoconf/autoheader/`
 
-automake_progs="automake-1.16 automake-1.15 automake-1.14 automake-1.13 automake-1.12 automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7 automake-1.6 automake-1.5"
+automake_progs="automake automake-1.16 automake-1.15 automake-1.14 automake-1.13 automake-1.12 automake-1.11"
 version_check automake AUTOMAKE "$automake_progs" $REQUIRED_AUTOMAKE_VERSION \
     "http://ftp.gnu.org/pub/gnu/automake/automake-$REQUIRED_AUTOMAKE_VERSION.tar.gz"
 ACLOCAL=`echo $AUTOMAKE | sed s/automake/aclocal/`
 
 if $want_libtool; then
-    version_check libtool LIBTOOLIZE libtoolize $REQUIRED_LIBTOOL_VERSION \
+    libtoolize_progs="libtoolize libtoolize-2.5 libtoolize-2.4 glibtoolize"
+    version_check libtool LIBTOOLIZE "$libtoolize_progs" $REQUIRED_LIBTOOL_VERSION \
         "http://ftp.gnu.org/pub/gnu/libtool/libtool-$REQUIRED_LIBTOOL_VERSION.tar.gz"
     require_m4macro libtool.m4
 fi
@@ -351,9 +354,8 @@ for configure_ac in $configure_files; do
 
         # Now run aclocal to pull in any additional macros needed
 
-	# if the AC_CONFIG_MACRO_DIR() macro is used, pass that
-	# directory to aclocal.
-	m4dir=`cat "$basename" | grep '^AC_CONFIG_MACRO_DIR' | sed -n -e 's/AC_CONFIG_MACRO_DIR(\([^()]*\))/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
+	# If AC_CONFIG_MACRO_DIR(S)() is used, pass that directory to aclocal.
+	m4dir=`cat "$basename" | grep '^AC_CONFIG_MACRO_DIRS\{0,1\}' | sed -n -e 's/AC_CONFIG_MACRO_DIRS\{0,1\}(\([^()]*\))/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
 	if [ -n "$m4dir" ]; then
 	    m4dir="-I $m4dir"
 	fi
