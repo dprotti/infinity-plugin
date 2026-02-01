@@ -61,7 +61,7 @@ If you found a bug please report it at
 
 Authors
 -------
-
+- James Carthew (c) 2026 Fixes/Patches
 - Julien Carme (c) 2000 Original author
 - Duilio Protti (C) 2016 Current maintainer
 - CBke (C) 2016 <https://github.com/CBke> Nice patches
