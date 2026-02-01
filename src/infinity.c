@@ -123,8 +123,13 @@ void infinity_finish(void)
 	quiting = TRUE;
 	finished = TRUE;
 	if (thread != NULL) {
-		g_thread_join(thread);
-		thread = NULL;
+		if (g_thread_self() == thread) {
+			g_warning("Infinity: cannot join renderer thread from itself");
+			thread = NULL;
+		} else {
+			g_thread_join(thread);
+			thread = NULL;
+		}
 	}
 	if (key_queue != NULL) {
 		g_async_queue_unref(key_queue);
