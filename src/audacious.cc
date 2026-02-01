@@ -37,6 +37,7 @@ static const char about_text[] =
 	"Based on the XMMS plugin:\n"
 	"Copyright 2000 Julien Carme\n\n"
 	"Contributions from:\n"
+	"James Carthew (C) 2026 <https://github.com/DMJC>\n"
 	"CBke (C) 2016 <https://github.com/CBke>\n"
 	"John Lightsey (C) 2004 <john@nixnuts.net>\n"
 	"Jean Delvare (C) 2004 <khali@linux-fr.org>\n"

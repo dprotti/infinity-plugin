@@ -1,5 +1,5 @@
 project('infinity-plugin', ['c', 'cpp'],
-  version: '0.9.0-dev',
+  version: '0.9.1-dev',
   meson_version: '>=1.1.0',
   default_options: [
     'c_std=gnu99',
