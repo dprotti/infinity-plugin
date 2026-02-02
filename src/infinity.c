@@ -43,7 +43,7 @@ static t_num_effect t_last_effect;
 static gboolean must_resize;
 static gboolean finished;
 static gboolean resizing;
-G_LOCK_DEFINE_STATIC(resizing);
+G_LOCK_DEFINE_STATIC(resize_lock);
 static gboolean initializing = FALSE;
 static gboolean quiting;
 #ifdef INFINITY_DEBUG
@@ -271,9 +271,9 @@ static gpointer renderer(void *arg)
 		}
 		process_key_queue();
 		if (display_take_resize(&width, &height)) {
-			G_LOCK(resizing);
+			G_LOCK(resize_lock);
 			resizing = TRUE;
-			G_UNLOCK(resizing);
+			G_UNLOCK(resize_lock);
 			must_resize = TRUE;
 		}
 		if (finished)
@@ -286,9 +286,9 @@ static gpointer renderer(void *arg)
 			params->set_width(width);
 			params->set_height(height);
 			must_resize = FALSE;
-			G_LOCK(resizing);
+			G_LOCK(resize_lock);
 			resizing = FALSE;
-			G_UNLOCK(resizing);
+			G_UNLOCK(resize_lock);
 		}
 		t_begin = g_get_monotonic_time();
 		display_blur(current_effect.num_effect);
