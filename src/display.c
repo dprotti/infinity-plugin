@@ -40,6 +40,7 @@ static sincos_t cosw = { 0, NULL };
 static sincos_t sinw = { 0, NULL };
 
 static vector_field_t *vector_field;
+static GMutex render_mutex;
 
 static guint16 *render_buffer;
 
@@ -206,6 +207,7 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
 	pending_resize = FALSE;
 	window_closed = FALSE;
 	visible = TRUE;
+	g_mutex_init(&render_mutex);
 
 	if (! effects_load_effects(player)) {
 		return FALSE;
@@ -226,14 +228,18 @@ void display_quit(void)
 {
 	if (! initialized)
 		return;
+	g_mutex_lock(&render_mutex);
 	compute_vector_field_destroy(vector_field);
 	compute_quit();
 	ui_quit_window();
+	g_mutex_unlock(&render_mutex);
+	g_mutex_clear(&render_mutex);
 	initialized = FALSE;
 }
 
 gboolean display_resize(gint32 _width, gint32 _height)
 {
+	g_mutex_lock(&render_mutex);
 	width = _width;
 	height = _height;
 
@@ -242,6 +248,7 @@ gboolean display_resize(gint32 _width, gint32 _height)
 	vector_field = compute_vector_field_new(width, height);
 	compute_generate_vector_field(vector_field);
 	compute_resize(width, height);
+	g_mutex_unlock(&render_mutex);
 	return screen_ok;
 }
 
@@ -293,11 +300,13 @@ void change_color(gint32 t2, gint32 t1, gint32 w)
 
 inline void display_blur(guint32 effect_index)
 {
+	g_mutex_lock(&render_mutex);
 	const guint32 wh = (guint32)vector_field->width * (guint32)vector_field->height;
 	effect_index %= NB_FCT;
 	surface1 = compute_surface(vector_field->vector + effect_index * wh,
 				   vector_field->width, vector_field->height);
 	display_surface();
+	g_mutex_unlock(&render_mutex);
 }
 
 void spectral(t_effect *current_effect)
