@@ -240,8 +240,8 @@ gboolean display_resize(gint32 _width, gint32 _height)
 	gboolean screen_ok = allocate_render_buffer();
 	compute_vector_field_destroy(vector_field);
 	vector_field = compute_vector_field_new(width, height);
-	compute_resize(width, height);
 	compute_generate_vector_field(vector_field);
+	compute_resize(width, height);
 	return screen_ok;
 }
 
@@ -291,9 +291,11 @@ void change_color(gint32 t2, gint32 t1, gint32 w)
 	}
 }
 
-inline void display_blur(guint32 vector_index)
+inline void display_blur(guint32 effect_index)
 {
-	surface1 = compute_surface(&(vector_field->vector[vector_index]),
+	const guint32 wh = (guint32)vector_field->width * (guint32)vector_field->height;
+	effect_index %= NB_FCT;
+	surface1 = compute_surface(vector_field->vector + effect_index * wh,
 				   vector_field->width, vector_field->height);
 	display_surface();
 }
