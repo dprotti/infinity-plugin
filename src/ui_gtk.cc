@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <memory>
 #include <mutex>
 #include <vector>
 
@@ -18,6 +19,63 @@ gint32 frame_height = 0;
 bool gtk_ready = false;
 bool is_fullscreen = false;
 std::mutex frame_mutex;
+
+void process_events();
+gint current_scale_factor(GtkWidget *widget);
+void notify_current_size();
+
+gboolean queue_draw(gpointer) {
+	if (drawing_area != nullptr) {
+		gtk_widget_queue_draw(drawing_area);
+		process_events();
+	}
+	return G_SOURCE_REMOVE;
+}
+
+struct ResizeRequest {
+	gint32 width;
+	gint32 height;
+};
+
+gboolean apply_resize(gpointer data) {
+	if (data == nullptr) {
+		return G_SOURCE_REMOVE;
+	}
+	std::unique_ptr<ResizeRequest> request(static_cast<ResizeRequest *>(data));
+	if (window_instance == nullptr) {
+		return G_SOURCE_REMOVE;
+	}
+	const gint scale = current_scale_factor(window_instance);
+	const gint32 logical_width = std::max(request->width / scale, 1);
+	const gint32 logical_height = std::max(request->height / scale, 1);
+	gtk_window_resize(GTK_WINDOW(window_instance), logical_width, logical_height);
+	process_events();
+	return G_SOURCE_REMOVE;
+}
+
+gboolean apply_toggle_fullscreen(gpointer) {
+	if (window_instance == nullptr) {
+		return G_SOURCE_REMOVE;
+	}
+	if (is_fullscreen) {
+		gtk_window_unfullscreen(GTK_WINDOW(window_instance));
+	} else {
+		gtk_window_fullscreen(GTK_WINDOW(window_instance));
+	}
+	process_events();
+	notify_current_size();
+	return G_SOURCE_REMOVE;
+}
+
+gboolean apply_exit_fullscreen(gpointer) {
+	if (window_instance == nullptr || !is_fullscreen) {
+		return G_SOURCE_REMOVE;
+	}
+	gtk_window_unfullscreen(GTK_WINDOW(window_instance));
+	process_events();
+	notify_current_size();
+	return G_SOURCE_REMOVE;
+}
 
 bool ensure_gtk_ready() {
 	if (gtk_ready) {
@@ -260,8 +318,7 @@ void ui_present(const guint16 *pixels, gint32 width, gint32 height)
 		frame_height = height;
 		frame_buffer.assign(pixels, pixels + (width * height));
 	}
-	gtk_widget_queue_draw(drawing_area);
-	process_events();
+	g_main_context_invoke(nullptr, queue_draw, nullptr);
 }
 
 void ui_resize(gint32 width, gint32 height)
@@ -269,11 +326,8 @@ void ui_resize(gint32 width, gint32 height)
 	if (window_instance == nullptr) {
 		return;
 	}
-	const gint scale = current_scale_factor(window_instance);
-	const gint32 logical_width = std::max(width / scale, 1);
-	const gint32 logical_height = std::max(height / scale, 1);
-	gtk_window_resize(GTK_WINDOW(window_instance), logical_width, logical_height);
-	process_events();
+	auto *request = new ResizeRequest{width, height};
+	g_main_context_invoke(nullptr, apply_resize, request);
 }
 
 void ui_toggle_fullscreen(void)
@@ -281,13 +335,7 @@ void ui_toggle_fullscreen(void)
 	if (window_instance == nullptr) {
 		return;
 	}
-	if (is_fullscreen) {
-		gtk_window_unfullscreen(GTK_WINDOW(window_instance));
-	} else {
-		gtk_window_fullscreen(GTK_WINDOW(window_instance));
-	}
-	process_events();
-	notify_current_size();
+	g_main_context_invoke(nullptr, apply_toggle_fullscreen, nullptr);
 }
 
 void ui_exit_fullscreen_if_needed(void)
@@ -295,7 +343,5 @@ void ui_exit_fullscreen_if_needed(void)
 	if (window_instance == nullptr || !is_fullscreen) {
 		return;
 	}
-	gtk_window_unfullscreen(GTK_WINDOW(window_instance));
-	process_events();
-	notify_current_size();
+	g_main_context_invoke(nullptr, apply_exit_fullscreen, nullptr);
 }
