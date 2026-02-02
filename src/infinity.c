@@ -291,7 +291,7 @@ static gpointer renderer(void *arg)
 			G_UNLOCK(resizing);
 		}
 		t_begin = g_get_monotonic_time();
-		display_blur(width * height * current_effect.num_effect);
+		display_blur(current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
 		if (t_last_color <= 32)
