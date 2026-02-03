@@ -18,13 +18,11 @@
 #include <unistd.h>
 #include <glib.h>
 
-#include <SDL.h>
-#include <SDL_thread.h>
-
 #include "config.h"
 #include "display.h"
 #include "effects.h"
 #include "infinity.h"
+#include "input.h"
 #include "types.h"
 
 #define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
@@ -45,17 +43,19 @@ static t_num_effect t_last_effect;
 static gboolean must_resize;
 static gboolean finished;
 static gboolean resizing;
-G_LOCK_DEFINE_STATIC(resizing);
+G_LOCK_DEFINE_STATIC(resize_lock);
 static gboolean initializing = FALSE;
-static gboolean visible;
 static gboolean quiting;
+#ifdef INFINITY_DEBUG
 static gboolean interactive_mode;
-static gboolean windowevent_close_received;
+#endif
 
-static SDL_Thread *thread;
+static GThread *thread;
+static GAsyncQueue *key_queue;
 
-static void check_events();
-static int renderer(void *);
+static gpointer renderer(void *arg);
+static void handle_key_event(InfinityKey key);
+static void process_key_queue(void);
 
 void infinity_init(InfParameters * _params, Player * _player)
 {
@@ -72,6 +72,9 @@ void infinity_init(InfParameters * _params, Player * _player)
 		}
 	}
 	initializing = TRUE;
+	if (key_queue == NULL) {
+		key_queue = g_async_queue_new();
+	}
 	params = _params;
 	player = _player;
 	width = params->get_width();
@@ -92,14 +95,14 @@ void infinity_init(InfParameters * _params, Player * _player)
 	finished = FALSE;
 	must_resize = FALSE;
 	resizing = FALSE;
+#ifdef INFINITY_DEBUG
 	interactive_mode = FALSE;
-	windowevent_close_received = FALSE;
-	visible = TRUE;
+#endif
 	quiting = FALSE;
 
 	display_load_random_effect(&current_effect);
 
-	thread = SDL_CreateThread(renderer, "infinity_renderer", NULL);
+	thread = g_thread_new("infinity_renderer", renderer, NULL);
 }
 
 void infinity_finish(void)
@@ -119,7 +122,19 @@ void infinity_finish(void)
 	}
 	quiting = TRUE;
 	finished = TRUE;
-	SDL_WaitThread(thread, NULL);
+	if (thread != NULL) {
+		if (g_thread_self() == thread) {
+			g_warning("Infinity: cannot join renderer thread from itself");
+			thread = NULL;
+		} else {
+			g_thread_join(thread);
+			thread = NULL;
+		}
+	}
+	if (key_queue != NULL) {
+		g_async_queue_unref(key_queue);
+		key_queue = NULL;
+	}
 	/*
 	 * Take some time to let it know infinity_render_multi_pcm()
 	 * that must not call display_set_pcm_data().
@@ -142,158 +157,86 @@ void infinity_render_multi_pcm(const float *data, int channels)
 		display_set_pcm_data(data, channels);
 }
 
-#ifdef INFINITY_DEBUG
-static void handle_interactive_mode() {
-	gint32 i;
-	gint32 sx, sy;
-	const byte *keystate = SDL_GetKeyboardState(NULL);
-
-	SDL_GetMouseState(&sx, &sy);
-	current_effect.spectral_shift = sx;
-	if (keystate[SDL_SCANCODE_A])
-		current_effect.curve_color = wrap(current_effect.curve_color - 32);
-	if (keystate[SDL_SCANCODE_Z])
-		current_effect.curve_color = wrap(current_effect.curve_color + 32);
-	if (keystate[SDL_SCANCODE_Q])
-		current_effect.spectral_color = wrap(current_effect.spectral_color - 32);
-	if (keystate[SDL_SCANCODE_S])
-		current_effect.spectral_color = wrap(current_effect.spectral_color + 32);
-	for (i = 0; i < 10; i++)
-		if (keystate[SDL_SCANCODE_F1 + i])
-			current_effect.num_effect = i % NB_FCT;
-	if (keystate[SDL_SCANCODE_D])
-		current_effect.spectral_amplitude = (current_effect.spectral_amplitude - 1);
-	if (keystate[SDL_SCANCODE_F])
-		current_effect.spectral_amplitude = (current_effect.spectral_amplitude + 1);
-	if (keystate[SDL_SCANCODE_E])
-		current_effect.curve_amplitude = (current_effect.curve_amplitude - 1);
-	if (keystate[SDL_SCANCODE_R])
-		current_effect.curve_amplitude = (current_effect.curve_amplitude + 1);
-	if (keystate[SDL_SCANCODE_M])
-		display_save_effect(&current_effect);
-	if (keystate[SDL_SCANCODE_W])
-		current_effect.mode_spectre = (current_effect.mode_spectre + 1) % 5;
-}
-#endif /* INFINITY_DEBUG */
-
-static void handle_window_event(SDL_Event *event) {
-	switch (event->window.event) {
-		case SDL_WINDOWEVENT_SHOWN:
-			visible = TRUE;
-			break;
-		case SDL_WINDOWEVENT_EXPOSED:
-			visible = TRUE;
-			break;
-		case SDL_WINDOWEVENT_HIDDEN:
-			visible = FALSE;
-			break;
-		/*case SDL_WINDOWEVENT_MOVED:
-			SDL_Log("Window %d moved to %d,%d",
-					event->window.windowID, event->window.data1,
-					event->window.data2);
-			break;*/
-		case SDL_WINDOWEVENT_RESIZED:
-			G_LOCK(resizing);
-			resizing = TRUE;
-			G_UNLOCK(resizing);
-			width = event->window.data1;
-			height = event->window.data2;
-			g_message("Infinity: screen resize to %dx%d pixels", width, height);
-			must_resize = TRUE;
-			break;
-		/*case SDL_WINDOWEVENT_SIZE_CHANGED:
-			SDL_Log("Window %d size changed to %dx%d",
-					event->window.windowID, event->window.data1,
-					event->window.data2);
-			break;*/
-		case SDL_WINDOWEVENT_MINIMIZED:
-			visible = FALSE;
-			break;
-		/*case SDL_WINDOWEVENT_MAXIMIZED:
-			SDL_Log("Window %d maximized", event->window.windowID);
-			break;
-		case SDL_WINDOWEVENT_RESTORED:
-			SDL_Log("Window %d restored", event->window.windowID);
-			break;*/
-		case SDL_WINDOWEVENT_CLOSE:
-			windowevent_close_received = TRUE;
-			player->disable_plugin();
-			break;
-		default:
-			break;
-		}
-}
-
-static void check_events()
+void infinity_queue_key(InfinityKey key)
 {
-	SDL_Event event;
+	if (key_queue == NULL) {
+		return;
+	}
+	g_async_queue_push(key_queue, GINT_TO_POINTER(key));
+}
 
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_QUIT:
-			if (! windowevent_close_received)
-				player->disable_plugin();
-			break;
-		case SDL_WINDOWEVENT:
-			handle_window_event(&event); break;
-		case SDL_KEYDOWN:
-			// TODO check how this may work in a Mac keyboard
-			switch (event.key.keysym.sym) {
-			case SDLK_RIGHT:
-				if (player->is_playing())
-					player->seek(5000);
-				break;
-			case SDLK_LEFT:
-				if (player->is_playing())
-					player->seek(-5000);
-				break;
-			case SDLK_UP:
-				player->adjust_volume(5); break;
-			case SDLK_DOWN:
-				player->adjust_volume(-5); break;
-			case SDLK_z:
-				player->previous(); break;
-			case SDLK_x:
-				player->play(); break;
-			case SDLK_c:
-				player->pause(); break;
-			case SDLK_v:
-				player->stop(); break;
-			case SDLK_b:
-				player->next(); break;
-			case SDLK_F11:
-				display_toggle_fullscreen(); break;
-			case SDLK_ESCAPE:
-				display_exit_fullscreen_if_needed(); break;
-			case SDLK_F12:
-				if (t_last_color > 32) {
-					t_last_color = 0;
-					old_color = color;
-					color = (color + 1) % NB_PALETTES;
-				}
-				break;
-			case SDLK_SPACE:
-				display_load_random_effect(&current_effect);
-				t_last_effect = 0;
-				break;
+static void handle_key_event(InfinityKey key)
+{
+	switch (key) {
+	case INFINITY_KEY_RIGHT:
+		if (player->is_playing())
+			player->seek(5000);
+		break;
+	case INFINITY_KEY_LEFT:
+		if (player->is_playing())
+			player->seek(-5000);
+		break;
+	case INFINITY_KEY_UP:
+		player->adjust_volume(5);
+		break;
+	case INFINITY_KEY_DOWN:
+		player->adjust_volume(-5);
+		break;
+	case INFINITY_KEY_PREV:
+		player->previous();
+		break;
+	case INFINITY_KEY_PLAY:
+		player->play();
+		break;
+	case INFINITY_KEY_PAUSE:
+		player->pause();
+		break;
+	case INFINITY_KEY_STOP:
+		player->stop();
+		break;
+	case INFINITY_KEY_NEXT:
+		player->next();
+		break;
+	case INFINITY_KEY_FULLSCREEN:
+		display_toggle_fullscreen();
+		break;
+	case INFINITY_KEY_EXIT_FULLSCREEN:
+		display_exit_fullscreen_if_needed();
+		break;
+	case INFINITY_KEY_NEXT_PALETTE:
+		if (t_last_color > 32) {
+			t_last_color = 0;
+			old_color = color;
+			color = (color + 1) % NB_PALETTES;
+		}
+		break;
+	case INFINITY_KEY_NEXT_EFFECT:
+		display_load_random_effect(&current_effect);
+		t_last_effect = 0;
+		break;
+	case INFINITY_KEY_TOGGLE_INTERACTIVE:
 #ifdef INFINITY_DEBUG
-			case SDLK_RETURN:
-				interactive_mode = !interactive_mode;
-				g_message("Infinity %s interactive mode", interactive_mode ? "entered" : "leaved");
-				break;
+		interactive_mode = !interactive_mode;
+		g_message("Infinity %s interactive mode", interactive_mode ? "entered" : "leaved");
 #endif
-			default:
-				break;
-			}
-			break; /* SDLK_KEYDOWN */
-		default:
+		break;
+	default:
+		break;
+	}
+}
+
+static void process_key_queue(void)
+{
+	if (key_queue == NULL) {
+		return;
+	}
+	for (;;) {
+		gpointer key_ptr = g_async_queue_try_pop(key_queue);
+		if (key_ptr == NULL) {
 			break;
 		}
+		handle_key_event((InfinityKey)GPOINTER_TO_INT(key_ptr));
 	}
-#ifdef INFINITY_DEBUG
-	if (interactive_mode)
-		handle_interactive_mode();
-#endif  /* INFINITY_DEBUG */
 }
 
 // log calling line to improve bug reports
@@ -303,7 +246,7 @@ static gint64 calculate_frame_length_usecs(gint32 fps, int line) {
 	return frame_length;
 }
 
-static int renderer(void *arg)
+static gpointer renderer(void *arg)
 {
 	gint64 now, render_time, t_begin;
 	gint32 frame_length;
@@ -316,14 +259,23 @@ static int renderer(void *arg)
 	t_between_colors = params->get_color_interval();
 	initializing = FALSE;
 	for (;; ) { /* ever... */
-		if (!visible) {
-			check_events();
+		if (display_window_closed()) {
+			player->disable_plugin();
+			break;
+		}
+		if (!display_is_visible()) {
 			if (finished)
 				break;
 			g_usleep(3 * frame_length);
 			continue;
 		}
-		check_events();
+		process_key_queue();
+		if (display_take_resize(&width, &height)) {
+			G_LOCK(resize_lock);
+			resizing = TRUE;
+			G_UNLOCK(resize_lock);
+			must_resize = TRUE;
+		}
 		if (finished)
 			break;
 		if (must_resize) {
@@ -334,12 +286,12 @@ static int renderer(void *arg)
 			params->set_width(width);
 			params->set_height(height);
 			must_resize = FALSE;
-			G_LOCK(resizing);
+			G_LOCK(resize_lock);
 			resizing = FALSE;
-			G_UNLOCK(resizing);
+			G_UNLOCK(resize_lock);
 		}
 		t_begin = g_get_monotonic_time();
-		display_blur(width * height * current_effect.num_effect);
+		display_blur(current_effect.num_effect);
 		spectral(&current_effect);
 		curve(&current_effect);
 		if (t_last_color <= 32)
@@ -388,5 +340,5 @@ static int renderer(void *arg)
 		}
 	}
 
-	return 0;
+	return NULL;
 }

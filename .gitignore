@@ -27,3 +27,4 @@ src/*.la
 src/.libs
 infinity.sublime-project
 infinity.sublime-workspace
+build

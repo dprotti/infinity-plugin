@@ -14,7 +14,7 @@ Install dependencies
 --------------------
 
     sudo yum install audacious
-    sudo yum install SDL2-devel glib2-devel audacious-devel
+    sudo yum install qt6-qtbase-devel glib2-devel audacious-devel
 
 Configure configure
 -------------------
@@ -39,7 +39,6 @@ Contact
     Philippe Back
     phil@highoctane.be
     @philippeback
-
 
 
 
