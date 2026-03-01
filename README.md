@@ -14,18 +14,19 @@ Requirements
 ------------
 
 Audacious 4.x, Glib 2.28, Qt 6.
-During building needs Meson, Ninja.
+
+During building needs Meson, Ninja, pkg-config.
 
 **Install deps in Ubuntu/Debian**
 
-`sudo apt-get -y install meson ninja-build pkg-config audacious-dev libglib2.0-dev qt6-base-dev`
+`sudo apt-get -y install meson ninja-build pkgconf audacious audacious-dev libglib2.0-dev qt6-base-dev`
 
 Install from tarball
 -------
 
 - [Download](https://github.com/dprotti/infinity-plugin/releases/latest/)
 - tar xf infinity-plugin-{version}.tar.xz
-- meson setup build
+- meson setup build --prefix=$(pkg-config --variable=prefix audacious)
 - meson compile -C build
 - sudo meson install -C build
 
@@ -33,7 +34,7 @@ Install from repo
 -------
 
 - git clone https://github.com/dprotti/infinity-plugin
-- meson setup build
+- meson setup build --prefix=$(pkg-config --variable=prefix audacious)
 - meson compile -C build
 - sudo meson install -C build
 
