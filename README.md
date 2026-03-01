@@ -13,9 +13,10 @@ saving and player control through keyboard.
 Requirements
 ------------
 
-Audacious 3.6, Glib 2.28, Qt 6
+Audacious 4.x, Glib 2.28, Qt 6.
+During building needs Meson, Ninja.
 
-**Install deps in Ubuntu**
+**Install deps in Ubuntu/Debian**
 
 `sudo apt-get -y install meson ninja-build pkg-config audacious-dev libglib2.0-dev qt6-base-dev`
 
@@ -50,20 +51,10 @@ Playing Around
 
 See [how to add new effects or how to control the plugin with the keyboard](https://github.com/dprotti/infinity-plugin/blob/master/minidocs/controlkeys.md).
 
-Known Bugs
-----------
-
-In Ubuntu over AMD64, try configure with
-``--prefix=/usr --libdir=/usr/lib/x86_64-linux-gnu``
-
-If you found a bug please report it at
-<https://github.com/dprotti/infinity-plugin/issues>.
-
 Authors
 -------
-- James Carthew (c) 2026 Fixes/Patches
-- Julien Carme (c) 2000 Original author
-- Duilio Protti (C) 2016 Current maintainer
+- Duilio Protti (C) 2016-2026 Current maintainer
+- James Carthew (c) 2026 Modernization: Audacious 4.x support, Qt UI, Meson build, bug fixes
 - CBke (C) 2016 <https://github.com/CBke> Nice patches
 - John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
 - Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
@@ -71,13 +62,18 @@ Authors
 - Haavard Kvaalen (C) 2000 <havardk@xmms.org> Converted original hand made Makefile to automake/autoconf/libtool
 - Chris Lea (C) 2000 <chrislea@luciddesign.com> Made RPMs
 - Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si> Misc optimisations
+- Julien Carme (c) 2000 Original author
+
+Contributions
+-------------
+
+Your feedback or help would be really appreciated.
+
+If you found a bug please report it at
+<https://github.com/dprotti/infinity-plugin/issues>.
 
 Old Versions
 ------------
 
 Releases older than 0.8.0beta1 can be found at Sourceforge: <https://sourceforge.net/projects/infinity-plugin/>
 
-Contributions
--------------
-
-Your feedback or help would be really appreciated.
