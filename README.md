@@ -54,7 +54,7 @@ See [how to add new effects or how to control the plugin with the keyboard](http
 
 Authors
 -------
-- Duilio Protti (C) 2016-2026 Current maintainer
+- Duilio Protti (C) 2004-2026 Current maintainer
 - James Carthew (c) 2026 Modernization: Audacious 4.x support, Qt UI, Meson build, bug fixes
 - CBke (C) 2016 <https://github.com/CBke> Nice patches
 - John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
