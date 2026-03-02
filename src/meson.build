@@ -4,7 +4,7 @@ common_deps = [glib_dep]
 
 libinfinity_sources = files(
   'infinity.c',
-  'compute.c',
+  'compute.cpp',
   'display.c',
   'effects.c',
 )
