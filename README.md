@@ -6,8 +6,6 @@ Music visualization plugin for [Audacious](http://audacious-media-player.org/).
 It generates beautiful light effects. Supports full-screen mode, mouse resizing, preferences
 saving and player control through keyboard.
 
-**[Go to Downloads](https://github.com/dprotti/infinity-plugin/releases/latest/)**
-
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
@@ -21,19 +19,11 @@ During building needs Meson, Ninja, pkg-config.
 
 `sudo apt-get -y install meson ninja-build pkgconf audacious audacious-dev libglib2.0-dev qt6-base-dev`
 
-Install from tarball
--------
-
-- [Download](https://github.com/dprotti/infinity-plugin/releases/latest/)
-- tar xf infinity-plugin-{version}.tar.xz
-- meson setup build --prefix=$(pkg-config --variable=prefix audacious)
-- meson compile -C build
-- sudo meson install -C build
-
-Install from repo
+Install
 -------
 
 - git clone https://github.com/dprotti/infinity-plugin
+- cd infinity-plugin
 - meson setup build --prefix=$(pkg-config --variable=prefix audacious)
 - meson compile -C build
 - sudo meson install -C build
@@ -76,5 +66,5 @@ If you found a bug please report it at
 Old Versions
 ------------
 
-Releases older than 0.8.0beta1 can be found at Sourceforge: <https://sourceforge.net/projects/infinity-plugin/>
+Can be found at Sourceforge: <https://sourceforge.net/projects/infinity-plugin/>
 
