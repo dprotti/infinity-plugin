@@ -2,11 +2,10 @@ Brief History
 =============
 
 Infinity was originally written by Julien Carme on 2000.
-Then the project was freezed for a couple of years, from 2001 to
-2004 I guess.
-In October 2003 I've found this plugin and I thought it was really
-beautiful so I decided to improve it by adding MMX support and
-created a project in Sourceforge.
-In 2013 the project was moved into Github.
-In 2016 code moved from 100% C to mix of C / C++ to match Audacious
-3.6 API.
+Then the project froze for a couple of years, from 2001 to 2004 I guess.
+In 2003 I came across this plugin and found it really beautiful so I decided
+to improve it by adding MMX support and creating a project in Sourceforge.
+2009: Infinity moved to Audacious media player based on the old good XMMS.
+2013: the project moved into Github.
+2016: code went from 100% C to mix of C / C++ to match Audacious 3.6 API.
+2026: AVX2 SIMD was added and build switched from autotools to meson.

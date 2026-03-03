@@ -1,6 +1,7 @@
 
 March 2026
 Use AVX2 SIMD if available
+Stop releases on github, trust packagers to make their own from repo.
 
 February 2026
 Bump to Audacious 4.x Thanks DMJC@users.noreply.github.com.
