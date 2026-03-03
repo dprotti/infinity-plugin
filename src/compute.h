@@ -26,8 +26,8 @@
  * Represents the interpollation information.
  */
 typedef struct {
-	guint32 coord;  /* Coordinates of the top left pixel. */
-	guint32 weight; /* 32 bits = 4*8 = weights of the four corners */
+    guint32 coord;  /* Coordinates of the top left pixel. */
+    guint32 weight; /* 32 bits = 4*8 = weights of the four corners */
 } t_interpol;
 
 /*
@@ -38,9 +38,9 @@ typedef struct {
  * because this is actually not true.
  */
 typedef struct {
-	gint32		width;  /* number of vectors */
-	gint32		height; /* length of each vector */
-	t_interpol *	vector; /* pointer to the vector field */
+    gint32		width;  /* number of vectors */
+    gint32		height; /* length of each vector */
+    t_interpol *	vector; /* pointer to the vector field */
 } vector_field_t;
 
 #ifdef __cplusplus

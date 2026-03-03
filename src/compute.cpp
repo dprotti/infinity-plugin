@@ -24,12 +24,12 @@
 
 typedef struct t_coord
 {
-	gint32 x, y;
+    gint32 x, y;
 } t_coord;
 
 typedef struct t_complex
 {
-	gfloat x, y;
+    gfloat x, y;
 } t_complex;
 
 static gint32 width, height, scale;
@@ -41,231 +41,231 @@ static bool avx2_available = false;
 
 static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2) /* p1 et p2:0-4 */
 {
-	t_complex b;
-	gfloat fact;
-	gfloat an;
-	gfloat circle_size;
-	gfloat speed;
-	gfloat co, si;
+    t_complex b;
+    gfloat fact;
+    gfloat an;
+    gfloat circle_size;
+    gfloat speed;
+    gfloat co, si;
 
-	a.x -= width / 2;
-	a.y -= height / 2;
+    a.x -= width / 2;
+    a.y -= height / 2;
 
-	switch (n)
-	{
-	case 0:
-		an = 0.025 * (p1 - 2) + 0.002;
-		co = cos(an);
-		si = sin(an);
-		circle_size = height * 0.25;
-		speed = (gfloat)2000 + p2 * 500;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	case 1:
-		an = 0.015 * (p1 - 2) + 0.002;
-		co = cos(an);
-		si = sin(an);
-		circle_size = height * 0.45;
-		speed = (gfloat)4000 + p2 * 1000;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		fact = (sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	case 2:
-		an = 0.002;
-		co = cos(an);
-		si = sin(an);
-		circle_size = height * 0.25;
-		speed = (gfloat)400 + p2 * 100;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	case 3:
-		an = (sin(sqrt(a.x * a.x + a.y * a.y) / 20) / 20) + 0.002;
-		co = cos(an);
-		si = sin(an);
-		circle_size = height * 0.25;
-		speed = (gfloat)4000;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	case 4:
-		an = 0.002;
-		co = cos(an);
-		si = sin(an);
-		circle_size = height * 0.25;
-		speed = sin(sqrt(a.x * a.x + a.y * a.y) / 5) * 3000 + 4000;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	case 5:
-		b.x = a.x * 1.02;
-		b.y = a.y * 1.02;
-		break;
-	case 6:
-		an = 0.002;
-		co = cos(an);
-		si = sin(an);
-		// circle_size = height * 0.25;
-		fact = 1 + cos(atan(a.x / (a.y + 0.00001)) * 6) * 0.02;
-		b.x = (co * a.x - si * a.y);
-		b.y = (si * a.x + co * a.y);
-		b.x *= fact;
-		b.y *= fact;
-		break;
-	default:
-		b.x = (gfloat)0.0;
-		b.y = (gfloat)0.0;
-	}
-	b.x += width / 2;
-	b.y += height / 2;
-	if (b.x < 0.0)
-		b.x = 0.0;
-	if (b.y < 0.0)
-		b.y = 0.0;
-	if (b.x > (gfloat)width - 1)
-		b.x = (gfloat)width - 1;
-	if (b.y > (gfloat)height - 1)
-		b.y = (gfloat)height - 1;
-	return b;
+    switch (n)
+    {
+    case 0:
+        an = 0.025 * (p1 - 2) + 0.002;
+        co = cos(an);
+        si = sin(an);
+        circle_size = height * 0.25;
+        speed = (gfloat)2000 + p2 * 500;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    case 1:
+        an = 0.015 * (p1 - 2) + 0.002;
+        co = cos(an);
+        si = sin(an);
+        circle_size = height * 0.45;
+        speed = (gfloat)4000 + p2 * 1000;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        fact = (sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    case 2:
+        an = 0.002;
+        co = cos(an);
+        si = sin(an);
+        circle_size = height * 0.25;
+        speed = (gfloat)400 + p2 * 100;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    case 3:
+        an = (sin(sqrt(a.x * a.x + a.y * a.y) / 20) / 20) + 0.002;
+        co = cos(an);
+        si = sin(an);
+        circle_size = height * 0.25;
+        speed = (gfloat)4000;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    case 4:
+        an = 0.002;
+        co = cos(an);
+        si = sin(an);
+        circle_size = height * 0.25;
+        speed = sin(sqrt(a.x * a.x + a.y * a.y) / 5) * 3000 + 4000;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        fact = -(sqrt(b.x * b.x + b.y * b.y) - circle_size) / speed + 1;
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    case 5:
+        b.x = a.x * 1.02;
+        b.y = a.y * 1.02;
+        break;
+    case 6:
+        an = 0.002;
+        co = cos(an);
+        si = sin(an);
+        // circle_size = height * 0.25;
+        fact = 1 + cos(atan(a.x / (a.y + 0.00001)) * 6) * 0.02;
+        b.x = (co * a.x - si * a.y);
+        b.y = (si * a.x + co * a.y);
+        b.x *= fact;
+        b.y *= fact;
+        break;
+    default:
+        b.x = (gfloat)0.0;
+        b.y = (gfloat)0.0;
+    }
+    b.x += width / 2;
+    b.y += height / 2;
+    if (b.x < 0.0)
+        b.x = 0.0;
+    if (b.y < 0.0)
+        b.y = 0.0;
+    if (b.x > (gfloat)width - 1)
+        b.x = (gfloat)width - 1;
+    if (b.y > (gfloat)height - 1)
+        b.y = (gfloat)height - 1;
+    return b;
 }
 
 /* We are trusting here on vector_field != NULL !!! */
 static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, guint32 p2,
-										   guint32 debut, guint32 step, vector_field_t *vector_field)
+                                           guint32 debut, guint32 step, vector_field_t *vector_field)
 {
-	const guint32 width = (guint32)vector_field->width;
-	const guint32 height = (guint32)vector_field->height;
-	const guint32 prop_transmitted = 249;
-	const guint32 b_add = g * width * height;
-	t_interpol *vector = vector_field->vector;
-	guint32 fin = debut + step;
-	guint32 cx, cy;
+    const guint32 width = (guint32)vector_field->width;
+    const guint32 height = (guint32)vector_field->height;
+    const guint32 prop_transmitted = 249;
+    const guint32 b_add = g * width * height;
+    t_interpol *vector = vector_field->vector;
+    guint32 fin = debut + step;
+    guint32 cx, cy;
 
-	if (fin > height)
-		fin = height;
-	for (cy = debut; cy < fin; cy++)
-	{
-		for (cx = 0; cx < width; cx++)
-		{
-			t_complex a;
-			gfloat fpy;
-			guint32 rw, lw, add;
-			guint32 w1, w2, w3, w4;
-			guint32 x, y;
+    if (fin > height)
+        fin = height;
+    for (cy = debut; cy < fin; cy++)
+    {
+        for (cx = 0; cx < width; cx++)
+        {
+            t_complex a;
+            gfloat fpy;
+            guint32 rw, lw, add;
+            guint32 w1, w2, w3, w4;
+            guint32 x, y;
 
-			a.x = (gfloat)cx;
-			a.y = (gfloat)cy;
-			a = fct(a, f, p1, p2);
-			add = cx + cy * width;
-			x = (guint32)(a.x);
-			y = (guint32)(a.y);
-			vector[b_add + add].coord = (x << 16) | y;
+            a.x = (gfloat)cx;
+            a.y = (gfloat)cy;
+            a = fct(a, f, p1, p2);
+            add = cx + cy * width;
+            x = (guint32)(a.x);
+            y = (guint32)(a.y);
+            vector[b_add + add].coord = (x << 16) | y;
 
-			fpy = a.y - floor(a.y);
-			rw = (guint32)((a.x - floor(a.x)) * prop_transmitted);
-			lw = prop_transmitted - rw;
-			w4 = (guint32)(fpy * rw);
-			w2 = rw - w4;
-			w3 = (guint32)(fpy * lw);
-			w1 = lw - w3;
-			vector[b_add + add].weight =
-				(w1 << 24) | (w2 << 16) | (w3 << 8) | w4;
-		}
-	}
+            fpy = a.y - floor(a.y);
+            rw = (guint32)((a.x - floor(a.x)) * prop_transmitted);
+            lw = prop_transmitted - rw;
+            w4 = (guint32)(fpy * rw);
+            w2 = rw - w4;
+            w3 = (guint32)(fpy * lw);
+            w1 = lw - w3;
+            vector[b_add + add].weight =
+                (w1 << 24) | (w2 << 16) | (w3 << 8) | w4;
+        }
+    }
 }
 
 void compute_init(gint32 _width, gint32 _height, gint32 _scale)
 {
-	width = _width;
-	height = _height;
-	scale = _scale;
+    width = _width;
+    height = _height;
+    scale = _scale;
 
-	surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
-	surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+    surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+    surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
 
-	avx2_available = __builtin_cpu_supports("avx2");
+    avx2_available = __builtin_cpu_supports("avx2");
 }
 
 void compute_resize(gint32 _width, gint32 _height)
 {
-	width = _width;
-	height = _height;
-	g_free(surface1);
-	g_free(surface2);
-	surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
-	surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+    width = _width;
+    height = _height;
+    g_free(surface1);
+    g_free(surface2);
+    surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+    surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
 }
 
 vector_field_t *compute_vector_field_new(gint32 width, gint32 height)
 {
-	vector_field_t *field;
+    vector_field_t *field;
 
-	field = g_new0(vector_field_t, 1);
-	field->vector = g_new0(t_interpol, width * height * NB_FCT);
-	field->width = width;
-	field->height = height;
-	return field;
+    field = g_new0(vector_field_t, 1);
+    field->vector = g_new0(t_interpol, width * height * NB_FCT);
+    field->width = width;
+    field->height = height;
+    return field;
 }
 
 void compute_vector_field_destroy(vector_field_t *vector_field)
 {
-	g_return_if_fail(vector_field != NULL);
+    g_return_if_fail(vector_field != NULL);
 
-	g_free(vector_field->vector);
-	g_free(vector_field);
+    g_free(vector_field->vector);
+    g_free(vector_field);
 }
 
 void compute_quit()
 {
-	g_free(surface1);
-	g_free(surface2);
+    g_free(surface1);
+    g_free(surface2);
 }
 
 void compute_generate_vector_field(vector_field_t *vector_field)
 {
-	guint32 f, i, _height;
+    guint32 f, i, _height;
 
-	g_return_if_fail(vector_field != NULL);
-	g_return_if_fail(vector_field->height >= 0);
+    g_return_if_fail(vector_field != NULL);
+    g_return_if_fail(vector_field->height >= 0);
 
-	_height = (guint32)vector_field->height;
+    _height = (guint32)vector_field->height;
 
-	for (f = 0; f < NB_FCT; f++)
-		for (i = 0; i < _height; i += 10)
-			compute_generate_sector(f, f, 2, 2, i, 10, vector_field);
+    for (f = 0; f < NB_FCT; f++)
+        for (i = 0; i < _height; i += 10)
+            compute_generate_sector(f, f, 2, 2, i, 10, vector_field);
 }
 
 static inline void scalar_compute_surface(t_interpol *vector, gint32 width, gint32 height)
 {
-	gint32 add_dest = 0;
-	for (gint32 j = 0; j < height; ++j)
-	{
-		for (gint32 i = 0; i < width; ++i)
-		{
-			t_interpol *interpol = &vector[add_dest];
-			guint32 add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
-			byte *ptr_pix = &surface1[add_src];
-			guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24) + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16) + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8) + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF)) >> 8;
-			surface2[add_dest] = (byte)(color > 255 ? 255 : color);
-			++add_dest;
-		}
-	}
+    gint32 add_dest = 0;
+    for (gint32 j = 0; j < height; ++j)
+    {
+        for (gint32 i = 0; i < width; ++i)
+        {
+            t_interpol *interpol = &vector[add_dest];
+            guint32 add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
+            byte *ptr_pix = &surface1[add_src];
+            guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24) + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16) + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8) + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF)) >> 8;
+            surface2[add_dest] = (byte)(color > 255 ? 255 : color);
+            ++add_dest;
+        }
+    }
 }
 
 static const __m256i const_255 = _mm256_set1_epi32(255);
@@ -358,21 +358,21 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
 
 byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
 {
-	bool use_simd = avx2_available && (width >= 1280) && (height >= 720);
+    bool use_simd = avx2_available && (width >= 1280) && (height >= 720);
 
-	if (use_simd)
-	{
-		simd_compute_surface(vector, width, height);
-	}
-	else
-	{
-		scalar_compute_surface(vector, width, height);
-	}
+    if (use_simd)
+    {
+        simd_compute_surface(vector, width, height);
+    }
+    else
+    {
+        scalar_compute_surface(vector, width, height);
+    }
 
-	// Swap surfaces
-	byte *ptr_swap = surface2;
-	surface2 = surface1;
-	surface1 = ptr_swap;
+    // Swap surfaces
+    byte *ptr_swap = surface2;
+    surface2 = surface1;
+    surface1 = ptr_swap;
 
-	return surface1;
+    return surface1;
 }

@@ -27,14 +27,14 @@
  * would be enough for some of them.
  */
 typedef struct {
-	gint32  num_effect; /* The number of the effect */
-	gint32  x_curve;
-	gint32  curve_color;
-	gint32  curve_amplitude;
-	gint32  spectral_amplitude;
-	gint32  spectral_color;
-	gint32  mode_spectre;
-	gint32  spectral_shift;
+    gint32  num_effect; /* The number of the effect */
+    gint32  x_curve;
+    gint32  curve_color;
+    gint32  curve_amplitude;
+    gint32  spectral_amplitude;
+    gint32  spectral_color;
+    gint32  mode_spectre;
+    gint32  spectral_shift;
 } t_effect;
 
 /*

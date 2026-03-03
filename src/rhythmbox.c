@@ -51,12 +51,12 @@
 
 typedef struct
 {
-	PeasExtensionBase parent;
+    PeasExtensionBase parent;
 } RBInfinityPlugin;
 
 typedef struct
 {
-	PeasExtensionBaseClass parent_class;
+    PeasExtensionBaseClass parent_class;
 } RBInfinityPluginClass;
 
 
@@ -90,43 +90,43 @@ static void notify_critical_error (const gchar *message) { g_message("notify_cri
 static void disable_plugin() { g_message("disable_plugin TODO"); }
 
 static Player player = {
-	.notify_critical_error = notify_critical_error,
-	.disable_plugin = disable_plugin
+    .notify_critical_error = notify_critical_error,
+    .disable_plugin = disable_plugin
 };
 
 static void
 rb_infinity_plugin_init (RBInfinityPlugin *plugin)
 {
-	g_message("RBInfinityPlugin initialising");
-	rb_debug ("RBInfinityPlugin initialising");
+    g_message("RBInfinityPlugin initialising");
+    rb_debug ("RBInfinityPlugin initialising");
 }
 
 static void
 impl_activate (PeasActivatable *plugin)
 {
-	RBShell *shell;
+    RBShell *shell;
 
-	g_object_get (plugin, "object", &shell, NULL);
-	g_message("Infinity plugin activated, with shell %p", shell);
-	//rb_error_dialog (NULL, "Sample Plugin", "Sample plugin activated, with shell %p", shell);
-	g_object_unref (shell);
-	infinity_init(&params, &player);
+    g_object_get (plugin, "object", &shell, NULL);
+    g_message("Infinity plugin activated, with shell %p", shell);
+    //rb_error_dialog (NULL, "Sample Plugin", "Sample plugin activated, with shell %p", shell);
+    g_object_unref (shell);
+    infinity_init(&params, &player);
 }
 
 static void
 impl_deactivate	(PeasActivatable *plugin)
 {
-	g_message("Infinity plugin deactivated");
-	//rb_error_dialog (NULL, "Sample Plugin", "Sample plugin deactivated");
-	infinity_finish();
+    g_message("Infinity plugin deactivated");
+    //rb_error_dialog (NULL, "Sample Plugin", "Sample plugin deactivated");
+    infinity_finish();
 }
 
 //G_MODULE_EXPORT void
 EXPORT void
 peas_register_types (PeasObjectModule *module)
 {
-	rb_infinity_plugin_register_type (G_TYPE_MODULE (module));
-	peas_object_module_register_extension_type (module,
-						    PEAS_TYPE_ACTIVATABLE,
-						    RB_TYPE_INFINITY_PLUGIN);
+    rb_infinity_plugin_register_type (G_TYPE_MODULE (module));
+    peas_object_module_register_extension_type (module,
+                            PEAS_TYPE_ACTIVATABLE,
+                            RB_TYPE_INFINITY_PLUGIN);
 }

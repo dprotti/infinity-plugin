@@ -1,0 +1,3 @@
+UseTab: Never          # always use spaces
+IndentWidth: 4         # 4 spaces per indent
+TabWidth: 4
