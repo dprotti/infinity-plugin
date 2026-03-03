@@ -30,6 +30,7 @@ typedef struct sincos {
     gfloat *f;
 } sincos_t;
 
+static const gint32 pcm_size = 512;
 static gint16 pcm_data[2][512];
 G_LOCK_DEFINE_STATIC(pcm_data);
 
@@ -280,8 +281,16 @@ inline void display_set_pcm_data(const float *data, int channels)
         return;
     }
     G_LOCK(pcm_data);
-    // TODO check this out, different types here...
-    memcpy(pcm_data, data, 2 * 512 * sizeof(gint16));
+    for (gint32 i = 0; i < pcm_size; i++) {
+        // Interleaved: data[0] = left0, data[1] = right0, data[2] = left1, ...
+        const float left = data[2 * i];
+        const float right = data[2 * i + 1];
+        // Scale [-1.0, 1.0] to [-32768, 32767], clamp for safety
+        gint32 scaled_left = (gint32)(left * 32767.0f);
+        gint32 scaled_right = (gint32)(right * 32767.0f);
+        pcm_data[1][i] = (gint16)CLAMP(scaled_left, -32768, 32767);  // Assuming [1] is left
+        pcm_data[0][i] = (gint16)CLAMP(scaled_right, -32768, 32767); // Assuming [0] is right (matches spectral usage)
+    }
     G_UNLOCK(pcm_data);
 }
 

@@ -16,7 +16,6 @@
 #include <immintrin.h> // For AVX2 intrinsics
 #include <math.h>
 #include <glib.h>
-#include <stdbool.h>
 
 #include "compute.h"
 #include "config.h"
