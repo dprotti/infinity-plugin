@@ -246,7 +246,7 @@ static gint64 calculate_frame_length_usecs(gint32 fps, int line) {
 	return frame_length;
 }
 
-static gpointer renderer(void *arg)
+static gpointer renderer(void *)
 {
 	gint64 now, render_time, t_begin;
 	gint32 frame_length;

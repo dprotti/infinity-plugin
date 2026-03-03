@@ -394,6 +394,7 @@ void spectral(t_effect *current_effect)
 				y1 = 0.0;
 			if (y2 < 0.0)
 				y2 = 0.0;
+			G_GNUC_FALLTHROUGH;
 		case 4:
 			line(halfwidth + cosw.f[i - step] * (shift + old_y1),
 			     halfheight + sinw.f[i - step] * (shift + old_y1),
