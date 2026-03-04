@@ -5,22 +5,21 @@
 #include <effects.h>
 #include <assert.h>
 
-#define EFFECTS_FILE	(DATADIR "/infinite_states")
+#define EFFECTS_FILE (DATADIR "/infinite_states")
 
 static t_effect effects[100];
 static gint32 nb_effects = 0;
 static gboolean initialized = FALSE;
 static gchar error_msg[256];
 
-void effects_append_effect(t_effect *effect)
-{
+void effects_append_effect(t_effect *effect) {
     FILE *f;
     gint32 i;
     gchar *personal_states = g_strconcat(g_get_home_dir(), "/infinite_states", NULL);
 
     g_return_if_fail(effect != NULL);
 
-    f = fopen (personal_states, "a");
+    f = fopen(personal_states, "a");
     if (f == NULL) {
         g_critical("Cannot open file '%s' for saving effects", personal_states);
         g_free(personal_states);
@@ -33,18 +32,16 @@ void effects_append_effect(t_effect *effect)
     fclose(f);
 }
 
-gboolean effects_load_effects(Player *player)
-{
+gboolean effects_load_effects(Player *player) {
     FILE *f;
     gint32 finished = 0;
     gint32 i, b, c, d, e;
 
     g_return_val_if_fail(player != NULL, FALSE);
 
-    f = fopen (EFFECTS_FILE, "r");
+    f = fopen(EFFECTS_FILE, "r");
     if (f == NULL) {
-        g_snprintf(error_msg, 256, "Cannot open file '%s' for loading effects",
-               EFFECTS_FILE);
+        g_snprintf(error_msg, 256, "Cannot open file '%s' for loading effects", EFFECTS_FILE);
         player->notify_critical_error(error_msg);
         return FALSE;
     }
@@ -81,12 +78,11 @@ gboolean effects_load_effects(Player *player)
     return TRUE;
 }
 
-void effects_load_random_effect(t_effect *effect)
-{
+void effects_load_random_effect(t_effect *effect) {
     gint32 trash;
 
     if (!initialized) {
-        #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         srand(trash);
         initialized = TRUE;
     }

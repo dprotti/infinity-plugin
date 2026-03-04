@@ -38,9 +38,9 @@ typedef struct {
  * because this is actually not true.
  */
 typedef struct {
-    gint32		width;  /* number of vectors */
-    gint32		height; /* length of each vector */
-    t_interpol *	vector; /* pointer to the vector field */
+    gint32 width;       /* number of vectors */
+    gint32 height;      /* length of each vector */
+    t_interpol *vector; /* pointer to the vector field */
 } vector_field_t;
 
 #ifdef __cplusplus
@@ -79,7 +79,7 @@ void compute_generate_vector_field(vector_field_t *vector_field);
 byte *compute_surface(t_interpol *vector, gint32 width, gint32 height);
 
 #ifdef __cplusplus
-}  // extern C
+} // extern C
 #endif
 
 #endif /* __INFINITY_COMPUTE__ */

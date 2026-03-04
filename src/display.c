@@ -26,7 +26,7 @@
 #define assign_max(p, a) (*p <= a ? *p = a : 0)
 
 typedef struct sincos {
-    gint32	i;
+    gint32 i;
     gfloat *f;
 } sincos_t;
 
@@ -37,8 +37,8 @@ G_LOCK_DEFINE_STATIC(pcm_data);
 static gint32 width, height, scale;
 
 /* Little optimization for cos/sin functions */
-static sincos_t cosw = { 0, NULL };
-static sincos_t sinw = { 0, NULL };
+static sincos_t cosw = {0, NULL};
+static sincos_t sinw = {0, NULL};
 
 static vector_field_t *vector_field;
 static GMutex render_mutex;
@@ -77,9 +77,8 @@ static gboolean allocate_render_buffer() {
     return TRUE;
 }
 
-static gboolean ui_init_window()
-{
-    if (! ui_init(width, height)) {
+static gboolean ui_init_window() {
+    if (!ui_init(width, height)) {
         g_snprintf(error_msg, 256, "Infinity cannot initialize UI window");
         player->notify_critical_error(error_msg);
         return FALSE;
@@ -87,14 +86,13 @@ static gboolean ui_init_window()
     return allocate_render_buffer();
 }
 
-static void generate_colors()
-{
+static void generate_colors() {
     gint32 i, k;
-    gfloat colors[NB_PALETTES][2][3] = { { { 1.0, 1.0, 1.0 }, { 1.0, 1.0, 1.0 } },
-                         { { 2.0, 1.5, 0.0 }, { 0.0, 0.5, 2.0 } },
-                         { { 0.0, 1.0, 2.0 }, { 0.0, 1.0, 0.0 } },
-                         { { 0.0, 2.0, 1.0 }, { 0.0, 0.0, 1.0 } },
-                         { { 2.0, 0.0, 0.0 }, { 0.0, 1.0, 1.0 } } };
+    gfloat colors[NB_PALETTES][2][3] = {{{1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}},
+        {{2.0, 1.5, 0.0}, {0.0, 0.5, 2.0}},
+        {{0.0, 1.0, 2.0}, {0.0, 1.0, 0.0}},
+        {{0.0, 2.0, 1.0}, {0.0, 0.0, 1.0}},
+        {{2.0, 0.0, 0.0}, {0.0, 1.0, 1.0}}};
 
     for (k = 0; k < NB_PALETTES; k++) {
         for (i = 0; i < 128; i++) {
@@ -108,8 +106,7 @@ static void generate_colors()
     }
 }
 
-static void display_surface()
-{
+static void display_surface() {
     gint32 i, j;
     byte *psrc;
 
@@ -123,31 +120,30 @@ static void display_surface()
     ui_present(render_buffer, width, height);
 }
 
-#define plot1(x, y, c) \
-\
-    if ((x) > 0 && (x) < width - 3 && (y) > 0 && (y) < height - 3) \
-        assign_max(&(surface1)[(x) + (y) * width], (c)) \
-\
+#define plot1(x, y, c)                                                                                                 \
+                                                                                                                       \
+    if ((x) > 0 && (x) < width - 3 && (y) > 0 && (y) < height - 3)                                                     \
+    assign_max(&(surface1)[(x) + (y) * width], (c))
 
-#define plot2(x, y, c) \
-    { \
-        gint32 ty; \
-        if ((x) > 0 && (gint32)(x) < width - 3 && (y) > 0 && (gint32)(y) < height - 3) { \
-            ty = (gint32)(y) * width; \
-            assign_max((&(surface1)[(gint32)(x) + ty]), (c)); \
-            assign_max((&(surface1)[(gint32)(x) + 1 + ty]), (c)); \
-            assign_max((&(surface1)[(gint32)(x) + ty + width]), (c)); \
-            assign_max((&(surface1)[(gint32)(x) + 1 + ty + width]), (c)); \
-        } \
-    } \
 
-#define SWAP(x, y) \
-    x ^= y; \
-    y ^= x; \
+#define plot2(x, y, c)                                                                                                 \
+    {                                                                                                                  \
+        gint32 ty;                                                                                                     \
+        if ((x) > 0 && (gint32)(x) < width - 3 && (y) > 0 && (gint32)(y) < height - 3) {                               \
+            ty = (gint32)(y) * width;                                                                                  \
+            assign_max((&(surface1)[(gint32)(x) + ty]), (c));                                                          \
+            assign_max((&(surface1)[(gint32)(x) + 1 + ty]), (c));                                                      \
+            assign_max((&(surface1)[(gint32)(x) + ty + width]), (c));                                                  \
+            assign_max((&(surface1)[(gint32)(x) + 1 + ty + width]), (c));                                              \
+        }                                                                                                              \
+    }
+
+#define SWAP(x, y)                                                                                                     \
+    x ^= y;                                                                                                            \
+    y ^= x;                                                                                                            \
     x ^= y;
 
-static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c)
-{
+static void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c) {
     gint32 dx, dy, cxy, dxy;
 
     /* calculate the distances */
@@ -200,8 +196,7 @@ static void ui_quit_window() {
     ui_quit();
 }
 
-gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_player)
-{
+gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_player) {
     width = _width;
     height = _height;
     scale = _scale;
@@ -211,10 +206,10 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
     visible = TRUE;
     g_mutex_init(&render_mutex);
 
-    if (! effects_load_effects(player)) {
+    if (!effects_load_effects(player)) {
         return FALSE;
     }
-    if (! ui_init_window()) {
+    if (!ui_init_window()) {
         ui_quit_window();
         return FALSE;
     }
@@ -226,9 +221,8 @@ gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *_pla
     return TRUE;
 }
 
-void display_quit(void)
-{
-    if (! initialized)
+void display_quit(void) {
+    if (!initialized)
         return;
     g_mutex_lock(&render_mutex);
     compute_vector_field_destroy(vector_field);
@@ -239,8 +233,7 @@ void display_quit(void)
     initialized = FALSE;
 }
 
-static void regenerate_cosine_tables()
-{
+static void regenerate_cosine_tables() {
     g_free(cosw.f);
     g_free(sinw.f);
     cosw.f = g_new0(gfloat, width + height + 1);
@@ -251,8 +244,7 @@ static void regenerate_cosine_tables()
     }
 }
 
-static gboolean regenerate_vector_field()
-{
+static gboolean regenerate_vector_field() {
     compute_vector_field_destroy(vector_field);
     vector_field = compute_vector_field_new(width, height);
     compute_generate_vector_field(vector_field);
@@ -260,13 +252,12 @@ static gboolean regenerate_vector_field()
         g_critical("Failed to allocate vector_field on resize to %dx%d", width, height);
         return FALSE;
     }
-    compute_resize(width, height);  // Update globals before generating vector field
+    compute_resize(width, height); // Update globals before generating vector field
     compute_generate_vector_field(vector_field);
     return TRUE;
 }
 
-gboolean display_resize(gint32 _width, gint32 _height)
-{
+gboolean display_resize(gint32 _width, gint32 _height) {
     g_mutex_lock(&render_mutex);
     width = _width;
     height = _height;
@@ -277,8 +268,7 @@ gboolean display_resize(gint32 _width, gint32 _height)
     return screen_ok && vector_field_ok;
 }
 
-gboolean display_take_resize(gint32 *out_width, gint32 *out_height)
-{
+gboolean display_take_resize(gint32 *out_width, gint32 *out_height) {
     g_mutex_lock(&resize_mutex);
     if (pending_resize) {
         *out_width = pending_width;
@@ -291,18 +281,15 @@ gboolean display_take_resize(gint32 *out_width, gint32 *out_height)
     return FALSE;
 }
 
-gboolean display_window_closed(void)
-{
+gboolean display_window_closed(void) {
     return window_closed;
 }
 
-gboolean display_is_visible(void)
-{
+gboolean display_is_visible(void) {
     return visible;
 }
 
-inline void display_set_pcm_data(const float *data, int channels)
-{
+inline void display_set_pcm_data(const float *data, int channels) {
     if (channels != 2) {
         g_critical("Unsupported number of channels (%d)\n", channels);
         return;
@@ -321,8 +308,7 @@ inline void display_set_pcm_data(const float *data, int channels)
     G_UNLOCK(pcm_data);
 }
 
-void change_color(gint32 t2, gint32 t1, gint32 w)
-{
+void change_color(gint32 t2, gint32 t1, gint32 w) {
     gint32 i;
     gint32 r, g, b;
 
@@ -334,19 +320,16 @@ void change_color(gint32 t2, gint32 t1, gint32 w)
     }
 }
 
-inline void display_blur(guint32 effect_index)
-{
+inline void display_blur(guint32 effect_index) {
     g_mutex_lock(&render_mutex);
     const guint32 wh = (guint32)vector_field->width * (guint32)vector_field->height;
     effect_index %= NB_FCT;
-    surface1 = compute_surface(vector_field->vector + effect_index * wh,
-                   vector_field->width, vector_field->height);
+    surface1 = compute_surface(vector_field->vector + effect_index * wh, vector_field->width, vector_field->height);
     display_surface();
     g_mutex_unlock(&render_mutex);
 }
 
-void spectral(t_effect *current_effect)
-{
+void spectral(t_effect *current_effect) {
     gint32 i, halfheight, halfwidth;
     gfloat old_y1, old_y2;
     gfloat y1, y2;
@@ -392,38 +375,26 @@ void spectral(t_effect *current_effect)
     for (i = step; i < width; i += step) {
         old_y1 = y1;
         old_y2 = y2;
-        y1 = (gfloat)(((pcm_data[1][(i << 9) / width / density_lines] >> 8) *
-                   current_effect->spectral_amplitude * height) >> 12);
-        y2 = (gfloat)(((pcm_data[0][(i << 9) / width / density_lines] >> 8) *
-                   current_effect->spectral_amplitude * height) >> 12);
+        y1 = (gfloat)(((pcm_data[1][(i << 9) / width / density_lines] >> 8) * current_effect->spectral_amplitude
+                          * height)
+                      >> 12);
+        y2 = (gfloat)(((pcm_data[0][(i << 9) / width / density_lines] >> 8) * current_effect->spectral_amplitude
+                          * height)
+                      >> 12);
         /* end CS */
         switch (current_effect->mode_spectre) {
         case 0:
-            line(i - step, halfheight + shift + old_y2,
-                 i, halfheight + shift + y2,
-                 current_effect->spectral_color);
+            line(i - step, halfheight + shift + old_y2, i, halfheight + shift + y2, current_effect->spectral_color);
             break;
         case 1:
-            line(i - step, halfheight + shift + old_y1,
-                 i, halfheight + shift + y1,
-                 current_effect->spectral_color);
-            line(i - step, halfheight - shift + old_y2,
-                 i, halfheight - shift + y2,
-                 current_effect->spectral_color);
+            line(i - step, halfheight + shift + old_y1, i, halfheight + shift + y1, current_effect->spectral_color);
+            line(i - step, halfheight - shift + old_y2, i, halfheight - shift + y2, current_effect->spectral_color);
             break;
         case 2:
-            line(i - step, halfheight + shift + old_y1,
-                 i, halfheight + shift + y1,
-                 current_effect->spectral_color);
-            line(i - step, halfheight - shift + old_y1,
-                 i, halfheight - shift + y1,
-                 current_effect->spectral_color);
-            line(halfwidth + shift + old_y2, i - step,
-                 halfwidth + shift + y2, i,
-                 current_effect->spectral_color);
-            line(halfwidth - shift + old_y2, i - step,
-                 halfwidth - shift + y2, i,
-                 current_effect->spectral_color);
+            line(i - step, halfheight + shift + old_y1, i, halfheight + shift + y1, current_effect->spectral_color);
+            line(i - step, halfheight - shift + old_y1, i, halfheight - shift + y1, current_effect->spectral_color);
+            line(halfwidth + shift + old_y2, i - step, halfwidth + shift + y2, i, current_effect->spectral_color);
+            line(halfwidth - shift + old_y2, i - step, halfwidth - shift + y2, i, current_effect->spectral_color);
             break;
         case 3:
             if (y1 < 0.0)
@@ -433,25 +404,25 @@ void spectral(t_effect *current_effect)
             G_GNUC_FALLTHROUGH;
         case 4:
             line(halfwidth + cosw.f[i - step] * (shift + old_y1),
-                 halfheight + sinw.f[i - step] * (shift + old_y1),
-                 halfwidth + cosw.f[i] * (shift + y1),
-                 halfheight + sinw.f[i] * (shift + y1),
-                 current_effect->spectral_color);
+                halfheight + sinw.f[i - step] * (shift + old_y1),
+                halfwidth + cosw.f[i] * (shift + y1),
+                halfheight + sinw.f[i] * (shift + y1),
+                current_effect->spectral_color);
             line(halfwidth - cosw.f[i - step] * (shift + old_y2),
-                 halfheight + sinw.f[i - step] * (shift + old_y2),
-                 halfwidth - cosw.f[i] * (shift + y2),
-                 halfheight + sinw.f[i] * (shift + y2),
-                 current_effect->spectral_color);
+                halfheight + sinw.f[i - step] * (shift + old_y2),
+                halfwidth - cosw.f[i] * (shift + y2),
+                halfheight + sinw.f[i] * (shift + y2),
+                current_effect->spectral_color);
             break;
         }
     }
     G_UNLOCK(pcm_data);
     if (current_effect->mode_spectre == 3 || current_effect->mode_spectre == 4) {
         line(halfwidth + cosw.f[width - step] * (shift + y1),
-             halfheight + sinw.f[width - step] * (shift + y1),
-             halfwidth - cosw.f[width - step] * (shift + y2),
-             halfheight + sinw.f[width - step] * (shift + y2),
-             current_effect->spectral_color);
+            halfheight + sinw.f[width - step] * (shift + y1),
+            halfwidth - cosw.f[width - step] * (shift + y2),
+            halfheight + sinw.f[width - step] * (shift + y2),
+            current_effect->spectral_color);
     }
 }
 
@@ -459,8 +430,7 @@ void spectral(t_effect *current_effect)
  * TODO current_effect->curve_color must be a byte. This is related to
  * t_effect typo.
  */
-void curve(t_effect *current_effect)
-{
+void curve(t_effect *current_effect) {
     gint32 i, j, k;
     gfloat v, vr;
     gfloat x, y;
@@ -474,16 +444,15 @@ void curve(t_effect *current_effect)
             x = cos((gfloat)(k) / (v + v * j * 1.34)) * height * amplitude;
             y = sin((gfloat)(k) / (1.756 * (v + v * j * 0.93))) * height * amplitude;
             plot2(x * cos((gfloat)k * vr) + y * sin((gfloat)k * vr) + width / 2,
-                  x * sin((gfloat)k * vr) - y * cos((gfloat)k * vr) + height / 2,
-                  (byte)current_effect->curve_color);
+                x * sin((gfloat)k * vr) - y * cos((gfloat)k * vr) + height / 2,
+                (byte)current_effect->curve_color);
             k++;
         }
     }
     current_effect->x_curve = k;
 }
 
-void display_toggle_fullscreen(void)
-{
+void display_toggle_fullscreen(void) {
     ui_toggle_fullscreen();
 }
 
@@ -491,18 +460,15 @@ void display_exit_fullscreen_if_needed(void) {
     ui_exit_fullscreen_if_needed();
 }
 
-inline void display_save_effect(t_effect *effect)
-{
+inline void display_save_effect(t_effect *effect) {
     effects_append_effect(effect);
 }
 
-inline void display_load_random_effect(t_effect *effect)
-{
+inline void display_load_random_effect(t_effect *effect) {
     effects_load_random_effect(effect);
 }
 
-void display_notify_resize(gint32 _width, gint32 _height)
-{
+void display_notify_resize(gint32 _width, gint32 _height) {
     g_message("display_notify_resize called with %dx%d", _width, _height);
     g_mutex_lock(&resize_mutex);
     pending_resize = TRUE;
@@ -512,12 +478,10 @@ void display_notify_resize(gint32 _width, gint32 _height)
     visible = TRUE;
 }
 
-void display_notify_close(void)
-{
+void display_notify_close(void) {
     window_closed = TRUE;
 }
 
-void display_notify_visibility(gboolean is_visible)
-{
+void display_notify_visibility(gboolean is_visible) {
     visible = is_visible;
 }

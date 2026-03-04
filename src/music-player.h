@@ -21,19 +21,19 @@
  */
 typedef struct _Player {
 
-    gboolean (*is_playing)      (void);
-    gchar*  (*get_title)        (void);
+    gboolean (*is_playing)(void);
+    gchar *(*get_title)(void);
 
-    void    (*play)             (void);
-    void    (*pause)            (void);
-    void    (*stop)             (void);
-    void    (*previous)         (void);
-    void    (*next)             (void);
-    void    (*seek)             (gint32 usecs);
-    void    (*adjust_volume)    (gint delta);
+    void (*play)(void);
+    void (*pause)(void);
+    void (*stop)(void);
+    void (*previous)(void);
+    void (*next)(void);
+    void (*seek)(gint32 usecs);
+    void (*adjust_volume)(gint delta);
 
-    void    (*notify_critical_error) (const gchar *message);
-    void    (*disable_plugin)   (void);  /* tell the player that this plugin has stopped */
+    void (*notify_critical_error)(const gchar *message);
+    void (*disable_plugin)(void); /* tell the player that this plugin has stopped */
 
 } Player;
 

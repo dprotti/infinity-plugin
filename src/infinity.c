@@ -25,15 +25,15 @@
 #include "input.h"
 #include "types.h"
 
-#define wrap(a)         (a < 0 ? 0 : (a > 255 ? 255 : a))
-#define next_effect()   (t_last_effect++)
-#define next_color()    (t_last_color++)
+#define wrap(a) (a < 0 ? 0 : (a > 255 ? 255 : a))
+#define next_effect() (t_last_effect++)
+#define next_color() (t_last_color++)
 
 typedef gint32 t_color;
 typedef gint32 t_num_effect;
 
-static InfParameters * params;
-static Player * player;
+static InfParameters *params;
+static Player *player;
 
 static gint32 width, height, scale;
 static t_effect current_effect;
@@ -57,8 +57,7 @@ static gpointer renderer(void *arg);
 static void handle_key_event(InfinityKey key);
 static void process_key_queue(void);
 
-void infinity_init(InfParameters * _params, Player * _player)
-{
+void infinity_init(InfParameters *_params, Player *_player) {
     gint32 _try;
 
     if (initializing) {
@@ -81,7 +80,7 @@ void infinity_init(InfParameters * _params, Player * _player)
     height = params->get_height();
     scale = params->get_scale();
 
-    if (! display_init(width, height, scale, player)) {
+    if (!display_init(width, height, scale, player)) {
         g_critical("Infinity: cannot initialize display");
         initializing = FALSE;
         finished = TRUE;
@@ -105,8 +104,7 @@ void infinity_init(InfParameters * _params, Player * _player)
     thread = g_thread_new("infinity_renderer", renderer, NULL);
 }
 
-void infinity_finish(void)
-{
+void infinity_finish(void) {
     gint32 _try;
 
     if (finished)
@@ -151,22 +149,19 @@ void infinity_finish(void)
     g_message("Infinity is shut down");
 }
 
-void infinity_render_multi_pcm(const float *data, int channels)
-{
+void infinity_render_multi_pcm(const float *data, int channels) {
     if (!initializing && !quiting)
         display_set_pcm_data(data, channels);
 }
 
-void infinity_queue_key(InfinityKey key)
-{
+void infinity_queue_key(InfinityKey key) {
     if (key_queue == NULL) {
         return;
     }
     g_async_queue_push(key_queue, GINT_TO_POINTER(key));
 }
 
-static void handle_key_event(InfinityKey key)
-{
+static void handle_key_event(InfinityKey key) {
     switch (key) {
     case INFINITY_KEY_RIGHT:
         if (player->is_playing())
@@ -225,8 +220,7 @@ static void handle_key_event(InfinityKey key)
     }
 }
 
-static void process_key_queue(void)
-{
+static void process_key_queue(void) {
     if (key_queue == NULL) {
         return;
     }
@@ -246,8 +240,7 @@ static gint64 calculate_frame_length_usecs(gint32 fps, int line) {
     return frame_length;
 }
 
-static gpointer renderer(void *)
-{
+static gpointer renderer(void *) {
     gint64 now, render_time, t_begin;
     gint32 frame_length;
     gint32 fps, new_fps;
@@ -258,7 +251,7 @@ static gpointer renderer(void *)
     t_between_effects = params->get_effect_interval();
     t_between_colors = params->get_color_interval();
     initializing = FALSE;
-    for (;; ) { /* ever... */
+    for (;;) { /* ever... */
         if (display_window_closed()) {
             player->disable_plugin();
             break;
@@ -279,7 +272,7 @@ static gpointer renderer(void *)
         if (finished)
             break;
         if (must_resize) {
-            if (! display_resize(width, height)) {
+            if (!display_resize(width, height)) {
                 player->disable_plugin();
                 break;
             }
