@@ -3,7 +3,8 @@
 
 #include <glib.h>
 
-typedef enum {
+typedef enum
+{
     INFINITY_KEY_RIGHT,
     INFINITY_KEY_LEFT,
     INFINITY_KEY_UP,
@@ -21,10 +22,11 @@ typedef enum {
 } InfinityKey;
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-void infinity_queue_key(InfinityKey key);
+    void infinity_queue_key(InfinityKey key);
 
 #ifdef __cplusplus
 }
