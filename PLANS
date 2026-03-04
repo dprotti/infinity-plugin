@@ -1,11 +1,2 @@
 
 Keep bringing beauty to the world.
-
-Others:
-- Move UI to Qt only (remove any leftover GTK/SDL remnants)
-- Continue SIMD-ifying compute/display hot paths using C++ intrinsics
-- Move all code to OO C++
-
-Stretch/Experimental
-- Add an optional OpenGL 4.3+ path using QOpenGLWidget: render to FBO → apply post-process shader chain (bloom, tone mapping) → present
-- Later: extract effect logic into compute shaders (GLSL / Vulkan) if going full GPU
