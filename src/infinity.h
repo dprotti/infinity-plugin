@@ -16,19 +16,18 @@
 #ifndef __INFINITY_INFINITY__
 #define __INFINITY_INFINITY__
 
-#include "music-player.h"
 #include <glib.h>
+#include "music-player.h"
 
-typedef struct _InfParameters
-{
-    gint32 (*get_width)(void);
-    void (*set_width)(gint32 width);
-    gint32 (*get_height)(void);
-    void (*set_height)(gint32 height);
-    gint32 (*get_scale)(void);
-    gint32 (*get_effect_interval)(void);
-    gint32 (*get_color_interval)(void);
-    gint32 (*get_max_fps)(void);
+typedef struct _InfParameters {
+    gint32  (*get_width)        (void);
+    void    (*set_width)        (gint32 width);
+    gint32  (*get_height)       (void);
+    void    (*set_height)       (gint32 height);
+    gint32  (*get_scale)        (void);
+    gint32  (*get_effect_interval) (void);
+    gint32  (*get_color_interval) (void);
+    gint32  (*get_max_fps)      (void);
 } InfParameters;
 
 /*
@@ -37,7 +36,7 @@ typedef struct _InfParameters
  * Reads configuration parameters and launches a thread where most of the
  * plugin job gets done.
  */
-void infinity_init(InfParameters* params, Player* player);
+void infinity_init(InfParameters * params, Player * player);
 
 /*
  * Closes rendering process.
@@ -47,6 +46,6 @@ void infinity_finish(void);
 /*
  * Expected to be called periodically by the player to provide actual PCM data.
  */
-void infinity_render_multi_pcm(const float* data, int channels);
+void infinity_render_multi_pcm(const float *data, int channels);
 
 #endif /* __INFINITY_INFINITY__ */

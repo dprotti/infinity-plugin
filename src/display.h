@@ -29,8 +29,7 @@
  *
  * Returns true on success; and false otherwise.
  */
-gboolean
-display_init(gint32 _width, gint32 _height, gint32 _scale, Player* player);
+gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *player);
 
 /*
  * Closes the display module.
@@ -45,7 +44,7 @@ void display_quit(void);
  */
 gboolean display_resize(gint32 width, gint32 height);
 
-gboolean display_take_resize(gint32* out_width, gint32* out_height);
+gboolean display_take_resize(gint32 *out_width, gint32 *out_height);
 gboolean display_window_closed(void);
 gboolean display_is_visible(void);
 
@@ -58,14 +57,14 @@ gboolean display_is_visible(void);
  *
  * See display_quit().
  */
-void display_set_pcm_data(const float* data, int channels);
+void display_set_pcm_data(const float *data, int channels);
 
 void display_show(void);
 
 void change_color(gint32 old_p, gint32 p, gint32 w);
 void display_blur(guint32 effect_index);
-void spectral(t_effect* current_effect);
-void curve(t_effect* current_effect);
+void spectral(t_effect *current_effect);
+void curve(t_effect *current_effect);
 
 /*
  * Makes the plugin screen switch to full-screen mode.
@@ -76,8 +75,8 @@ void display_toggle_fullscreen(void);
 
 void display_exit_fullscreen_if_needed(void);
 
-void display_save_effect(t_effect* effect);
-void display_load_random_effect(t_effect* effect);
+void display_save_effect(t_effect *effect);
+void display_load_random_effect(t_effect *effect);
 
 void display_notify_resize(gint32 width, gint32 height);
 void display_notify_close(void);

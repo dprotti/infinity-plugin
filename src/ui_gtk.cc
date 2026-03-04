@@ -1,5 +1,5 @@
-#include "input.h"
 #include "ui.h"
+#include "input.h"
 
 #include <gtk/gtk.h>
 
@@ -9,11 +9,10 @@
 #include <mutex>
 #include <vector>
 
-namespace
-{
+namespace {
 
-GtkWidget* window_instance = nullptr;
-GtkWidget* drawing_area = nullptr;
+GtkWidget *window_instance = nullptr;
+GtkWidget *drawing_area = nullptr;
 std::vector<guint16> frame_buffer;
 gint32 frame_width = 0;
 gint32 frame_height = 0;
@@ -22,57 +21,45 @@ bool is_fullscreen = false;
 std::mutex frame_mutex;
 
 void process_events();
-gint current_scale_factor(GtkWidget* widget);
+gint current_scale_factor(GtkWidget *widget);
 void notify_current_size();
 
-gboolean queue_draw(gpointer)
-{
-    if (drawing_area != nullptr)
-    {
+gboolean queue_draw(gpointer) {
+    if (drawing_area != nullptr) {
         gtk_widget_queue_draw(drawing_area);
         process_events();
     }
     return G_SOURCE_REMOVE;
 }
 
-struct ResizeRequest
-{
+struct ResizeRequest {
     gint32 width;
     gint32 height;
 };
 
-gboolean apply_resize(gpointer data)
-{
-    if (data == nullptr)
-    {
+gboolean apply_resize(gpointer data) {
+    if (data == nullptr) {
         return G_SOURCE_REMOVE;
     }
-    std::unique_ptr<ResizeRequest> request(static_cast<ResizeRequest*>(data));
-    if (window_instance == nullptr)
-    {
+    std::unique_ptr<ResizeRequest> request(static_cast<ResizeRequest *>(data));
+    if (window_instance == nullptr) {
         return G_SOURCE_REMOVE;
     }
     const gint scale = current_scale_factor(window_instance);
     const gint32 logical_width = std::max(request->width / scale, 1);
     const gint32 logical_height = std::max(request->height / scale, 1);
-    gtk_window_resize(
-        GTK_WINDOW(window_instance), logical_width, logical_height);
+    gtk_window_resize(GTK_WINDOW(window_instance), logical_width, logical_height);
     process_events();
     return G_SOURCE_REMOVE;
 }
 
-gboolean apply_toggle_fullscreen(gpointer)
-{
-    if (window_instance == nullptr)
-    {
+gboolean apply_toggle_fullscreen(gpointer) {
+    if (window_instance == nullptr) {
         return G_SOURCE_REMOVE;
     }
-    if (is_fullscreen)
-    {
+    if (is_fullscreen) {
         gtk_window_unfullscreen(GTK_WINDOW(window_instance));
-    }
-    else
-    {
+    } else {
         gtk_window_fullscreen(GTK_WINDOW(window_instance));
     }
     process_events();
@@ -80,10 +67,8 @@ gboolean apply_toggle_fullscreen(gpointer)
     return G_SOURCE_REMOVE;
 }
 
-gboolean apply_exit_fullscreen(gpointer)
-{
-    if (window_instance == nullptr || !is_fullscreen)
-    {
+gboolean apply_exit_fullscreen(gpointer) {
+    if (window_instance == nullptr || !is_fullscreen) {
         return G_SOURCE_REMOVE;
     }
     gtk_window_unfullscreen(GTK_WINDOW(window_instance));
@@ -92,14 +77,11 @@ gboolean apply_exit_fullscreen(gpointer)
     return G_SOURCE_REMOVE;
 }
 
-bool ensure_gtk_ready()
-{
-    if (gtk_ready)
-    {
+bool ensure_gtk_ready() {
+    if (gtk_ready) {
         return true;
     }
-    if (gtk_init_check(nullptr, nullptr) == FALSE)
-    {
+    if (gtk_init_check(nullptr, nullptr) == FALSE) {
         g_message("Infinity: unable to initialize GTK");
         return false;
     }
@@ -107,32 +89,26 @@ bool ensure_gtk_ready()
     return true;
 }
 
-void process_events()
-{
-    while (gtk_events_pending())
-    {
+void process_events() {
+    while (gtk_events_pending()) {
         gtk_main_iteration_do(FALSE);
     }
 }
 
-gint current_scale_factor(GtkWidget* widget)
-{
-    if (widget == nullptr)
-    {
+gint current_scale_factor(GtkWidget *widget) {
+    if (widget == nullptr) {
         return 1;
     }
     return std::max(gtk_widget_get_scale_factor(widget), 1);
 }
 
-gboolean on_draw(GtkWidget* widget, cairo_t* cr, gpointer)
-{
+gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer) {
     std::vector<guint16> frame_copy;
     gint32 width = 0;
     gint32 height = 0;
     {
         std::lock_guard<std::mutex> lock(frame_mutex);
-        if (frame_buffer.empty())
-        {
+        if (frame_buffer.empty()) {
             return FALSE;
         }
         frame_copy = frame_buffer;
@@ -142,33 +118,30 @@ gboolean on_draw(GtkWidget* widget, cairo_t* cr, gpointer)
 
     const gint32 target_width = gtk_widget_get_allocated_width(widget);
     const gint32 target_height = gtk_widget_get_allocated_height(widget);
-    if (target_width <= 0 || target_height <= 0)
-    {
+    if (target_width <= 0 || target_height <= 0) {
         return FALSE;
     }
 
-    const int stride =
-        cairo_format_stride_for_width(CAIRO_FORMAT_RGB16_565, width);
-    std::vector<unsigned char> surface_buffer(
-        static_cast<size_t>(stride) * height);
-    const unsigned char* source =
-        reinterpret_cast<const unsigned char*>(frame_copy.data());
+    const int stride = cairo_format_stride_for_width(CAIRO_FORMAT_RGB16_565, width);
+    std::vector<unsigned char> surface_buffer(static_cast<size_t>(stride) * height);
+    const unsigned char *source = reinterpret_cast<const unsigned char *>(frame_copy.data());
     const int row_bytes = width * static_cast<int>(sizeof(guint16));
-    for (gint32 row = 0; row < height; ++row)
-    {
-        std::memcpy(
-            surface_buffer.data() + (stride * row), source + (row_bytes * row),
-            row_bytes);
+    for (gint32 row = 0; row < height; ++row) {
+        std::memcpy(surface_buffer.data() + (stride * row),
+                source + (row_bytes * row),
+                row_bytes);
     }
 
-    cairo_surface_t* surface = cairo_image_surface_create_for_data(
-        surface_buffer.data(), CAIRO_FORMAT_RGB16_565, width, height, stride);
+    cairo_surface_t *surface = cairo_image_surface_create_for_data(
+        surface_buffer.data(),
+        CAIRO_FORMAT_RGB16_565,
+        width,
+        height,
+        stride);
 
     cairo_save(cr);
-    const double scale_x =
-        static_cast<double>(target_width) / static_cast<double>(width);
-    const double scale_y =
-        static_cast<double>(target_height) / static_cast<double>(height);
+    const double scale_x = static_cast<double>(target_width) / static_cast<double>(width);
+    const double scale_y = static_cast<double>(target_height) / static_cast<double>(height);
     cairo_scale(cr, scale_x, scale_y);
     cairo_set_source_surface(cr, surface, 0, 0);
     cairo_pattern_set_filter(cairo_get_source(cr), CAIRO_FILTER_BILINEAR);
@@ -178,10 +151,8 @@ gboolean on_draw(GtkWidget* widget, cairo_t* cr, gpointer)
     return FALSE;
 }
 
-void on_size_allocate(GtkWidget* widget, GtkAllocation* allocation, gpointer)
-{
-    if (allocation == nullptr)
-    {
+void on_size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer) {
+    if (allocation == nullptr) {
         return;
     }
     const gint scale = current_scale_factor(widget);
@@ -190,26 +161,21 @@ void on_size_allocate(GtkWidget* widget, GtkAllocation* allocation, gpointer)
     display_notify_resize(pixel_width, pixel_height);
 }
 
-gboolean on_delete_event(GtkWidget*, GdkEvent*, gpointer)
-{
+gboolean on_delete_event(GtkWidget *, GdkEvent *, gpointer) {
     display_notify_close();
     return FALSE;
 }
 
-void on_show(GtkWidget*, gpointer)
-{
+void on_show(GtkWidget *, gpointer) {
     display_notify_visibility(TRUE);
 }
 
-void on_hide(GtkWidget*, gpointer)
-{
+void on_hide(GtkWidget *, gpointer) {
     display_notify_visibility(FALSE);
 }
 
-gboolean on_key_press(GtkWidget*, GdkEventKey* event, gpointer)
-{
-    switch (event->keyval)
-    {
+gboolean on_key_press(GtkWidget *, GdkEventKey *event, gpointer) {
+    switch (event->keyval) {
     case GDK_KEY_Right:
         infinity_queue_key(INFINITY_KEY_RIGHT);
         break;
@@ -264,21 +230,16 @@ gboolean on_key_press(GtkWidget*, GdkEventKey* event, gpointer)
     return FALSE;
 }
 
-gboolean on_window_state(GtkWidget*, GdkEventWindowState* event, gpointer)
-{
-    if ((event->changed_mask & GDK_WINDOW_STATE_FULLSCREEN) == 0)
-    {
+gboolean on_window_state(GtkWidget *, GdkEventWindowState *event, gpointer) {
+    if ((event->changed_mask & GDK_WINDOW_STATE_FULLSCREEN) == 0) {
         return FALSE;
     }
-    is_fullscreen =
-        (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN) != 0;
+    is_fullscreen = (event->new_window_state & GDK_WINDOW_STATE_FULLSCREEN) != 0;
     return FALSE;
 }
 
-void notify_current_size()
-{
-    if (drawing_area == nullptr)
-    {
+void notify_current_size() {
+    if (drawing_area == nullptr) {
         return;
     }
     const gint scale = current_scale_factor(drawing_area);
@@ -291,13 +252,11 @@ void notify_current_size()
 
 gboolean ui_init(gint32 width, gint32 height)
 {
-    if (!ensure_gtk_ready())
-    {
+    if (!ensure_gtk_ready()) {
         return FALSE;
     }
 
-    if (window_instance != nullptr)
-    {
+    if (window_instance != nullptr) {
         return TRUE;
     }
 
@@ -309,11 +268,9 @@ gboolean ui_init(gint32 width, gint32 height)
     const gint scale = current_scale_factor(window_instance);
     const gint32 logical_width = std::max(width / scale, 1);
     const gint32 logical_height = std::max(height / scale, 1);
-    gtk_window_resize(
-        GTK_WINDOW(window_instance), logical_width, logical_height);
+    gtk_window_resize(GTK_WINDOW(window_instance), logical_width, logical_height);
     gtk_window_set_resizable(GTK_WINDOW(window_instance), TRUE);
-    gtk_window_set_default_size(
-        GTK_WINDOW(window_instance), logical_width, logical_height);
+    gtk_window_set_default_size(GTK_WINDOW(window_instance), logical_width, logical_height);
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_hexpand(drawing_area, TRUE);
@@ -322,18 +279,13 @@ gboolean ui_init(gint32 width, gint32 height)
 
     gtk_widget_add_events(window_instance, GDK_KEY_PRESS_MASK);
 
-    g_signal_connect(
-        window_instance, "delete-event", G_CALLBACK(on_delete_event), nullptr);
+    g_signal_connect(window_instance, "delete-event", G_CALLBACK(on_delete_event), nullptr);
     g_signal_connect(window_instance, "show", G_CALLBACK(on_show), nullptr);
     g_signal_connect(window_instance, "hide", G_CALLBACK(on_hide), nullptr);
-    g_signal_connect(
-        window_instance, "key-press-event", G_CALLBACK(on_key_press), nullptr);
-    g_signal_connect(
-        window_instance, "window-state-event", G_CALLBACK(on_window_state),
-        nullptr);
+    g_signal_connect(window_instance, "key-press-event", G_CALLBACK(on_key_press), nullptr);
+    g_signal_connect(window_instance, "window-state-event", G_CALLBACK(on_window_state), nullptr);
     g_signal_connect(drawing_area, "draw", G_CALLBACK(on_draw), nullptr);
-    g_signal_connect(
-        drawing_area, "size-allocate", G_CALLBACK(on_size_allocate), nullptr);
+    g_signal_connect(drawing_area, "size-allocate", G_CALLBACK(on_size_allocate), nullptr);
 
     gtk_widget_show_all(window_instance);
     process_events();
@@ -347,8 +299,7 @@ void ui_ensure_app(void)
 
 void ui_quit(void)
 {
-    if (window_instance == nullptr)
-    {
+    if (window_instance == nullptr) {
         return;
     }
     gtk_widget_destroy(window_instance);
@@ -356,11 +307,9 @@ void ui_quit(void)
     drawing_area = nullptr;
 }
 
-void ui_present(const guint16* pixels, gint32 width, gint32 height)
+void ui_present(const guint16 *pixels, gint32 width, gint32 height)
 {
-    if (drawing_area == nullptr || pixels == nullptr || width <= 0 ||
-        height <= 0)
-    {
+    if (drawing_area == nullptr || pixels == nullptr || width <= 0 || height <= 0) {
         return;
     }
     {
@@ -374,18 +323,16 @@ void ui_present(const guint16* pixels, gint32 width, gint32 height)
 
 void ui_resize(gint32 width, gint32 height)
 {
-    if (window_instance == nullptr)
-    {
+    if (window_instance == nullptr) {
         return;
     }
-    auto* request = new ResizeRequest { width, height };
+    auto *request = new ResizeRequest{width, height};
     g_main_context_invoke(nullptr, apply_resize, request);
 }
 
 void ui_toggle_fullscreen(void)
 {
-    if (window_instance == nullptr)
-    {
+    if (window_instance == nullptr) {
         return;
     }
     g_main_context_invoke(nullptr, apply_toggle_fullscreen, nullptr);
@@ -393,8 +340,7 @@ void ui_toggle_fullscreen(void)
 
 void ui_exit_fullscreen_if_needed(void)
 {
-    if (window_instance == nullptr || !is_fullscreen)
-    {
+    if (window_instance == nullptr || !is_fullscreen) {
         return;
     }
     g_main_context_invoke(nullptr, apply_exit_fullscreen, nullptr);

@@ -16,8 +16,8 @@
 #ifndef __INFINITY_COMPUTE__
 #define __INFINITY_COMPUTE__
 
-#include "types.h"
 #include <glib.h>
+#include "types.h"
 
 #define NB_FCT 7
 #define PI 3.14159
@@ -25,8 +25,7 @@
 /*
  * Represents the interpollation information.
  */
-typedef struct
-{
+typedef struct {
     guint32 coord;  /* Coordinates of the top left pixel. */
     guint32 weight; /* 32 bits = 4*8 = weights of the four corners */
 } t_interpol;
@@ -38,51 +37,49 @@ typedef struct
  * to calculate the memory size of an object of this type
  * because this is actually not true.
  */
-typedef struct
-{
-    gint32 width;       /* number of vectors */
-    gint32 height;      /* length of each vector */
-    t_interpol* vector; /* pointer to the vector field */
+typedef struct {
+    gint32		width;  /* number of vectors */
+    gint32		height; /* length of each vector */
+    t_interpol *	vector; /* pointer to the vector field */
 } vector_field_t;
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
-    /*
-     * The constructor of the ::vector_field_t type.
-     */
-    vector_field_t* compute_vector_field_new(int width, int height);
+/*
+ * The constructor of the ::vector_field_t type.
+ */
+vector_field_t *compute_vector_field_new(int width, int height);
 
-    /*
-     * The destructor of the ::vector_field_t type.
-     *
-     * @param vector_field Must be non NULL pointer to a
-     * ::vector_field_t object.
-     */
-    void compute_vector_field_destroy(vector_field_t* vector_field);
+/*
+ * The destructor of the ::vector_field_t type.
+ *
+ * @param vector_field Must be non NULL pointer to a
+ * ::vector_field_t object.
+ */
+void compute_vector_field_destroy(vector_field_t *vector_field);
 
-    /*
-     * It frees any allocated resource and mades clenaup work.
-     */
-    void compute_quit(void);
+/*
+ * It frees any allocated resource and mades clenaup work.
+ */
+void compute_quit(void);
 
-    void compute_init(gint32 width, gint32 height, gint32 scale);
+void compute_init(gint32 width, gint32 height, gint32 scale);
 
-    /*
-     * Tell the module that the screen has been resized.
-     *
-     * Warning: may be this will be deprecated.
-     */
-    void compute_resize(gint32 width, gint32 height);
+/*
+ * Tell the module that the screen has been resized.
+ *
+ * Warning: may be this will be deprecated.
+ */
+void compute_resize(gint32 width, gint32 height);
 
-    void compute_generate_vector_field(vector_field_t* vector_field);
+void compute_generate_vector_field(vector_field_t *vector_field);
 
-    byte* compute_surface(t_interpol* vector, gint32 width, gint32 height);
+byte *compute_surface(t_interpol *vector, gint32 width, gint32 height);
 
 #ifdef __cplusplus
-} // extern C
+}  // extern C
 #endif
 
 #endif /* __INFINITY_COMPUTE__ */
