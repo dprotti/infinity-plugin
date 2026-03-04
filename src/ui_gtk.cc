@@ -127,17 +127,11 @@ gboolean on_draw(GtkWidget *widget, cairo_t *cr, gpointer) {
     const unsigned char *source = reinterpret_cast<const unsigned char *>(frame_copy.data());
     const int row_bytes = width * static_cast<int>(sizeof(guint16));
     for (gint32 row = 0; row < height; ++row) {
-        std::memcpy(surface_buffer.data() + (stride * row),
-                source + (row_bytes * row),
-                row_bytes);
+        std::memcpy(surface_buffer.data() + (stride * row), source + (row_bytes * row), row_bytes);
     }
 
     cairo_surface_t *surface = cairo_image_surface_create_for_data(
-        surface_buffer.data(),
-        CAIRO_FORMAT_RGB16_565,
-        width,
-        height,
-        stride);
+        surface_buffer.data(), CAIRO_FORMAT_RGB16_565, width, height, stride);
 
     cairo_save(cr);
     const double scale_x = static_cast<double>(target_width) / static_cast<double>(width);
@@ -250,8 +244,7 @@ void notify_current_size() {
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height)
-{
+gboolean ui_init(gint32 width, gint32 height) {
     if (!ensure_gtk_ready()) {
         return FALSE;
     }
@@ -292,13 +285,11 @@ gboolean ui_init(gint32 width, gint32 height)
     return TRUE;
 }
 
-void ui_ensure_app(void)
-{
+void ui_ensure_app(void) {
     ensure_gtk_ready();
 }
 
-void ui_quit(void)
-{
+void ui_quit(void) {
     if (window_instance == nullptr) {
         return;
     }
@@ -307,8 +298,7 @@ void ui_quit(void)
     drawing_area = nullptr;
 }
 
-void ui_present(const guint16 *pixels, gint32 width, gint32 height)
-{
+void ui_present(const guint16 *pixels, gint32 width, gint32 height) {
     if (drawing_area == nullptr || pixels == nullptr || width <= 0 || height <= 0) {
         return;
     }
@@ -321,8 +311,7 @@ void ui_present(const guint16 *pixels, gint32 width, gint32 height)
     g_main_context_invoke(nullptr, queue_draw, nullptr);
 }
 
-void ui_resize(gint32 width, gint32 height)
-{
+void ui_resize(gint32 width, gint32 height) {
     if (window_instance == nullptr) {
         return;
     }
@@ -330,16 +319,14 @@ void ui_resize(gint32 width, gint32 height)
     g_main_context_invoke(nullptr, apply_resize, request);
 }
 
-void ui_toggle_fullscreen(void)
-{
+void ui_toggle_fullscreen(void) {
     if (window_instance == nullptr) {
         return;
     }
     g_main_context_invoke(nullptr, apply_toggle_fullscreen, nullptr);
 }
 
-void ui_exit_fullscreen_if_needed(void)
-{
+void ui_exit_fullscreen_if_needed(void) {
     if (window_instance == nullptr || !is_fullscreen) {
         return;
     }

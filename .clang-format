@@ -1,3 +1,71 @@
-UseTab: Never          # always use spaces
-IndentWidth: 4         # 4 spaces per indent
-TabWidth: 4
+# .clang-format for infinity-plugin
+# Strictly compatible with clang-format 17
+
+Language:        Cpp
+BasedOnStyle:    LLVM
+
+IndentWidth:             4
+TabWidth:                4
+UseTab:                  Never
+ColumnLimit:             120
+MaxEmptyLinesToKeep:     2
+KeepEmptyLinesAtTheStartOfBlocks: true
+
+AccessModifierOffset:    -4
+
+BreakBeforeBraces:       Attach
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens:              ControlStatements
+
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeCtorInitializerColon:   true
+
+DerivePointerAlignment:  false
+PointerAlignment:        Right
+ReferenceAlignment:      Pointer
+
+SpaceInEmptyParentheses: false
+SpacesInParentheses:     false
+SpacesInSquareBrackets:  false
+SpacesInAngles:          false
+
+PackConstructorInitializers: Never
+ConstructorInitializerIndentWidth: 4
+
+# Prevent collapse of braced lists
+BinPackArguments:        false
+BinPackParameters:       false
+
+# Very high penalties → strongly discourage merging items or breaking existing lines
+PenaltyBreakString:                  5000     # extremely high — protects string pieces
+PenaltyBreakBeforeFirstCallParameter: 3000    # very high — resists starting a new line early
+PenaltyExcessCharacter:              1000     # makes slight over-column costly
+PenaltyBreakAssignment:              100      # medium — somewhat discourages break after =
+
+# Try to reduce alignment pressure on braced lists
+AlignAfterOpenBracket:   DontAlign   # Prevent indenting under = or {
+
+AlwaysBreakBeforeMultilineStrings:   false
+
+# Optional but often helpful in clang-17 for arrays/structs:
+AlignArrayOfStructures:  None
+
+IncludeBlocks:           Preserve
+SortIncludes:            false
+
+IndentPPDirectives:      AfterHash
+
+FixNamespaceComments:    false
+NamespaceIndentation:    None
+CompactNamespaces:       false
+
+AlignEscapedNewlines:    Right
+AlignOperands:           true
+AlignTrailingComments:   true
+
+BreakBeforeBinaryOperators: All

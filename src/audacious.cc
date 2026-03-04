@@ -30,72 +30,64 @@ extern "C" {
 
 #define CFGID "infinity"
 
-static const char about_text[] =
-    "Infinity " PACKAGE_VERSION "\n\n"
-    "https://dprotti.github.io/infinity-plugin\n\n"
-    "Copyright 2004-2026 Duilio Protti\n\n"
-    "Based on the XMMS plugin:\n"
-    "Copyright 2000 Julien Carme\n\n"
-    "Contributions from:\n"
-    "James Carthew (C) 2026 <https://github.com/DMJC>\n"
-    "CBke (C) 2016 <https://github.com/CBke>\n"
-    "John Lightsey (C) 2004 <john@nixnuts.net>\n"
-    "Jean Delvare (C) 2004 <khali@linux-fr.org>\n"
-    "Will Tatam (C) 2004 <wtatam@premierit.com>\n"
-    "Haavard Kvaalen (C) 2000 <havardk@xmms.org>\n"
-    "Chris Lea (C) 2000 <chrislea@luciddesign.com>\n"
-    "Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si>\n";
+static const char about_text[] = "Infinity " PACKAGE_VERSION "\n\n"
+                                 "https://dprotti.github.io/infinity-plugin\n\n"
+                                 "Copyright 2004-2026 Duilio Protti\n\n"
+                                 "Based on the XMMS plugin:\n"
+                                 "Copyright 2000 Julien Carme\n\n"
+                                 "Contributions from:\n"
+                                 "James Carthew (C) 2026 <https://github.com/DMJC>\n"
+                                 "CBke (C) 2016 <https://github.com/CBke>\n"
+                                 "John Lightsey (C) 2004 <john@nixnuts.net>\n"
+                                 "Jean Delvare (C) 2004 <khali@linux-fr.org>\n"
+                                 "Will Tatam (C) 2004 <wtatam@premierit.com>\n"
+                                 "Haavard Kvaalen (C) 2000 <havardk@xmms.org>\n"
+                                 "Chris Lea (C) 2000 <chrislea@luciddesign.com>\n"
+                                 "Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si>\n";
 
-static const PreferencesWidget prefs_fps[] = {
-    WidgetLabel ("<b>Frames per second</b>"),
-    WidgetSpin ("Max. :", WidgetInt (CFGID, "max_fps"), {15, 60, 1, "fps"}),
-    WidgetLabel ("<b>How often change effect</b>"),
-    WidgetSpin ("Every", WidgetInt (CFGID, "effect_time"), {50, 500, 5, "frames"}),
-    WidgetLabel ("<b>How often change colors</b>"),
-    WidgetSpin ("Every", WidgetInt (CFGID, "palette_time"), {50, 500, 5, "frames"}),
+static const PreferencesWidget prefs_fps[] = {WidgetLabel("<b>Frames per second</b>"),
+    WidgetSpin("Max. :", WidgetInt(CFGID, "max_fps"), {15, 60, 1, "fps"}),
+    WidgetLabel("<b>How often change effect</b>"),
+    WidgetSpin("Every", WidgetInt(CFGID, "effect_time"), {50, 500, 5, "frames"}),
+    WidgetLabel("<b>How often change colors</b>"),
+    WidgetSpin("Every", WidgetInt(CFGID, "palette_time"), {50, 500, 5, "frames"}),
 
-    WidgetLabel ("<b>Controls</b>"),
-    WidgetLabel ("Up/Down:\tup/down main volume"),
-    WidgetLabel ("Left/Right:\treward/forward current song"),
-    WidgetLabel ("z:\t\t\tprevious song"),
-    WidgetLabel ("x:\t\t\tplay"),
-    WidgetLabel ("c:\t\t\tpause"),
-    WidgetLabel ("v:\t\t\tstop"),
-    WidgetLabel ("b:\t\t\tnext song"),
-    WidgetLabel ("F11:\t\ttoggle full-screen"),
-    WidgetLabel ("F12:\t\tchange palette"),
-    WidgetLabel ("Space:\t\tchange effect"),
-    WidgetLabel ("Enter:\t\tswitch to interactive mode\n\t\t\t(only if compiled with --enable-debug)   ")
-};
+    WidgetLabel("<b>Controls</b>"),
+    WidgetLabel("Up/Down:\tup/down main volume"),
+    WidgetLabel("Left/Right:\treward/forward current song"),
+    WidgetLabel("z:\t\t\tprevious song"),
+    WidgetLabel("x:\t\t\tplay"),
+    WidgetLabel("c:\t\t\tpause"),
+    WidgetLabel("v:\t\t\tstop"),
+    WidgetLabel("b:\t\t\tnext song"),
+    WidgetLabel("F11:\t\ttoggle full-screen"),
+    WidgetLabel("F12:\t\tchange palette"),
+    WidgetLabel("Space:\t\tchange effect"),
+    WidgetLabel("Enter:\t\tswitch to interactive mode\n\t\t\t(only if compiled with --enable-debug)   ")};
 
-static const PreferencesWidget prefs_widgets[] = {
-    WidgetBox ({{prefs_fps}})
-};
+static const PreferencesWidget prefs_widgets[] = {WidgetBox({{prefs_fps}})};
 
 static const PluginPreferences preferences = {{prefs_widgets}};
 
 class InfinityPlugin : VisPlugin {
 public:
-    static constexpr PluginInfo info = {
-        "Infinity",
-        PACKAGE,
-        about_text,
-        & preferences
-    };
+    static constexpr PluginInfo info = {"Infinity", PACKAGE, about_text, &preferences};
 
-    constexpr InfinityPlugin () : VisPlugin (info, Visualizer::MultiPCM) {}
+    constexpr InfinityPlugin()
+        : VisPlugin(info, Visualizer::MultiPCM) {
+    }
 
-    bool init ();
-    void cleanup ();
+    bool init();
+    void cleanup();
 
     // No embedded widget; UI toolkit creates its own window.
     // void * get_gtk_widget ();
 
-    void clear ();
-    void render_multi_pcm (const float * pcm, int channels);
+    void clear();
+    void render_multi_pcm(const float *pcm, int channels);
 
 private:
-    void load_settings ();
+    void load_settings();
 };
 
 EXPORT InfinityPlugin aud_plugin_instance;
@@ -149,12 +141,12 @@ static gboolean is_playing() {
     return aud_drct_get_playing() && aud_drct_get_ready();
 }
 
-static gchar* get_title() {
-/*      String title = aud_playlist_get_title(aud_playlist_get_playing());
-        return (gchar*) title.to_raw();*/
-        auto playlist = Playlist::playing_playlist();
-        String title = playlist.entry_filename(playlist.get_position());
-        return (gchar*) (const char *) title;
+static gchar *get_title() {
+    /*      String title = aud_playlist_get_title(aud_playlist_get_playing());
+            return (gchar*) title.to_raw();*/
+    auto playlist = Playlist::playing_playlist();
+    String title = playlist.entry_filename(playlist.get_position());
+    return (gchar *)(const char *)title;
 }
 
 static void play() {
@@ -187,17 +179,16 @@ static void adjust_volume(gint delta) {
     aud_drct_set_volume_main(volume + delta);
 }
 
-static void notify_critical_error (const gchar *message) {
+static void notify_critical_error(const gchar *message) {
     aud_ui_show_error(message);
 }
 
 static void disable_plugin() {
-    PluginHandle * plugin = aud_plugin_lookup_basename("libinfinite");
+    PluginHandle *plugin = aud_plugin_lookup_basename("libinfinite");
     aud_plugin_enable(plugin, false);
 }
 
-static Player player = {
-    .is_playing = is_playing,
+static Player player = {.is_playing = is_playing,
     .get_title = get_title,
     .play = play,
     .pause = aud_pause,
@@ -207,11 +198,9 @@ static Player player = {
     .seek = seek,
     .adjust_volume = adjust_volume,
     .notify_critical_error = notify_critical_error,
-    .disable_plugin = disable_plugin
-};
+    .disable_plugin = disable_plugin};
 
-bool InfinityPlugin::init(void)
-{
+bool InfinityPlugin::init(void) {
     load_settings();
     init_params();
     infinity_init(&params, &player);
@@ -219,21 +208,20 @@ bool InfinityPlugin::init(void)
     return TRUE;
 }
 
-void InfinityPlugin::clear ()
-{
+void InfinityPlugin::clear() {
     g_message("Infinity: clear()");
 }
 
-void InfinityPlugin::cleanup(void)
-{
+void InfinityPlugin::cleanup(void) {
     g_message("Infinity: cleanup()");
     infinity_finish();
 }
 
-void InfinityPlugin::render_multi_pcm (const float * pcm, int channels) {
+void InfinityPlugin::render_multi_pcm(const float *pcm, int channels) {
     infinity_render_multi_pcm(pcm, channels);
 }
 
+// clang-format off
 static const char * const defaults[] = {
     "width", "512",
     "height", "288",
@@ -243,8 +231,8 @@ static const char * const defaults[] = {
     "max_fps", "30",
     nullptr
 };
+// clang-format on
 
-void InfinityPlugin::load_settings(void)
-{
-    aud_config_set_defaults (CFGID, defaults);
+void InfinityPlugin::load_settings(void) {
+    aud_config_set_defaults(CFGID, defaults);
 }

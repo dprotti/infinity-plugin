@@ -167,8 +167,7 @@ void process_events() {
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height)
-{
+gboolean ui_init(gint32 width, gint32 height) {
     ensure_app_instance();
     if (QApplication::instance() == nullptr) {
         return FALSE;
@@ -186,8 +185,7 @@ gboolean ui_init(gint32 width, gint32 height)
     return TRUE;
 }
 
-void ui_quit(void)
-{
+void ui_quit(void) {
     if (window_instance == nullptr) {
         return;
     }
@@ -196,8 +194,7 @@ void ui_quit(void)
     window_instance = nullptr;
 }
 
-void ui_present(const guint16 *pixels, gint32 width, gint32 height)
-{
+void ui_present(const guint16 *pixels, gint32 width, gint32 height) {
     if (window_instance == nullptr) {
         return;
     }
@@ -205,8 +202,7 @@ void ui_present(const guint16 *pixels, gint32 width, gint32 height)
     process_events();
 }
 
-void ui_resize(gint32 width, gint32 height)
-{
+void ui_resize(gint32 width, gint32 height) {
     if (window_instance == nullptr) {
         return;
     }
@@ -217,20 +213,17 @@ void ui_resize(gint32 width, gint32 height)
     process_events();
 }
 
-void ui_toggle_fullscreen(void)
-{
+void ui_toggle_fullscreen(void) {
     if (window_instance == nullptr) {
         return;
     }
     window_instance->set_fullscreen(!window_instance->is_fullscreen());
     process_events();
     const qreal ratio = window_instance->devicePixelRatioF();
-    display_notify_resize(qRound(window_instance->width() * ratio),
-                  qRound(window_instance->height() * ratio));
+    display_notify_resize(qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
 }
 
-void ui_exit_fullscreen_if_needed(void)
-{
+void ui_exit_fullscreen_if_needed(void) {
     if (window_instance == nullptr) {
         return;
     }
@@ -238,7 +231,6 @@ void ui_exit_fullscreen_if_needed(void)
         window_instance->set_fullscreen(false);
         process_events();
         const qreal ratio = window_instance->devicePixelRatioF();
-        display_notify_resize(qRound(window_instance->width() * ratio),
-                      qRound(window_instance->height() * ratio));
+        display_notify_resize(qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
     }
 }

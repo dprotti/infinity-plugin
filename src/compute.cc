@@ -21,13 +21,11 @@
 #include "config.h"
 #include "types.h"
 
-typedef struct t_coord
-{
+typedef struct t_coord {
     gint32 x, y;
 } t_coord;
 
-typedef struct t_complex
-{
+typedef struct t_complex {
     gfloat x, y;
 } t_complex;
 
@@ -50,8 +48,7 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2) /* p1 
     a.x -= width / 2;
     a.y -= height / 2;
 
-    switch (n)
-    {
+    switch (n) {
     case 0:
         an = 0.025 * (p1 - 2) + 0.002;
         co = cos(an);
@@ -145,9 +142,8 @@ static inline t_complex fct(t_complex a, guint32 n, gint32 p1, gint32 p2) /* p1 
 }
 
 /* We are trusting here on vector_field != NULL !!! */
-static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, guint32 p2,
-                                           guint32 debut, guint32 step, vector_field_t *vector_field)
-{
+static inline void compute_generate_sector(
+    guint32 g, guint32 f, guint32 p1, guint32 p2, guint32 debut, guint32 step, vector_field_t *vector_field) {
     const guint32 width = (guint32)vector_field->width;
     const guint32 height = (guint32)vector_field->height;
     const guint32 prop_transmitted = 249;
@@ -158,10 +154,8 @@ static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, gui
 
     if (fin > height)
         fin = height;
-    for (cy = debut; cy < fin; cy++)
-    {
-        for (cx = 0; cx < width; cx++)
-        {
+    for (cy = debut; cy < fin; cy++) {
+        for (cx = 0; cx < width; cx++) {
             t_complex a;
             gfloat fpy;
             guint32 rw, lw, add;
@@ -183,14 +177,12 @@ static inline void compute_generate_sector(guint32 g, guint32 f, guint32 p1, gui
             w2 = rw - w4;
             w3 = (guint32)(fpy * lw);
             w1 = lw - w3;
-            vector[b_add + add].weight =
-                (w1 << 24) | (w2 << 16) | (w3 << 8) | w4;
+            vector[b_add + add].weight = (w1 << 24) | (w2 << 16) | (w3 << 8) | w4;
         }
     }
 }
 
-void compute_init(gint32 _width, gint32 _height, gint32 _scale)
-{
+void compute_init(gint32 _width, gint32 _height, gint32 _scale) {
     width = _width;
     height = _height;
     scale = _scale;
@@ -201,8 +193,7 @@ void compute_init(gint32 _width, gint32 _height, gint32 _scale)
     avx2_available = __builtin_cpu_supports("avx2");
 }
 
-void compute_resize(gint32 _width, gint32 _height)
-{
+void compute_resize(gint32 _width, gint32 _height) {
     width = _width;
     height = _height;
     g_free(surface1);
@@ -211,8 +202,7 @@ void compute_resize(gint32 _width, gint32 _height)
     surface2 = (byte *)g_malloc0((gulong)(width + 1) * (height + 1));
 }
 
-vector_field_t *compute_vector_field_new(gint32 width, gint32 height)
-{
+vector_field_t *compute_vector_field_new(gint32 width, gint32 height) {
     vector_field_t *field;
 
     field = g_new0(vector_field_t, 1);
@@ -222,22 +212,19 @@ vector_field_t *compute_vector_field_new(gint32 width, gint32 height)
     return field;
 }
 
-void compute_vector_field_destroy(vector_field_t *vector_field)
-{
+void compute_vector_field_destroy(vector_field_t *vector_field) {
     g_return_if_fail(vector_field != NULL);
 
     g_free(vector_field->vector);
     g_free(vector_field);
 }
 
-void compute_quit()
-{
+void compute_quit() {
     g_free(surface1);
     g_free(surface2);
 }
 
-void compute_generate_vector_field(vector_field_t *vector_field)
-{
+void compute_generate_vector_field(vector_field_t *vector_field) {
     guint32 f, i, _height;
 
     g_return_if_fail(vector_field != NULL);
@@ -250,17 +237,18 @@ void compute_generate_vector_field(vector_field_t *vector_field)
             compute_generate_sector(f, f, 2, 2, i, 10, vector_field);
 }
 
-static inline void scalar_compute_surface(t_interpol *vector, gint32 width, gint32 height)
-{
+static inline void scalar_compute_surface(t_interpol *vector, gint32 width, gint32 height) {
     gint32 add_dest = 0;
-    for (gint32 j = 0; j < height; ++j)
-    {
-        for (gint32 i = 0; i < width; ++i)
-        {
+    for (gint32 j = 0; j < height; ++j) {
+        for (gint32 i = 0; i < width; ++i) {
             t_interpol *interpol = &vector[add_dest];
             guint32 add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
             byte *ptr_pix = &surface1[add_src];
-            guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24) + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16) + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8) + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF)) >> 8;
+            guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24)
+                                + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16)
+                                + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8)
+                                + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF))
+                            >> 8;
             surface2[add_dest] = (byte)(color > 255 ? 255 : color);
             ++add_dest;
         }
@@ -271,11 +259,13 @@ static const __m256i const_255 = _mm256_set1_epi32(255);
 static const __m256i const_1 = _mm256_set1_epi32(1);
 static const __m256i const_ff = _mm256_set1_epi32(0xFF);
 static const __m256i const_3 = _mm256_set1_epi32(3);
-static const __m256i const_neg3= _mm256_set1_epi32(~3);
+static const __m256i const_neg3 = _mm256_set1_epi32(~3);
+// clang-format off
 static const __m256i pack_mask = _mm256_setr_epi8(
     0, 4, 8, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     0, 4, 8, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 );
+// clang-format on
 
 static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32 height) {
     gint32 add_dest = 0;
@@ -296,12 +286,12 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
                 c[k] = (wgt >> 8) & 0xFF;
                 d[k] = wgt & 0xFF;
             }
-            __m256i x_v = _mm256_loadu_si256((__m256i*)x); // Assuming aligned, but use loadu for safety
-            __m256i y_v = _mm256_loadu_si256((__m256i*)y);
-            __m256i a_v = _mm256_loadu_si256((__m256i*)a);
-            __m256i b_v = _mm256_loadu_si256((__m256i*)b);
-            __m256i c_v = _mm256_loadu_si256((__m256i*)c);
-            __m256i d_v = _mm256_loadu_si256((__m256i*)d);
+            __m256i x_v = _mm256_loadu_si256((__m256i *)x); // Assuming aligned, but use loadu for safety
+            __m256i y_v = _mm256_loadu_si256((__m256i *)y);
+            __m256i a_v = _mm256_loadu_si256((__m256i *)a);
+            __m256i b_v = _mm256_loadu_si256((__m256i *)b);
+            __m256i c_v = _mm256_loadu_si256((__m256i *)c);
+            __m256i d_v = _mm256_loadu_si256((__m256i *)d);
             // add_src_v = y * width + x
             __m256i add_src_v = _mm256_add_epi32(_mm256_mullo_epi32(y_v, width_v), x_v);
             // Gather helper for one pixel position
@@ -310,7 +300,7 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
                 __m256i byte_offsets = _mm256_and_si256(base_addr_v, const_3);
                 __m256i aligned_addr_v = _mm256_and_si256(base_addr_v, const_neg3);
                 // Gather 32-bit words
-                __m256i words = _mm256_i32gather_epi32((int*)surface1, aligned_addr_v, 1);
+                __m256i words = _mm256_i32gather_epi32((int *)surface1, aligned_addr_v, 1);
                 // Shift right by (byte_offset * 8) to extract the byte
                 __m256i shifts = _mm256_slli_epi32(byte_offsets, 3);
                 __m256i bytes = _mm256_srlv_epi32(words, shifts);
@@ -330,14 +320,14 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
             color_v = _mm256_max_epi32(color_v, _mm256_setzero_si256()); // Assuming no negative, but for safety
             __m256i packed = _mm256_shuffle_epi8(color_v, pack_mask);
             // Extract low and high 128-bit lanes
-            __m128i low_lane = _mm256_castsi256_si128(packed); // [c0, c1, c2, c3, 0, 0, ..., 0]
+            __m128i low_lane = _mm256_castsi256_si128(packed);       // [c0, c1, c2, c3, 0, 0, ..., 0]
             __m128i high_lane = _mm256_extracti128_si256(packed, 1); // [c4, c5, c6, c7, 0, 0, ..., 0]
             // Align high lane to positions 4-7 by left-shifting 4 bytes
             __m128i shifted_high = _mm_slli_si128(high_lane, 4); // [0, 0, 0, 0, c4, c5, c6, c7, 0, ..., 0]
             // Merge
             __m128i eight_bytes = _mm_or_si128(low_lane, shifted_high); // [c0, c1, c2, c3, c4, c5, c6, c7, 0, ..., 0]
             // Store first 8 bytes
-            _mm_storel_epi64((__m128i*)(surface2 + add_dest), eight_bytes);
+            _mm_storel_epi64((__m128i *)(surface2 + add_dest), eight_bytes);
             add_dest += 8;
         }
         // Scalar remainder for this row
@@ -346,17 +336,17 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
             guint32 add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
             byte *ptr_pix = &surface1[add_src];
             guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24)
-                             + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16)
-                             + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8)
-                             + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF)) >> 8;
+                                + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16)
+                                + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8)
+                                + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF))
+                            >> 8;
             surface2[add_dest] = (byte)(color > 255 ? 255 : color);
             ++add_dest;
         }
     }
 }
 
-byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
-{
+byte *compute_surface(t_interpol *vector, gint32 width, gint32 height) {
     // -- Temporary disable AVX2 until obtaining smoothness similar or better than scalar version in 4K fullscreen --
     // bool use_simd = avx2_available && (width >= 1280) && (height >= 720);
 
@@ -366,7 +356,7 @@ byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
     // }
     // else
     // {
-        scalar_compute_surface(vector, width, height);
+    scalar_compute_surface(vector, width, height);
     // }
 
     // Swap surfaces
