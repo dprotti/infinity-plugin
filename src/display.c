@@ -62,6 +62,7 @@ static gboolean initialized;
 static gboolean pending_resize;
 static gint32 pending_width;
 static gint32 pending_height;
+static GMutex resize_mutex;
 static gboolean window_closed;
 static gboolean visible;
 
@@ -238,30 +239,56 @@ void display_quit(void)
     initialized = FALSE;
 }
 
+static void regenerate_cosine_tables()
+{
+    g_free(cosw.f);
+    g_free(sinw.f);
+    cosw.f = g_new0(gfloat, width + height + 1);
+    sinw.f = g_new0(gfloat, width + height + 1);
+    for (gint32 i = 0; i < width + height; i++) {
+        cosw.f[i] = cos((gfloat)i / 64);
+        sinw.f[i] = sin((gfloat)i / 64);
+    }
+}
+
+static gboolean regenerate_vector_field()
+{
+    compute_vector_field_destroy(vector_field);
+    vector_field = compute_vector_field_new(width, height);
+    compute_generate_vector_field(vector_field);
+    if (vector_field == NULL) {
+        g_critical("Failed to allocate vector_field on resize to %dx%d", width, height);
+        return FALSE;
+    }
+    compute_resize(width, height);  // Update globals before generating vector field
+    compute_generate_vector_field(vector_field);
+    return TRUE;
+}
+
 gboolean display_resize(gint32 _width, gint32 _height)
 {
     g_mutex_lock(&render_mutex);
     width = _width;
     height = _height;
-
+    regenerate_cosine_tables();
     gboolean screen_ok = allocate_render_buffer();
-    compute_vector_field_destroy(vector_field);
-    vector_field = compute_vector_field_new(width, height);
-    compute_generate_vector_field(vector_field);
-    compute_resize(width, height);
+    gboolean vector_field_ok = regenerate_vector_field();
     g_mutex_unlock(&render_mutex);
-    return screen_ok;
+    return screen_ok && vector_field_ok;
 }
 
 gboolean display_take_resize(gint32 *out_width, gint32 *out_height)
 {
-    if (!pending_resize) {
-        return FALSE;
+    g_mutex_lock(&resize_mutex);
+    if (pending_resize) {
+        *out_width = pending_width;
+        *out_height = pending_height;
+        pending_resize = FALSE;
+        g_mutex_unlock(&resize_mutex);
+        return TRUE;
     }
-    pending_resize = FALSE;
-    *out_width = pending_width;
-    *out_height = pending_height;
-    return TRUE;
+    g_mutex_unlock(&resize_mutex);
+    return FALSE;
 }
 
 gboolean display_window_closed(void)
@@ -476,9 +503,12 @@ inline void display_load_random_effect(t_effect *effect)
 
 void display_notify_resize(gint32 _width, gint32 _height)
 {
+    g_message("display_notify_resize called with %dx%d", _width, _height);
+    g_mutex_lock(&resize_mutex);
     pending_resize = TRUE;
     pending_width = _width;
     pending_height = _height;
+    g_mutex_unlock(&resize_mutex);
     visible = TRUE;
 }
 

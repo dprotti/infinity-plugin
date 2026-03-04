@@ -207,8 +207,8 @@ void compute_resize(gint32 _width, gint32 _height)
     height = _height;
     g_free(surface1);
     g_free(surface2);
-    surface1 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
-    surface2 = (byte *)g_malloc((gulong)(width + 1) * (height + 1));
+    surface1 = (byte *)g_malloc0((gulong)(width + 1) * (height + 1));
+    surface2 = (byte *)g_malloc0((gulong)(width + 1) * (height + 1));
 }
 
 vector_field_t *compute_vector_field_new(gint32 width, gint32 height)
@@ -357,16 +357,17 @@ static inline void simd_compute_surface(t_interpol *vector, gint32 width, gint32
 
 byte *compute_surface(t_interpol *vector, gint32 width, gint32 height)
 {
-    bool use_simd = avx2_available && (width >= 1280) && (height >= 720);
+    // -- Temporary disable AVX2 until obtaining smoothness similar or better than scalar version in 4K fullscreen --
+    // bool use_simd = avx2_available && (width >= 1280) && (height >= 720);
 
-    if (use_simd)
-    {
-        simd_compute_surface(vector, width, height);
-    }
-    else
-    {
+    // if (use_simd)
+    // {
+    //     simd_compute_surface(vector, width, height);
+    // }
+    // else
+    // {
         scalar_compute_surface(vector, width, height);
-    }
+    // }
 
     // Swap surfaces
     byte *ptr_swap = surface2;
