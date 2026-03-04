@@ -20,4 +20,4 @@ jobs:
         with:
           clang-format-version: '17'
           check-path: src/
-          fallback-style: file        # this means it will use your .clang-format
+          fallback-style: none
