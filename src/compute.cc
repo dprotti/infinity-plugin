@@ -238,19 +238,45 @@ void compute_generate_vector_field(vector_field_t *vector_field) {
 }
 
 static inline void scalar_compute_surface(t_interpol *vector, gint32 width, gint32 height) {
-    gint32 add_dest = 0;
+    byte *__restrict__ src = surface1; // tell compiler no aliasing
+    byte *__restrict__ dest = surface2;
+    const gint32 stride = width;
+
     for (gint32 j = 0; j < height; ++j) {
         for (gint32 i = 0; i < width; ++i) {
-            t_interpol *interpol = &vector[add_dest];
-            guint32 add_src = (interpol->coord & 0xFFFF) * width + (interpol->coord >> 16);
-            byte *ptr_pix = &surface1[add_src];
-            guint32 color = ((guint32)(*(ptr_pix)) * (interpol->weight >> 24)
-                                + (guint32)(*(ptr_pix + 1)) * ((interpol->weight & 0xFFFFFF) >> 16)
-                                + (guint32)(*(ptr_pix + width)) * ((interpol->weight & 0xFFFF) >> 8)
-                                + (guint32)(*(ptr_pix + width + 1)) * (interpol->weight & 0xFF))
-                            >> 8;
-            surface2[add_dest] = (byte)(color > 255 ? 255 : color);
-            ++add_dest;
+            const t_interpol *ip = &vector[j * stride + i];
+
+            // Extract source coordinates
+            const guint32 x = ip->coord >> 16;
+            const guint32 y = ip->coord & 0xFFFF;
+
+            // Base pointer to top-left of the 2×2 bilinear block
+            const byte *p = src + (y * stride + x);
+
+            // ──────────────────────────────────────────────────────────────
+            // Software prefetch, cache-friendly
+            // Prefetch 8 elements ahead in current row + a few in next row
+            // (tuned for typical L1/L2 cache line size)
+            // ──────────────────────────────────────────────────────────────
+            if (i + 8 < width) {
+                __builtin_prefetch(&vector[j * stride + i + 8], 0, 3); // read, high temporal locality
+            }
+            if (j + 1 < height && i < 16) {
+                __builtin_prefetch(&vector[(j + 1) * stride + i], 0, 2);
+            }
+
+            // Unpack weights once
+            const guint32 w1 = ip->weight >> 24;
+            const guint32 w2 = (ip->weight >> 16) & 0xFF;
+            const guint32 w3 = (ip->weight >> 8) & 0xFF;
+            const guint32 w4 = ip->weight & 0xFF;
+
+            // Bilinear weighted sum
+            const guint32 sum = w1 * (guint32)p[0] + w2 * (guint32)p[1] + w3 * (guint32)p[stride]
+                                + w4 * (guint32)p[stride + 1];
+
+            // Clamp-free, sum is mathematically ≤ 255*255*4 = 260100 → >>8 never exceeds 255
+            dest[j * stride + i] = (guint8)(sum >> 8);
         }
     }
 }
