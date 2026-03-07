@@ -20,6 +20,10 @@
 #include "music-player.h"
 #include "types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Represents effect related information.
  *
@@ -53,5 +57,9 @@ void effects_append_effect(t_effect *effect);
 gboolean effects_load_effects(Player *player);
 
 void effects_load_random_effect(t_effect *effect);
+
+#ifdef __cplusplus
+} // extern C
+#endif
 
 #endif /* __INFINITY_EFFECTS__ */

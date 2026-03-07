@@ -24,6 +24,10 @@
 
 #define NB_PALETTES 5
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Initializes the display related structures and UI window.
  *
@@ -81,5 +85,9 @@ void display_load_random_effect(t_effect *effect);
 void display_notify_resize(gint32 width, gint32 height);
 void display_notify_close(void);
 void display_notify_visibility(gboolean is_visible);
+
+#ifdef __cplusplus
+} // extern C
+#endif
 
 #endif /* __INFINITY_DISPLAY__ */
