@@ -24,7 +24,7 @@ Install
 
 - git clone https://github.com/dprotti/infinity-plugin
 - cd infinity-plugin
-- meson setup build --prefix=$(pkg-config --variable=prefix audacious)
+- meson setup build --prefix=$(pkg-config --variable=prefix audacious) --buildtype=release -Db_lto=true
 - meson compile -C build
 - sudo meson install -C build
 
