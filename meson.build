@@ -25,22 +25,6 @@ else
   error('Unknown syntax for EXPORT keyword')
 endif
 
-# ────────────────────────────────────────────────────────────────
-# Optional: AVX2 support (only if compiler accepts -mavx2)
-# ────────────────────────────────────────────────────────────────
-
-avx2_args = []
-if cc.has_argument('-mavx2')
-  avx2_args = ['-mavx2']
-  message('Compiler supports -mavx2 → enabling AVX2 code path')
-else
-  message('Compiler does **not** support -mavx2 → AVX2 disabled')
-endif
-add_project_arguments(avx2_args, language : 'cpp')
-if cc.has_argument('-mavx2')
-  add_project_arguments('-DHAVE_AVX2', language : 'cpp')
-endif
-
 config_data = configuration_data()
 config_data.set('EXPORT', export_define)
 config_data.set('INFINITY_DEBUG', get_option('infinity_debug'))

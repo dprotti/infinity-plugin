@@ -8,4 +8,4 @@ to improve it by adding MMX support and creating a project in Sourceforge.
 2009: Infinity moved to Audacious media player based on the old good XMMS.
 2013: the project moved into Github.
 2016: code went from 100% C to mix of C / C++ to match Audacious 3.6 API.
-2026: AVX2 SIMD was added and build switched from autotools to meson.
+2026: Build switched from autotools to meson. C++17 ports and improvements.
