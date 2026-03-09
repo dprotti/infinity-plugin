@@ -1,9 +1,12 @@
+
 #include "ui.h"
+#include "infinity.h"
 #include "input.h"
 
 #include <gtk/gtk.h>
 
 #include <algorithm>
+#include <cassert>
 #include <cstring>
 #include <memory>
 #include <mutex>
@@ -181,56 +184,57 @@ void on_hide(GtkWidget *, gpointer) {
 gboolean on_key_press(GtkWidget *, GdkEventKey *event, gpointer) {
     switch (event->keyval) {
     case GDK_KEY_Right:
-        infinity_queue_key(INFINITY_KEY_RIGHT);
+        g_display_callbacks.queue_key(INFINITY_KEY_RIGHT);
         break;
     case GDK_KEY_Left:
-        infinity_queue_key(INFINITY_KEY_LEFT);
+        g_display_callbacks.queue_key(INFINITY_KEY_LEFT);
         break;
     case GDK_KEY_Up:
-        infinity_queue_key(INFINITY_KEY_UP);
+        g_display_callbacks.queue_key(INFINITY_KEY_UP);
         break;
     case GDK_KEY_Down:
-        infinity_queue_key(INFINITY_KEY_DOWN);
+        g_display_callbacks.queue_key(INFINITY_KEY_DOWN);
         break;
     case GDK_KEY_z:
     case GDK_KEY_Z:
-        infinity_queue_key(INFINITY_KEY_PREV);
+        g_display_callbacks.queue_key(INFINITY_KEY_PREV);
         break;
     case GDK_KEY_x:
     case GDK_KEY_X:
-        infinity_queue_key(INFINITY_KEY_PLAY);
+        g_display_callbacks.queue_key(INFINITY_KEY_PLAY);
         break;
     case GDK_KEY_c:
     case GDK_KEY_C:
-        infinity_queue_key(INFINITY_KEY_PAUSE);
+        g_display_callbacks.queue_key(INFINITY_KEY_PAUSE);
         break;
     case GDK_KEY_v:
     case GDK_KEY_V:
-        infinity_queue_key(INFINITY_KEY_STOP);
+        g_display_callbacks.queue_key(INFINITY_KEY_STOP);
         break;
     case GDK_KEY_b:
     case GDK_KEY_B:
-        infinity_queue_key(INFINITY_KEY_NEXT);
+        g_display_callbacks.queue_key(INFINITY_KEY_NEXT);
         break;
     case GDK_KEY_F11:
-        infinity_queue_key(INFINITY_KEY_FULLSCREEN);
+        g_display_callbacks.queue_key(INFINITY_KEY_FULLSCREEN);
         break;
     case GDK_KEY_Escape:
-        infinity_queue_key(INFINITY_KEY_EXIT_FULLSCREEN);
+        g_display_callbacks.queue_key(INFINITY_KEY_EXIT_FULLSCREEN);
         break;
     case GDK_KEY_F12:
-        infinity_queue_key(INFINITY_KEY_NEXT_PALETTE);
+        g_display_callbacks.queue_key(INFINITY_KEY_NEXT_PALETTE);
         break;
     case GDK_KEY_space:
-        infinity_queue_key(INFINITY_KEY_NEXT_EFFECT);
+        g_display_callbacks.queue_key(INFINITY_KEY_NEXT_EFFECT);
         break;
     case GDK_KEY_Return:
     case GDK_KEY_KP_Enter:
-        infinity_queue_key(INFINITY_KEY_TOGGLE_INTERACTIVE);
+        g_display_callbacks.queue_key(INFINITY_KEY_TOGGLE_INTERACTIVE);
         break;
     default:
         break;
     }
+
     return FALSE;
 }
 
@@ -256,7 +260,7 @@ void notify_current_size() {
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks) {
+gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks &callbacks) {
     if (!ensure_gtk_ready()) {
         return FALSE;
     }
@@ -265,9 +269,11 @@ gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks)
         return TRUE;
     }
 
-    if (callbacks != nullptr) {
-        g_display_callbacks = *callbacks;
-    }
+    assert(callbacks.notify_close);
+    assert(callbacks.notify_resize);
+    assert(callbacks.notify_visibility);
+    assert(callbacks.queue_key);
+    g_display_callbacks = callbacks;
 
     window_instance = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(window_instance), "Infinity");

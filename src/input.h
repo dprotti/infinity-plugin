@@ -1,8 +1,6 @@
 #ifndef __INFINITY_INPUT__
 #define __INFINITY_INPUT__
 
-#include <glib.h>
-
 typedef enum {
     INFINITY_KEY_RIGHT,
     INFINITY_KEY_LEFT,
@@ -19,15 +17,5 @@ typedef enum {
     INFINITY_KEY_NEXT_EFFECT,
     INFINITY_KEY_TOGGLE_INTERACTIVE
 } InfinityKey;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void infinity_queue_key(InfinityKey key);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __INFINITY_INPUT__ */

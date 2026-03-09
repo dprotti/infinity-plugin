@@ -22,11 +22,9 @@
 #include <libaudcore/preferences.h>
 #include <libaudcore/runtime.h>
 
-extern "C" {
 #include "config.h"
 #include "infinity.h"
 #include "types.h"
-}
 
 #define CFGID "infinity"
 
@@ -80,14 +78,12 @@ public:
     bool init();
     void cleanup();
 
-    // No embedded widget; UI toolkit creates its own window.
-    // void * get_gtk_widget ();
-
     void clear();
     void render_multi_pcm(const float *pcm, int channels);
 
 private:
     void load_settings();
+    std::unique_ptr<Infinity> infinity_{nullptr};
 };
 
 EXPORT InfinityPlugin aud_plugin_instance;
@@ -142,8 +138,6 @@ static gboolean is_playing() {
 }
 
 static gchar *get_title() {
-    /*      String title = aud_playlist_get_title(aud_playlist_get_playing());
-            return (gchar*) title.to_raw();*/
     auto playlist = Playlist::playing_playlist();
     String title = playlist.entry_filename(playlist.get_position());
     return (gchar *)(const char *)title;
@@ -203,7 +197,7 @@ static Player player = {.is_playing = is_playing,
 bool InfinityPlugin::init(void) {
     load_settings();
     init_params();
-    infinity_init(&params, &player);
+    infinity_ = std::make_unique<Infinity>(&params, &player);
 
     return TRUE;
 }
@@ -214,11 +208,11 @@ void InfinityPlugin::clear() {
 
 void InfinityPlugin::cleanup(void) {
     g_message("Infinity: cleanup()");
-    infinity_finish();
+    infinity_->finish();
 }
 
 void InfinityPlugin::render_multi_pcm(const float *pcm, int channels) {
-    infinity_render_multi_pcm(pcm, channels);
+    infinity_->render_multi_pcm(pcm, channels);
 }
 
 // clang-format off

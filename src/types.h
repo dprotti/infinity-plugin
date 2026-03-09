@@ -16,8 +16,26 @@
 #ifndef __INFINITY_TYPES__
 #define __INFINITY_TYPES__
 
-#include <stdint.h>
+#include <glib.h> /* gint32 */
 
+#ifdef __cplusplus
+#    include <cstdint>
+#else
+#    include <stdint.h>
+#endif
+
+#ifdef __cplusplus
+using byte = std::uint8_t;
+#else
 typedef uint8_t byte;
+#endif
+
+#ifdef __cplusplus
+using t_color = gint32;
+using t_num_effect = gint32;
+#else
+typedef gint32 t_color;
+typedef gint32 t_num_effect;
+#endif
 
 #endif /* __INFINITY_TYPES__ */

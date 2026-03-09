@@ -1,4 +1,6 @@
+
 #include "ui.h"
+#include "infinity.h"
 #include "input.h"
 
 #include <QApplication>
@@ -16,6 +18,7 @@
 #include <QtGlobal>
 #include <QEventLoop>
 
+#include <cassert>
 #include <memory>
 
 namespace {
@@ -102,47 +105,47 @@ protected:
     void keyPressEvent(QKeyEvent *event) override {
         switch (event->key()) {
         case Qt::Key_Right:
-            infinity_queue_key(INFINITY_KEY_RIGHT);
+            Infinity::queue_key(INFINITY_KEY_RIGHT);
             break;
         case Qt::Key_Left:
-            infinity_queue_key(INFINITY_KEY_LEFT);
+            Infinity::queue_key(INFINITY_KEY_LEFT);
             break;
         case Qt::Key_Up:
-            infinity_queue_key(INFINITY_KEY_UP);
+            Infinity::queue_key(INFINITY_KEY_UP);
             break;
         case Qt::Key_Down:
-            infinity_queue_key(INFINITY_KEY_DOWN);
+            Infinity::queue_key(INFINITY_KEY_DOWN);
             break;
         case Qt::Key_Z:
-            infinity_queue_key(INFINITY_KEY_PREV);
+            Infinity::queue_key(INFINITY_KEY_PREV);
             break;
         case Qt::Key_X:
-            infinity_queue_key(INFINITY_KEY_PLAY);
+            Infinity::queue_key(INFINITY_KEY_PLAY);
             break;
         case Qt::Key_C:
-            infinity_queue_key(INFINITY_KEY_PAUSE);
+            Infinity::queue_key(INFINITY_KEY_PAUSE);
             break;
         case Qt::Key_V:
-            infinity_queue_key(INFINITY_KEY_STOP);
+            Infinity::queue_key(INFINITY_KEY_STOP);
             break;
         case Qt::Key_B:
-            infinity_queue_key(INFINITY_KEY_NEXT);
+            Infinity::queue_key(INFINITY_KEY_NEXT);
             break;
         case Qt::Key_F11:
-            infinity_queue_key(INFINITY_KEY_FULLSCREEN);
+            Infinity::queue_key(INFINITY_KEY_FULLSCREEN);
             break;
         case Qt::Key_Escape:
-            infinity_queue_key(INFINITY_KEY_EXIT_FULLSCREEN);
+            Infinity::queue_key(INFINITY_KEY_EXIT_FULLSCREEN);
             break;
         case Qt::Key_F12:
-            infinity_queue_key(INFINITY_KEY_NEXT_PALETTE);
+            Infinity::queue_key(INFINITY_KEY_NEXT_PALETTE);
             break;
         case Qt::Key_Space:
-            infinity_queue_key(INFINITY_KEY_NEXT_EFFECT);
+            Infinity::queue_key(INFINITY_KEY_NEXT_EFFECT);
             break;
         case Qt::Key_Return:
         case Qt::Key_Enter:
-            infinity_queue_key(INFINITY_KEY_TOGGLE_INTERACTIVE);
+            Infinity::queue_key(INFINITY_KEY_TOGGLE_INTERACTIVE);
             break;
         default:
             break;
@@ -177,7 +180,7 @@ void process_events() {
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks) {
+gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks &callbacks) {
     ensure_app_instance();
     if (QApplication::instance() == nullptr) {
         return FALSE;
@@ -187,9 +190,11 @@ gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks)
         return TRUE;
     }
 
-    if (callbacks != nullptr) {
-        g_display_callbacks = *callbacks;
-    }
+    assert(callbacks.notify_close);
+    assert(callbacks.notify_resize);
+    assert(callbacks.notify_visibility);
+    assert(callbacks.queue_key);
+    g_display_callbacks = callbacks;
 
     window_instance = new InfinityWindow();
     window_instance->resize(width, height);

@@ -16,78 +16,140 @@
 #ifndef __INFINITY_DISPLAY__
 #define __INFINITY_DISPLAY__
 
+#include <functional>
 #include <glib.h>
+#include <string>
 
 #include "compute.h"
 #include "effects.h"
-#include "music-player.h"
+#include "ui.h"
 
-#define NB_PALETTES 5
+#define NB_PALETTES 5  // TODO avoid macro
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+class Display {
+public:
+    Display(Player *_player, std::function<void(InfinityKey)> _queue_key);
 
-/*
- * Initializes the display related structures and UI window.
- *
- * Returns true on success; and false otherwise.
- */
-gboolean display_init(gint32 _width, gint32 _height, gint32 _scale, Player *player);
+    bool init(gint32 _width, gint32 _height, gint32 _scale);
 
-/*
- * Closes the display module.
- */
-void display_quit(void);
+    void quit();
 
-/*
- * Change the size of the display to the new dimension
- * width x height.
- *
- * Returns true on success; and false otherwise.
- */
-gboolean display_resize(gint32 width, gint32 height);
+    bool resize(gint32 _width, gint32 _height);
 
-gboolean display_take_resize(gint32 *out_width, gint32 *out_height);
-gboolean display_window_closed(void);
-gboolean display_is_visible(void);
+    bool take_resize(gint32 *out_w, gint32 *out_h);
 
-/*
- * Set data as the data PCM data of this module.
- *
- * This function makes a copy of data.
- *
- * Warning: be aware that this function locks a mutex.
- *
- * See display_quit().
- */
-void display_set_pcm_data(const float *data, int channels);
+    [[nodiscard]] bool window_closed() const;
+    [[nodiscard]] bool is_visible() const;
 
-void display_show(void);
+    void set_pcm_data(const float *data, int channels);
 
-void change_color(gint32 old_p, gint32 p, gint32 w);
-void display_blur(guint32 effect_index);
-void spectral(t_effect *current_effect);
-void curve(t_effect *current_effect);
+    void show();
 
-/*
- * Makes the plugin screen switch to full-screen mode.
- *
- * See display_init().
- */
-void display_toggle_fullscreen(void);
+    void change_color(gint32 t2, gint32 t1, gint32 w);
 
-void display_exit_fullscreen_if_needed(void);
+    void blur(guint32 effect_index);
 
-void display_save_effect(t_effect *effect);
-void display_load_random_effect(t_effect *effect);
+    struct SpectralResult {
+        gint32 final_y1;
+        gint32 final_y2;
+    };
 
-void display_notify_resize(gint32 width, gint32 height);
-void display_notify_close(void);
-void display_notify_visibility(gboolean is_visible);
+    SpectralResult draw_spectral_amplitudes(t_effect *effect, gint32 halfheight, gint32 halfwidth, gint32 shift);
 
-#ifdef __cplusplus
-} // extern C
-#endif
+    void draw_spectral_closing_line(
+        t_effect *effect, gint32 y1, gint32 y2, gint32 halfheight, gint32 halfwidth, gint32 shift);
+
+    void spectral(t_effect *current_effect);
+
+    void plot_lissajous_phase(gfloat phase_offset_factor, gint32 &k, byte curve_color_index, gfloat amplitude);
+
+    void curve(t_effect *effect);
+
+    void toggle_fullscreen();
+    void exit_fullscreen_if_needed();
+    void save_effect(t_effect *effect);
+    void load_random_effect(t_effect *effect);
+
+    void notify_resize(gint32 w, gint32 h);
+    void notify_close();
+    void notify_visibility(gboolean v);
+
+private:
+    struct color_entry_t {
+        guint8 r;
+        guint8 g;
+        guint8 b;
+    };
+
+    bool allocate_render_buffer();
+
+    bool ui_init_window();
+
+    void generate_colors();
+
+    void display_surface();
+
+    static void assign_max(byte *ptr, byte value) {
+        if (*ptr <= value) {
+            *ptr = value;
+        }
+    }
+    inline void plot1(byte *surf, gint32 x, gint32 y, byte c) const {
+        if (x > 0 && x < width - 3 && y > 0 && y < height - 3) {
+            assign_max(&surf[static_cast<size_t>(x) + static_cast<size_t>(y) * width], c);
+        }
+    }
+
+    inline void plot2(byte *surf, gint32 x, gint32 y, byte c) const {
+        if (x > 0 && x < width - 3 && y > 0 && y < height - 3) {
+            gint32 ty = y * width;
+            assign_max(&surf[static_cast<size_t>(x) + ty], c);
+            assign_max(&surf[static_cast<size_t>(x) + 1 + ty], c);
+            assign_max(&surf[static_cast<size_t>(x) + ty + width], c);
+            assign_max(&surf[static_cast<size_t>(x) + 1 + ty + width], c);
+        }
+    }
+
+    void line(gint32 x1, gint32 y1, gint32 x2, gint32 y2, gint32 c);
+
+    void regenerate_cosine_tables();
+    bool regenerate_vector_field();
+
+    void ui_quit_window();
+
+    static constexpr gint32 PCM_SIZE = 512;
+
+    gint32 width = 0;
+    gint32 height = 0;
+    gint32 scale = 0;
+    Player *player = nullptr;
+    DisplayCallbacks display_callbacks;
+
+    std::mutex render_mutex;
+    std::mutex resize_mutex;
+    std::mutex pcm_mutex;
+
+    std::vector<guint16> render_buffer;
+
+    std::array<std::array<color_entry_t, 256>, NB_PALETTES> color_table;
+    std::array<guint16, 256> current_colors{};
+
+    std::vector<gfloat> cos_table;
+    std::vector<gfloat> sin_table;
+
+    vector_field_t *vector_field = nullptr;
+    byte *surface1 = nullptr;
+
+    std::array<std::array<gint16, PCM_SIZE>, 2> pcm_data{};
+
+    gboolean initialized = false;
+    gboolean pending_resize = false;
+    gint32 pending_width = 0;
+    gint32 pending_height = 0;
+    gboolean window_closed_ = false;
+    gboolean visible = true;
+
+    std::string error_msg;
+};
 
 #endif /* __INFINITY_DISPLAY__ */

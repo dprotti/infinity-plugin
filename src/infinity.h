@@ -16,7 +16,16 @@
 #ifndef __INFINITY_INFINITY__
 #define __INFINITY_INFINITY__
 
+#include <atomic>
+#include <deque>
 #include <glib.h>
+#include <mutex>
+#include <random>
+#include <thread>
+
+#include "display.h"
+#include "effects.h"
+#include "input.h"
 #include "music-player.h"
 
 typedef struct _InfParameters {
@@ -30,22 +39,52 @@ typedef struct _InfParameters {
     gint32 (*get_max_fps)(void);
 } InfParameters;
 
-/*
- * Initializes rendering process.
- *
- * Reads configuration parameters and launches a thread where most of the
- * plugin job gets done.
- */
-void infinity_init(InfParameters *params, Player *player);
+class Infinity {
+public:
+    Infinity(InfParameters *params, Player *player);
+    ~Infinity();
 
-/*
- * Closes rendering process.
- */
-void infinity_finish(void);
+    void finish();
+    void render_multi_pcm(const float *data, int channels);
 
-/*
- * Expected to be called periodically by the player to provide actual PCM data.
- */
-void infinity_render_multi_pcm(const float *data, int channels);
+private:
+    void renderer();
+    void handle_key_event(InfinityKey key);
+    void queue_key(InfinityKey key);
+    void process_key_queue();
+    gint64 calculate_frame_length_usecs(gint32 fps, int line);
+
+    Display display_;
+    std::mt19937 rng_;
+    InfParameters *params_{nullptr};
+    Player *player_{nullptr};
+
+    gint32 width_{0};
+    gint32 height_{0};
+    gint32 scale_{0};
+
+    t_effect current_effect_{};
+    t_color color_{0};
+    t_color old_color_{0};
+    t_num_effect t_last_color_{0};
+    t_num_effect t_last_effect_{0};
+
+    bool must_resize_{false};
+    bool finished_{false};
+    bool resizing_{false};
+    std::mutex resize_mutex_;
+
+    std::atomic<bool> initializing_{false};
+    std::atomic<bool> quiting_{false};
+
+#ifdef INFINITY_DEBUG
+    bool interactive_mode_{false};
+#endif
+
+    std::thread render_thread_;
+
+    std::deque<InfinityKey> key_queue_;
+    std::mutex key_mutex_;
+};
 
 #endif /* __INFINITY_INFINITY__ */

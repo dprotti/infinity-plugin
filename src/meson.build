@@ -3,7 +3,7 @@ src_inc = include_directories('.', '..')
 common_deps = [glib_dep]
 
 libinfinity_sources = files(
-  'infinity.c',
+  'infinity.cc',
   'compute.cc',
   'display.cc',
   'effects.c',
