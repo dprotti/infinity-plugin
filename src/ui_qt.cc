@@ -20,6 +20,8 @@
 
 namespace {
 
+DisplayCallbacks g_display_callbacks = {};
+
 class InfinityWindow final : public QWidget {
 public:
     InfinityWindow() {
@@ -70,22 +72,30 @@ protected:
         const qreal ratio = devicePixelRatioF();
         const gint32 pixel_width = qRound(event->size().width() * ratio);
         const gint32 pixel_height = qRound(event->size().height() * ratio);
-        display_notify_resize(pixel_width, pixel_height);
+        if (g_display_callbacks.notify_resize != nullptr) {
+            g_display_callbacks.notify_resize(pixel_width, pixel_height);
+        }
         QWidget::resizeEvent(event);
     }
 
     void showEvent(QShowEvent *event) override {
-        display_notify_visibility(TRUE);
+        if (g_display_callbacks.notify_visibility != nullptr) {
+            g_display_callbacks.notify_visibility(TRUE);
+        }
         QWidget::showEvent(event);
     }
 
     void hideEvent(QHideEvent *event) override {
-        display_notify_visibility(FALSE);
+        if (g_display_callbacks.notify_visibility != nullptr) {
+            g_display_callbacks.notify_visibility(FALSE);
+        }
         QWidget::hideEvent(event);
     }
 
     void closeEvent(QCloseEvent *event) override {
-        display_notify_close();
+        if (g_display_callbacks.notify_close != nullptr) {
+            g_display_callbacks.notify_close();
+        }
         QWidget::closeEvent(event);
     }
 
@@ -167,7 +177,7 @@ void process_events() {
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height) {
+gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks) {
     ensure_app_instance();
     if (QApplication::instance() == nullptr) {
         return FALSE;
@@ -175,6 +185,10 @@ gboolean ui_init(gint32 width, gint32 height) {
 
     if (window_instance != nullptr) {
         return TRUE;
+    }
+
+    if (callbacks != nullptr) {
+        g_display_callbacks = *callbacks;
     }
 
     window_instance = new InfinityWindow();
@@ -220,7 +234,10 @@ void ui_toggle_fullscreen(void) {
     window_instance->set_fullscreen(!window_instance->is_fullscreen());
     process_events();
     const qreal ratio = window_instance->devicePixelRatioF();
-    display_notify_resize(qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
+    if (g_display_callbacks.notify_resize != nullptr) {
+        g_display_callbacks.notify_resize(
+            qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
+    }
 }
 
 void ui_exit_fullscreen_if_needed(void) {
@@ -231,6 +248,9 @@ void ui_exit_fullscreen_if_needed(void) {
         window_instance->set_fullscreen(false);
         process_events();
         const qreal ratio = window_instance->devicePixelRatioF();
-        display_notify_resize(qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
+        if (g_display_callbacks.notify_resize != nullptr) {
+            g_display_callbacks.notify_resize(
+                qRound(window_instance->width() * ratio), qRound(window_instance->height() * ratio));
+        }
     }
 }

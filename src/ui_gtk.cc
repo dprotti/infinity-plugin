@@ -11,6 +11,8 @@
 
 namespace {
 
+DisplayCallbacks g_display_callbacks = {};
+
 GtkWidget *window_instance = nullptr;
 GtkWidget *drawing_area = nullptr;
 std::vector<guint16> frame_buffer;
@@ -152,20 +154,28 @@ void on_size_allocate(GtkWidget *widget, GtkAllocation *allocation, gpointer) {
     const gint scale = current_scale_factor(widget);
     const gint32 pixel_width = allocation->width * scale;
     const gint32 pixel_height = allocation->height * scale;
-    display_notify_resize(pixel_width, pixel_height);
+    if (g_display_callbacks.notify_resize != nullptr) {
+        g_display_callbacks.notify_resize(pixel_width, pixel_height);
+    }
 }
 
 gboolean on_delete_event(GtkWidget *, GdkEvent *, gpointer) {
-    display_notify_close();
+    if (g_display_callbacks.notify_close != nullptr) {
+        g_display_callbacks.notify_close();
+    }
     return FALSE;
 }
 
 void on_show(GtkWidget *, gpointer) {
-    display_notify_visibility(TRUE);
+    if (g_display_callbacks.notify_visibility != nullptr) {
+        g_display_callbacks.notify_visibility(TRUE);
+    }
 }
 
 void on_hide(GtkWidget *, gpointer) {
-    display_notify_visibility(FALSE);
+    if (g_display_callbacks.notify_visibility != nullptr) {
+        g_display_callbacks.notify_visibility(FALSE);
+    }
 }
 
 gboolean on_key_press(GtkWidget *, GdkEventKey *event, gpointer) {
@@ -239,18 +249,24 @@ void notify_current_size() {
     const gint scale = current_scale_factor(drawing_area);
     const gint32 width = gtk_widget_get_allocated_width(drawing_area) * scale;
     const gint32 height = gtk_widget_get_allocated_height(drawing_area) * scale;
-    display_notify_resize(width, height);
+    if (g_display_callbacks.notify_resize != nullptr) {
+        g_display_callbacks.notify_resize(width, height);
+    }
 }
 
 } // namespace
 
-gboolean ui_init(gint32 width, gint32 height) {
+gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks *callbacks) {
     if (!ensure_gtk_ready()) {
         return FALSE;
     }
 
     if (window_instance != nullptr) {
         return TRUE;
+    }
+
+    if (callbacks != nullptr) {
+        g_display_callbacks = *callbacks;
     }
 
     window_instance = gtk_window_new(GTK_WINDOW_TOPLEVEL);

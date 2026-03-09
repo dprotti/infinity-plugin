@@ -3,23 +3,19 @@
 
 #include <glib.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct DisplayCallbacks {
+    void (*notify_resize)(gint32 width, gint32 height);
+    void (*notify_close)(void);
+    void (*notify_visibility)(gboolean is_visible);
+};
 
-gboolean ui_init(gint32 width, gint32 height);
+// These would resolve either to the Gtk or else the Qt implementation - chosen at compile time.
+
+gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks* callbacks);
 void ui_quit(void);
 void ui_present(const guint16 *pixels, gint32 width, gint32 height);
 void ui_resize(gint32 width, gint32 height);
 void ui_toggle_fullscreen(void);
 void ui_exit_fullscreen_if_needed(void);
-
-void display_notify_resize(gint32 width, gint32 height);
-void display_notify_close(void);
-void display_notify_visibility(gboolean is_visible);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __INFINITY_UI__ */

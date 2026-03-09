@@ -377,7 +377,9 @@ private:
     }
 
     bool ui_init_window() {
-        if (!ui_init(width, height)) {
+        DisplayCallbacks callbacks = {display_notify_resize, display_notify_close, display_notify_visibility};
+
+        if (!ui_init(width, height, &callbacks)) {
             error_msg = "Infinity cannot initialize UI window";
             if (player) {
                 player->notify_critical_error(error_msg.c_str());
