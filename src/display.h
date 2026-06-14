@@ -13,11 +13,11 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef __INFINITY_DISPLAY__
-#define __INFINITY_DISPLAY__
+#pragma once
 
 #include <functional>
 #include <glib.h>
+#include <mutex>
 #include <string>
 
 #include "compute.h"
@@ -28,7 +28,7 @@
 
 class Display {
 public:
-    Display(Player *_player, std::function<void(InfinityKey)> _queue_key);
+    explicit Display(std::function<void(InfinityKey)> _queue_key);
 
     bool init(gint32 _width, gint32 _height, gint32 _scale);
 
@@ -94,6 +94,7 @@ private:
             *ptr = value;
         }
     }
+
     inline void plot1(byte *surf, gint32 x, gint32 y, byte c) const {
         if (x > 0 && x < width - 3 && y > 0 && y < height - 3) {
             assign_max(&surf[static_cast<size_t>(x) + static_cast<size_t>(y) * width], c);
@@ -122,7 +123,7 @@ private:
     gint32 width = 0;
     gint32 height = 0;
     gint32 scale = 0;
-    Player *player = nullptr;
+
     DisplayCallbacks display_callbacks;
 
     std::mutex render_mutex;
@@ -151,5 +152,3 @@ private:
 
     std::string error_msg;
 };
-
-#endif /* __INFINITY_DISPLAY__ */

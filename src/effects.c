@@ -1,3 +1,6 @@
+// Copyright (c) 2000-2026 Julien Carme, CBke, and Duilio Protti
+// SPDX-License-Identifier: GPL-2.0-or-later
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <glib.h>
@@ -27,27 +30,25 @@ void effects_append_effect(t_effect *effect) {
     }
     g_message("Infinity appended effect to '%s'", personal_states);
     g_free(personal_states);
-    for (i = 0; i < sizeof(t_effect); i++)
+    for (i = 0; i < (gint32)sizeof(t_effect); i++)
         fputc(*((byte *)effect + i), f);
     fclose(f);
 }
 
-gboolean effects_load_effects(Player *player) {
+gboolean effects_load_effects() {
     FILE *f;
     gint32 finished = 0;
     gint32 i, b, c, d, e;
 
-    g_return_val_if_fail(player != NULL, FALSE);
-
     f = fopen(EFFECTS_FILE, "r");
     if (f == NULL) {
         g_snprintf(error_msg, 256, "Cannot open file '%s' for loading effects", EFFECTS_FILE);
-        player->notify_critical_error(error_msg);
+        g_critical("%s", error_msg);
         return FALSE;
     }
     while (!finished) {
         byte *ptr_effect = (byte *)&effects[nb_effects];
-        for (i = 0; i < sizeof(t_effect); i += 4) {
+        for (i = 0; i < (gint32)sizeof(t_effect); i += 4) {
             b = fgetc(f);
             if (b != EOF) {
                 c = fgetc(f);
@@ -71,9 +72,8 @@ gboolean effects_load_effects(Player *player) {
                 finished = 1;
             }
         }
-        nb_effects++;
+        if (!finished) nb_effects++;
     }
-    nb_effects--;
     fclose(f);
     return TRUE;
 }
@@ -90,7 +90,7 @@ void effects_load_random_effect(t_effect *effect) {
         gint32 num_effect = rand() % nb_effects;
         gint32 i;
 
-        for (i = 0; i < sizeof(t_effect); i++)
+        for (i = 0; i < (gint32)sizeof(t_effect); i++)
             *((byte *)effect + i) = *((byte *)(&effects[num_effect]) + i);
     }
 }

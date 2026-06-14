@@ -13,12 +13,12 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef __INFINITY_INFINITY__
-#define __INFINITY_INFINITY__
+#pragma once
 
 #include <atomic>
 #include <deque>
 #include <glib.h>
+#include <memory>
 #include <mutex>
 #include <random>
 #include <thread>
@@ -26,38 +26,49 @@
 #include "display.h"
 #include "effects.h"
 #include "input.h"
-#include "music-player.h"
 
-typedef struct _InfParameters {
-    gint32 (*get_width)(void);
-    void (*set_width)(gint32 width);
-    gint32 (*get_height)(void);
-    void (*set_height)(gint32 height);
-    gint32 (*get_scale)(void);
-    gint32 (*get_effect_interval)(void);
-    gint32 (*get_color_interval)(void);
-    gint32 (*get_max_fps)(void);
-} InfParameters;
+#include "config.h"
+#if CAPTURE_BACKEND_PULSEAUDIO
+#  include "pulseaudio_capture.h"
+   using CaptureBackend = PulseAudioCapture;
+#else
+#  include "pipewire_capture.h"
+   using CaptureBackend = PipeWireCapture;
+#endif
+
+// Audio capture backend selected at build time (see meson_options.txt).
+enum class CaptureBknd { PipeWire, PulseAudio };
+
+struct StandaloneParams {
+    gint32 width           = 1280;
+    gint32 height          = 720;
+    gint32 scale           = 1;
+    gint32 effect_interval = 300;
+    gint32 color_interval  = 150;
+    gint32 max_fps         = 30;
+    gint32 sample_rate     = 44100;
+};
 
 class Infinity {
 public:
-    Infinity(InfParameters *params, Player *player);
+    explicit Infinity(const StandaloneParams& params = {});
     ~Infinity();
 
     void finish();
-    void render_multi_pcm(const float *data, int channels);
+
+    [[nodiscard]] bool window_closed() const { return display_.window_closed(); }
 
 private:
     void renderer();
     void handle_key_event(InfinityKey key);
     void queue_key(InfinityKey key);
     void process_key_queue();
-    gint64 calculate_frame_length_usecs(gint32 fps, int line);
+    [[nodiscard]] gint64 calculate_frame_length_usecs(gint32 fps, int line);
 
     Display display_;
+    std::unique_ptr<CaptureBackend> capture_;
+    StandaloneParams params_;
     std::mt19937 rng_;
-    InfParameters *params_{nullptr};
-    Player *player_{nullptr};
 
     gint32 width_{0};
     gint32 height_{0};
@@ -77,14 +88,8 @@ private:
     std::atomic<bool> initializing_{false};
     std::atomic<bool> quiting_{false};
 
-#ifdef INFINITY_DEBUG
-    bool interactive_mode_{false};
-#endif
-
     std::thread render_thread_;
 
     std::deque<InfinityKey> key_queue_;
     std::mutex key_mutex_;
 };
-
-#endif /* __INFINITY_INFINITY__ */

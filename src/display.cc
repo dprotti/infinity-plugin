@@ -22,18 +22,17 @@
 
 #include "config.h"
 #include "display.h"
-#include "music-player.h"
 #include "types.h"
 
-Display::Display(Player *_player, std::function<void(InfinityKey)> _queue_key)
-    : player(_player) {
-    assert(player);
+Display::Display(std::function<void(InfinityKey)> _queue_key) {
     assert(_queue_key);
 
-    DisplayCallbacks callbacks = {[this](gint32 width, gint32 height) { notify_resize(width, height); },
+    DisplayCallbacks callbacks = {
+        [this](gint32 width, gint32 height) { notify_resize(width, height); },
         [this]() { notify_close(); },
         [this](gboolean is_visible) { notify_visibility(is_visible); },
-        _queue_key};
+        _queue_key
+    };
     display_callbacks = callbacks;
 }
 
@@ -45,7 +44,7 @@ bool Display::init(gint32 _width, gint32 _height, gint32 _scale) {
     window_closed_ = false;
     visible = true;
 
-    if (!effects_load_effects(player)) {
+    if (!effects_load_effects()) {
         return false;
     }
     if (!ui_init_window()) {
@@ -343,9 +342,7 @@ bool Display::allocate_render_buffer() {
     render_buffer.assign(static_cast<size_t>(width) * height, 0);
     if (render_buffer.size() != static_cast<size_t>(width) * height) {
         error_msg = "Infinity cannot allocate render buffer";
-        if (player) {
-            player->notify_critical_error(error_msg.c_str());
-        }
+        g_critical("%s", error_msg.c_str());
         return false;
     }
     return true;
@@ -354,9 +351,7 @@ bool Display::allocate_render_buffer() {
 bool Display::ui_init_window() {
     if (!ui_init(width, height, display_callbacks)) {
         error_msg = "Infinity cannot initialize UI window";
-        if (player) {
-            player->notify_critical_error(error_msg.c_str());
-        }
+        g_critical("%s", error_msg.c_str());
         return false;
     }
     return allocate_render_buffer();

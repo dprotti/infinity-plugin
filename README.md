@@ -1,37 +1,100 @@
 Infinity
 ========
 
-Music visualization plugin for [Audacious](http://audacious-media-player.org/).
+Standalone app for audio visualization in Linux.
 
-It generates beautiful light effects. Supports full-screen mode, mouse resizing, preferences
-saving and player control through keyboard.
+Generates charming light effects. Supports full-screen mode and mouse resizing.
 
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
 ------------
 
-Audacious 4.x, Glib 2.28, Qt 6.
+Pipewire 0.3, Gtk+ 3.x, Glib 2.28.
 
 During building needs Meson, Ninja, pkg-config.
 
-**Install deps in Ubuntu/Debian**
+**Install Deps**
 
-`sudo apt-get -y install meson ninja-build pkgconf audacious audacious-dev libglib2.0-dev qt6-base-dev`
+***Ubuntu 22**
 
-Install
+`sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber pipewire-pulse libpulse-dev`
+
+***Ubuntu 24 and newer**
+
+`sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber`
+
+Install & Run
 -------
 
 - git clone https://github.com/dprotti/infinity-plugin
 - cd infinity-plugin
-- meson setup build --prefix=$(pkg-config --variable=prefix audacious) --buildtype=release -Db_lto=true
+- meson setup build -Db_lto=true
+  - **Ubuntu 22 only**: meson setup build -Dcapture-backend=pulseaudio -Db_lto=true
 - meson compile -C build
 - sudo meson install -C build
+- infinity
 
-Run
+After the last step you should see a new window titled "Infinity" reacting to
+audio played on your desktop.
+
+Troubleshooting
+---------------
+
+### Visualization is not reacting to audio
+
+Infinity captures audio from your default output device (speakers/headphones)
+via PipeWire. If the visualization runs but ignores desktop audio, work through
+these steps.
+
+**1. Confirm PipeWire is the active audio server**
+
+```
+pactl info | grep "Server Name"
+```
+
+Expected output contains `PulseAudio (on PipeWire ...)`. If it says only
+`pulseaudio`, PipeWire is not running. Enable it:
+
+```
+sudo apt-get install pipewire-pulse wireplumber
+systemctl --user disable pulseaudio.service pulseaudio.socket
+systemctl --user mask pulseaudio
+systemctl --user enable pipewire pipewire-pulse wireplumber
+systemctl --user start pipewire pipewire-pulse wireplumber
+```
+
+Log out and back in, then re-run the `pactl info` check.
+
+**2. Confirm a monitor source exists**
+
+```
+pactl list sources short | grep monitor
+```
+
+You should see at least one line with `monitor` in the name and status
+`RUNNING` or `IDLE`. If the list is empty, your ALSA driver may not be
+exposing a loopback — check `dmesg | grep snd` for ALSA errors.
+
+**3. Confirm WirePlumber is running**
+
+WirePlumber is the session manager that links Infinity to the monitor source.
+Without it the stream stays in `paused` state indefinitely.
+
+```
+systemctl --user status wireplumber
+```
+
+If it is not active, start it:
+
+```
+systemctl --user enable --now wireplumber
+```
+
+Then restart Infinity.
+
+Options
 ---
-
-Audacious -> View -> Visualizations -> Infinity
 
 Enter / leave full-screen by pressing `F11`.
 
@@ -67,4 +130,3 @@ Old Versions
 ------------
 
 Can be found at Sourceforge: <https://sourceforge.net/projects/infinity-plugin/>
-

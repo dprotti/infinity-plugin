@@ -13,28 +13,19 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include <glib.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "config.h"
 #include "infinity.h"
 #include "types.h"
 
-void Infinity::queue_key(InfinityKey key) {
-    std::lock_guard<std::mutex> lock(key_mutex_);
-    key_queue_.push_back(key);
-}
+#include <glib.h>
+#include <chrono>
 
-Infinity::~Infinity() {
-    finish();
-}
-
-Infinity::Infinity(InfParameters *_params, Player *_player)
-    : display_(_player, [this](InfinityKey key) { queue_key(key); }),
+Infinity::Infinity(const StandaloneParams& params)
+    : display_([this](InfinityKey key) { queue_key(key); }),
+      params_(params),
       rng_(std::random_device{}()) {
-    gint32 _try = 0;
 
+    gint32 _try = 0;
     if (initializing_.load()) {
         while (initializing_.load()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -46,29 +37,29 @@ Infinity::Infinity(InfParameters *_params, Player *_player)
     }
     initializing_.store(true);
 
-    params_ = _params;
-    player_ = _player;
-    width_ = params_->get_width();
-    height_ = params_->get_height();
-    scale_ = params_->get_scale();
+    width_ = params.width;
+    height_ = params.height;
+    scale_ = params.scale;
+
+    if (!effects_load_effects()) {
+        g_critical("Failed to load effects");
+    }
 
     if (!display_.init(width_, height_, scale_)) {
         g_critical("Infinity: cannot initialize display");
         initializing_.store(false);
         finished_ = true;
-        player_->disable_plugin();
         return;
     }
 
-    old_color_ = 0;
-    color_ = 0;
+    capture_ = std::make_unique<CaptureBackend>(display_, CaptureConfig{params_.sample_rate, 2});
+    if (!capture_->start()) {
+        g_critical("Failed to start audio capture");
+    }
 
     finished_ = false;
     must_resize_ = false;
     resizing_ = false;
-#ifdef INFINITY_DEBUG
-    interactive_mode_ = false;
-#endif
     quiting_ = false;
 
     display_.load_random_effect(&current_effect_);
@@ -77,87 +68,34 @@ Infinity::Infinity(InfParameters *_params, Player *_player)
     initializing_.store(false);
 }
 
-void Infinity::finish() {
-    gint32 _try = 0;
+Infinity::~Infinity() {
+    finish();
+}
 
-    if (finished_) {
-        return;
-    }
-    if (initializing_.load()) {
-        g_warning("The plugin have not yet initialized");
-        while (initializing_.load()) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            if (_try++ > 10) {
-                return;
-            }
-        }
-    }
+void Infinity::finish() {
+    if (finished_) { return; }
+
     quiting_ = true;
     finished_ = true;
+
+    if (capture_) { capture_->stop(); }
 
     if (render_thread_.joinable()) {
         render_thread_.join();
     }
 
-    {
-        std::lock_guard<std::mutex> lock(key_mutex_);
-        key_queue_.clear();
-    }
-
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     display_.quit();
 
     g_message("Infinity shuts down");
 }
 
-void Infinity::render_multi_pcm(const float *data, int channels) {
-    if (!initializing_.load() && !quiting_) {
-        display_.set_pcm_data(data, channels);
-    }
+void Infinity::queue_key(InfinityKey key) {
+    std::lock_guard<std::mutex> lock(key_mutex_);
+    key_queue_.push_back(key);
 }
 
 void Infinity::handle_key_event(InfinityKey key) {
     switch (key) {
-    case INFINITY_KEY_RIGHT: {
-        if (player_->is_playing()) {
-            player_->seek(5000);
-        }
-        break;
-    }
-    case INFINITY_KEY_LEFT: {
-        if (player_->is_playing()) {
-            player_->seek(-5000);
-        }
-        break;
-    }
-    case INFINITY_KEY_UP: {
-        player_->adjust_volume(5);
-        break;
-    }
-    case INFINITY_KEY_DOWN: {
-        player_->adjust_volume(-5);
-        break;
-    }
-    case INFINITY_KEY_PREV: {
-        player_->previous();
-        break;
-    }
-    case INFINITY_KEY_PLAY: {
-        player_->play();
-        break;
-    }
-    case INFINITY_KEY_PAUSE: {
-        player_->pause();
-        break;
-    }
-    case INFINITY_KEY_STOP: {
-        player_->stop();
-        break;
-    }
-    case INFINITY_KEY_NEXT: {
-        player_->next();
-        break;
-    }
     case INFINITY_KEY_FULLSCREEN: {
         display_.toggle_fullscreen();
         break;
@@ -177,13 +115,6 @@ void Infinity::handle_key_event(InfinityKey key) {
     case INFINITY_KEY_NEXT_EFFECT: {
         display_.load_random_effect(&current_effect_);
         t_last_effect_ = 0;
-        break;
-    }
-    case INFINITY_KEY_TOGGLE_INTERACTIVE: {
-#ifdef INFINITY_DEBUG
-        interactive_mode_ = !interactive_mode_;
-        g_message("Infinity %s interactive mode", interactive_mode_ ? "entered" : "leaved");
-#endif
         break;
     }
     default: {
@@ -216,16 +147,12 @@ void Infinity::renderer() {
     using Clock = std::chrono::steady_clock;
     using Microseconds = std::chrono::microseconds;
 
-    gint32 fps = params_->get_max_fps();
+    gint32 fps = params_.max_fps;
     gint64 frame_length = calculate_frame_length_usecs(fps, __LINE__);
-    gint32 t_between_effects = params_->get_effect_interval();
-    gint32 t_between_colors = params_->get_color_interval();
+    gint32 t_between_effects = params_.effect_interval;
+    gint32 t_between_colors = params_.color_interval;
 
     for (;;) {
-        if (display_.window_closed()) {
-            player_->disable_plugin();
-            break;
-        }
         if (!display_.is_visible()) {
             if (finished_) {
                 break;
@@ -249,12 +176,8 @@ void Infinity::renderer() {
         }
 
         if (must_resize_) {
-            if (!display_.resize(width_, height_)) {
-                player_->disable_plugin();
-                break;
-            }
-            params_->set_width(width_);
-            params_->set_height(height_);
+            params_.width = width_;
+            params_.height = height_;
             must_resize_ = false;
             {
                 std::lock_guard<std::mutex> lock(resize_mutex_);
@@ -275,36 +198,19 @@ void Infinity::renderer() {
         ++t_last_effect_;
 
         if (t_last_effect_ % t_between_effects == 0) {
-#ifdef INFINITY_DEBUG
-            if (!interactive_mode_) {
-                display_.load_random_effect(&current_effect_);
-                t_last_effect_ = 0;
-                t_between_effects = params_->get_effect_interval();
-            }
-#else
             display_.load_random_effect(&current_effect_);
             t_last_effect_ = 0;
-            t_between_effects = params_->get_effect_interval();
-#endif
+            t_between_effects = params_.effect_interval;
         }
 
         if (t_last_color_ % t_between_colors == 0) {
-#ifdef INFINITY_DEBUG
-            if (!interactive_mode_) {
-                old_color_ = color_;
-                color_ = std::uniform_int_distribution<int>(0, NB_PALETTES - 1)(rng_);
-                t_last_color_ = 0;
-                t_between_colors = params_->get_color_interval();
-            }
-#else
             old_color_ = color_;
             color_ = std::uniform_int_distribution<int>(0, NB_PALETTES - 1)(rng_);
             t_last_color_ = 0;
-            t_between_colors = params_->get_color_interval();
-#endif
+            t_between_colors = params_.color_interval;
         }
 
-        gint32 new_fps = params_->get_max_fps();
+        gint32 new_fps = params_.max_fps;
         if (new_fps != fps) {
             fps = new_fps;
             frame_length = calculate_frame_length_usecs(fps, __LINE__);

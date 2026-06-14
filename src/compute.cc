@@ -270,7 +270,7 @@ static inline void scalar_compute_surface(t_interpol *vector, gint32 width, gint
             const guint32 sum = w1 * (guint32)p[0] + w2 * (guint32)p[1] + w3 * (guint32)p[stride]
                                 + w4 * (guint32)p[stride + 1];
 
-            // Clamp-free, sum is mathematically ≤ 255*255*4 = 260100 → >>8 never exceeds 255
+            // Clamp-free, sum is mathematically ≤ 255*255*4 = 260100 -> >>8 never exceeds 255
             dest[j * stride + i] = (guint8)(sum >> 8);
         }
     }

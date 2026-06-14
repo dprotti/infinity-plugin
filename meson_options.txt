@@ -1,2 +1,8 @@
-option('infinity_debug', type: 'boolean', value: false, description: 'Enable Infinity debug logging')
 option('vectorization', type: 'boolean', value: true, description: 'Enable auto vectorization for GCC')
+option(
+  'capture-backend',
+  type: 'combo',
+  choices: ['pipewire', 'pulseaudio'],
+  value: 'pipewire',
+  description: 'Audio capture backend. Use pipewire (default) or pulseaudio as a fallback for systems where PipeWire stream autoconnect does not work.',
+)
