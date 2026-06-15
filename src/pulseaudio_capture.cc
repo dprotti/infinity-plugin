@@ -22,6 +22,7 @@ struct PulseAudioCapture::Impl {
     CaptureConfig config;
 
     std::atomic<bool> running{false};
+    std::atomic<bool> shutting_down{false};
     std::thread       capture_thread;
 
     // PulseAudio async objects – all owned by the mainloop thread.
@@ -46,7 +47,9 @@ struct PulseAudioCapture::Impl {
             // Ask for server info so we can learn the default sink name.
             pa_context_get_server_info(ctx, on_server_info, impl);
         } else if (state == PA_CONTEXT_FAILED || state == PA_CONTEXT_TERMINATED) {
-            g_critical("PulseAudio: context failed or terminated");
+            if (!impl->shutting_down.load()) {
+                g_critical("PulseAudio: context failed or terminated");
+            }
             pa_threaded_mainloop_signal(impl->mainloop, 0);
         }
     }
@@ -116,8 +119,10 @@ struct PulseAudioCapture::Impl {
             g_message("PulseAudio: stream READY – visualizations will react to audio");
             pa_threaded_mainloop_signal(impl->mainloop, 0);
         } else if (state == PA_STREAM_FAILED || state == PA_STREAM_TERMINATED) {
-            g_critical("PulseAudio: stream failed or terminated: %s",
-                       pa_strerror(pa_context_errno(pa_stream_get_context(s))));
+            if (!impl->shutting_down.load()) {
+                g_critical("PulseAudio: stream failed or terminated: %s",
+                        pa_strerror(pa_context_errno(pa_stream_get_context(s))));
+            }
             pa_threaded_mainloop_signal(impl->mainloop, 0);
         }
     }
@@ -214,6 +219,7 @@ void PulseAudioCapture::stop() {
     if (!impl_->mainloop) return;
 
     impl_->running.store(false);
+    impl_->shutting_down.store(true);
 
     pa_threaded_mainloop_lock(impl_->mainloop);
 

@@ -246,6 +246,11 @@ gboolean on_window_state(GtkWidget *, GdkEventWindowState *event, gpointer) {
     return FALSE;
 }
 
+void on_destroy(GtkWidget *, gpointer) {
+    window_instance = nullptr;
+    drawing_area = nullptr;
+}
+
 void notify_current_size() {
     if (drawing_area == nullptr) {
         return;
@@ -297,6 +302,7 @@ gboolean ui_init(gint32 width, gint32 height, const DisplayCallbacks &callbacks)
     g_signal_connect(window_instance, "delete-event", G_CALLBACK(on_delete_event), nullptr);
     g_signal_connect(window_instance, "show", G_CALLBACK(on_show), nullptr);
     g_signal_connect(window_instance, "hide", G_CALLBACK(on_hide), nullptr);
+    g_signal_connect(window_instance, "destroy", G_CALLBACK(on_destroy), nullptr);
     g_signal_connect(window_instance, "key-press-event", G_CALLBACK(on_key_press), nullptr);
     g_signal_connect(window_instance, "window-state-event", G_CALLBACK(on_window_state), nullptr);
     g_signal_connect(drawing_area, "draw", G_CALLBACK(on_draw), nullptr);
