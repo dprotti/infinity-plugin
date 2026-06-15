@@ -1,18 +1,17 @@
 Infinity
 ========
 
-Standalone app for audio visualization in Linux.
-
-Generates charming light effects. Supports full-screen mode and mouse resizing.
+A lightweight audio visualizer for Linux.
+Reacts to whatever's playing on your desktop and renders it as fluid, generative light patterns.
 
 ![Screenshot of Infinity](https://a.fsdn.com/con/app/proj/infinity-plugin/screenshots/Infinity.png)
 
 Requirements
 ------------
 
-Pipewire 0.3, Gtk+ 3.x, Glib 2.28.
+Runtime: PipeWire 0.3, GTK+ 3.x, GLib 2.28
 
-During building needs Meson, Ninja, pkg-config.
+Build tools: Meson, Ninja, pkg-config
 
 **Install Deps**
 
@@ -20,18 +19,27 @@ Tested in Ubuntu 22 & 24.
 
 `sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber pipewire-pulse libpulse-dev`
 
-Install & Run
--------
+Build & Install
+---------------
 
-- git clone https://github.com/dprotti/infinity-plugin
-- cd infinity-plugin
-- meson setup build -Db_lto=true
-- meson compile -C build
-- sudo meson install -C build
-- infinity
+```
+git clone https://github.com/dprotti/infinity-plugin
+cd infinity-plugin
+meson setup build -Db_lto=true
+meson compile -C build
+sudo meson install -C build
+```
 
-After the last step you should see a new window titled "Infinity" reacting to
-audio played on your desktop.
+Then just run:
+```
+infinity
+```
+
+A window titled "Infinity" should appear and start reacting to audio playing on your desktop.
+
+![Infinity Window](https://private-user-images.githubusercontent.com/286028572/608171578-d9d5d24d-624f-46e0-9542-4b01ce90cb59.png "Infinity window")
+
+Enter / leave full-screen by pressing `F11`.
 
 Troubleshooting
 ---------------
@@ -88,38 +96,24 @@ systemctl --user enable --now wireplumber
 
 Then restart Infinity.
 
-Options
----
-
-Enter / leave full-screen by pressing `F11`.
-
-![Screenshot of Infinity Settings](https://cloud.githubusercontent.com/assets/2084073/16421084/2d45d54a-3d2a-11e6-9919-3d6aa5733743.png "Infinity Settings")
-
-Playing Around
---------------
-
-See [how to add new effects or how to control the plugin with the keyboard](https://github.com/dprotti/infinity-plugin/blob/master/minidocs/controlkeys.md).
-
 Authors
 -------
-- Duilio Protti (C) 2004-2026 Current maintainer
-- James Carthew (c) 2026 Modernization: Audacious 4.x support, Qt UI, Meson build, bug fixes
-- CBke (C) 2016 <https://github.com/CBke> Nice patches
-- John Lightsey (C) 2004 <john@nixnuts.net> Portability fixes and GPL License compliance
-- Jean Delvare (C) 2004 <khali@linux-fr.org> Some nice patches
-- Will Tatam (C) 2004 <wtatam@premierit.com> Online source RPMs <http://apt.premierithosting.com/FC2/i386/SRPMS.premierit/>
-- Haavard Kvaalen (C) 2000 <havardk@xmms.org> Converted original hand made Makefile to automake/autoconf/libtool
-- Chris Lea (C) 2000 <chrislea@luciddesign.com> Made RPMs
-- Mitja Horvat (C) 2000 <Mitja.Horvat@hermes.si> Misc optimisations
-- Julien Carme (c) 2000 Original author
+- Duilio Protti - maintainer, 2004-2026
+- James Carthew - audacious 4.x support, Qt UI, Meson build, bug fixes, 2026
+- CBke - patches, 2016
+- John Lightsey - portability fixes and GPL License compliance, 2004
+- Jean Delvare - patches, 2004
+- Will Tatam - RPM packaging, 2004
+- Haavard Kvaalen - autotools build, 2000
+- Chris Lea (C) - RPM packaging, 2000
+- Mitja Horvat - optimisations, 2000
+- Julien Carme - original author, 2000
 
 Contributions
 -------------
 
-Your feedback or help would be really appreciated.
-
-If you found a bug please report it at
-<https://github.com/dprotti/infinity-plugin/issues>.
+Contributions and bug reports are welcome!
+If something's broken or you have an idea, open an issue at https://github.com/dprotti/infinity-plugin/issues
 
 Old Versions
 ------------
