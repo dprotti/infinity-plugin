@@ -17,7 +17,9 @@ Build tools: Meson, Ninja, pkg-config
 
 Tested in Ubuntu 22 & 24.
 
-`sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber pipewire-pulse libpulse-dev`
+```
+sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber pipewire-pulse libpulse-dev
+```
 
 Build & Install
 ---------------
