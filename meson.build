@@ -38,7 +38,7 @@ if cc.get_id() == 'gcc'
     language: 'c',
   )
   if get_option('vectorization')
-    add_project_arguments('-ftree-vectorize', language: 'c')
+    add_project_arguments('-ftree-vectorize', language: ['c', 'cpp'])
   endif
 endif
 
