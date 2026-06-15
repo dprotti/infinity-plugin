@@ -37,7 +37,7 @@ infinity
 
 A window titled "Infinity" should appear and start reacting to audio playing on your desktop.
 
-![Infinity Window](https://private-user-images.githubusercontent.com/286028572/608171578-d9d5d24d-624f-46e0-9542-4b01ce90cb59.png "Infinity window")
+![Infinity Window](minidocs/inf_window.png)
 
 Enter / leave full-screen by pressing `F11`.
 
