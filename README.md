@@ -16,13 +16,9 @@ During building needs Meson, Ninja, pkg-config.
 
 **Install Deps**
 
-***Ubuntu 22**
+Tested in Ubuntu 22 & 24.
 
 `sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber pipewire-pulse libpulse-dev`
-
-***Ubuntu 24 and newer**
-
-`sudo apt-get -y install meson ninja-build pkgconf libglib2.0-dev libgtk-3-dev libpipewire-0.3-dev wireplumber`
 
 Install & Run
 -------
@@ -30,7 +26,6 @@ Install & Run
 - git clone https://github.com/dprotti/infinity-plugin
 - cd infinity-plugin
 - meson setup build -Db_lto=true
-  - **Ubuntu 22 only**: meson setup build -Dcapture-backend=pulseaudio -Db_lto=true
 - meson compile -C build
 - sudo meson install -C build
 - infinity

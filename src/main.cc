@@ -11,7 +11,7 @@ static void print_usage(const char* argv0) {
         "Usage: %s [OPTIONS]\n\n"
         "Options:\n"
         "  --help                 Show this help\n"
-        "  --capture=<backend>    Audio capture backend: pipewire (default) or pulseaudio\n"
+        "  --capture=<backend>    Audio capture backend: pipewire or pulseaudio (default)\n"
         "                         The backend must match the one selected at build time.\n"
         "                         Rebuild with -Dcapture-backend=<backend> to change it.\n\n"
         "Build-time backend: %s\n",
